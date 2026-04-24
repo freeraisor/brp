@@ -1,28 +1,413 @@
 <section class="actor tab effects {{tab.cssClass}}" data-group="primary" data-tab="effects">
-
-    <div class="effects-grid">
-      <div class="diff-label left">{{localize 'BRP.sourceItem'}}</div>
-      <div class="diff-label centre">{{localize 'BRP.effect'}}</div>
-      <div class="diff-label centre">{{localize 'BRP.amount'}}</div>
-      <div class="diff-label centre">{{localize 'BRP.active'}}</div>
-    </div>
-
-    <ol class="gr-list">
-    {{#each effects as |effect|}}
-      <li class="item item-edit effects-grid" data-item-id = "{{effect.id}}" data-document-class="Item">
-        <div class="effect-source left rollable" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'BRP.sourceItem')}}">{{effect.sourceName}}</div>
-        <div class="centre truncate" data-tooltip="{{effect.name}}">{{effect.name}}</div>
-        <div class="centre">{{effect.value}}</div>
-        {{#if effect.isActive}}
-        <div class="centre" data-tooltip="{{localize 'BRP.active'}}">
-          <a class="mediumIcon"><i class="item-control fas fa-person-rays"></i></a>
+  {{#with effectsView as |effects|}}
+    <section class="brp-effects-refresh {{#if effects.readOnly}}is-read-only{{/if}}">
+      <header class="brp-effects-refresh-titlebar">
+        <div class="brp-effects-refresh-heading">
+          <i class="fas fa-bolt"></i>
+          <span>{{effects.header.title}}</span>
+          {{#if effects.gmOnly}}
+            <span class="brp-effects-refresh-mode-badge">
+              <i class="fas fa-shield-halved"></i>
+              <span>{{effects.header.gmOnlyLabel}}</span>
+            </span>
+          {{/if}}
         </div>
-        {{else}}
-        <div class="centre" data-tooltip="{{localize 'BRP.inactive'}}">
-          <a class="mediumIcon fade"><i class="item-control fas fa-person-rays"></i></a>
+
+        <div class="brp-effects-refresh-controls">
+          {{#if effects.header.showLock}}
+            <div class="brp-effects-refresh-lock">
+              <i class="fas fa-lock"></i>
+              <span>{{effects.header.lockLabel}}</span>
+            </div>
+          {{/if}}
         </div>
-        {{/if}}
-      </li>
-    {{/each}}
-    </ol>
+      </header>
+
+      <section class="brp-effects-refresh-toolbar">
+        <div class="brp-effects-refresh-toolbar-label">{{localize 'BRP.filters'}}</div>
+
+        <div class="brp-effects-refresh-filter-chips">
+          {{#each effects.toolbar.filters as |chip|}}
+            <button
+              type="button"
+              class="brp-effects-refresh-filter-chip {{#if chip.active}}is-active{{/if}}"
+              data-action="{{chip.action}}"
+              data-filter="{{chip.id}}"
+              aria-pressed="{{#if chip.active}}true{{else}}false{{/if}}"
+            >
+              <span>{{chip.label}}</span>
+              <span class="brp-effects-refresh-filter-count">{{chip.count}}</span>
+            </button>
+          {{/each}}
+        </div>
+
+        <div class="brp-effects-refresh-toolbar-spacer"></div>
+
+        <button
+          type="button"
+          class="brp-effects-refresh-add-button {{#if effects.toolbar.addAction.disabled}}is-disabled{{/if}}"
+          {{#if effects.toolbar.addAction.disabled}}disabled{{else}}data-action="{{effects.toolbar.addAction.action}}"{{/if}}
+        >
+          <i class="fas fa-plus"></i>
+          <span>{{effects.toolbar.addAction.label}} {{localize 'BRP.effect'}}</span>
+        </button>
+      </section>
+
+      {{#if effects.groups.length}}
+        <div class="brp-effects-refresh-groups">
+          {{#each effects.groups as |group|}}
+            <section class="brp-effects-refresh-group {{#if group.collapsed}}is-collapsed{{/if}}" data-effects-group="{{group.id}}" data-source-type="{{group.id}}">
+              <header class="brp-effects-refresh-group-header" data-source-type="{{group.id}}">
+                <button
+                  type="button"
+                  class="brp-effects-refresh-group-toggle"
+                  data-action="{{group.action}}"
+                  data-group-id="{{group.id}}"
+                  aria-expanded="{{#if group.collapsed}}false{{else}}true{{/if}}"
+                  data-tooltip="{{#if group.collapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}"
+                >
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+
+                <span class="brp-effects-refresh-group-icon" aria-hidden="true">
+                  {{#if (eq group.id 'items')}}<i class="fas fa-cube"></i>{{/if}}
+                  {{#if (eq group.id 'status')}}<i class="fas fa-circle-exclamation"></i>{{/if}}
+                  {{#if (eq group.id 'wounds')}}<i class="fas fa-bandage"></i>{{/if}}
+                  {{#if (eq group.id 'magic')}}<i class="fas fa-wand-sparkles"></i>{{/if}}
+                  {{#if (eq group.id 'injuries')}}<i class="fas fa-heart-crack"></i>{{/if}}
+                  {{#if (eq group.id 'manual')}}<i class="fas fa-pen"></i>{{/if}}
+                </span>
+
+                <h3 class="brp-effects-refresh-group-title">{{group.label}}</h3>
+                <span class="brp-effects-refresh-group-count">{{group.count}}</span>
+                <span class="brp-effects-refresh-group-line"></span>
+              </header>
+
+              <div class="brp-effects-refresh-group-body" {{#if group.collapsed}}hidden{{/if}}>
+                <ol class="brp-effects-refresh-card-list">
+                  {{#each group.rows as |row|}}
+                    <li
+                      class="item brp-effects-refresh-card {{#unless row.isActive}}is-inactive{{/unless}} {{#if row.hidden}}is-hidden{{/if}} {{#if row.isCompatibilityOnly}}is-compatibility-only{{/if}}"
+                      data-effects-row-id="{{row.id}}"
+                      data-source-type="{{row.sourceType}}"
+                      data-search-text="{{row.searchText}}"
+                      data-effect-id="{{row.effectId}}"
+                      data-parent-id="{{row.parentId}}"
+                      data-change-index="{{row.changeIndex}}"
+                    >
+                      <div class="brp-effects-refresh-card-icon" aria-hidden="true">
+                        {{#if (eq row.sourceType 'items')}}<i class="fas fa-cube"></i>{{/if}}
+                        {{#if (eq row.sourceType 'status')}}<i class="fas fa-circle-exclamation"></i>{{/if}}
+                        {{#if (eq row.sourceType 'wounds')}}<i class="fas fa-bandage"></i>{{/if}}
+                        {{#if (eq row.sourceType 'magic')}}<i class="fas fa-wand-sparkles"></i>{{/if}}
+                        {{#if (eq row.sourceType 'injuries')}}<i class="fas fa-heart-crack"></i>{{/if}}
+                        {{#if (eq row.sourceType 'manual')}}<i class="fas fa-pen"></i>{{/if}}
+                      </div>
+
+                      <div class="brp-effects-refresh-card-main">
+                        <div class="brp-effects-refresh-card-title-row">
+                          {{#if row.parentActions.openEffect}}
+                            <button
+                              type="button"
+                              class="brp-effects-refresh-card-name"
+                              data-action="{{row.parentActions.openEffect.action}}"
+                              data-document-class="{{row.parentActions.openEffect.documentClass}}"
+                              data-parent-id="{{row.parentActions.openEffect.parentId}}"
+                              data-effect-id="{{row.parentActions.openEffect.effectId}}"
+                              data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'BRP.effectsActionOpenEffect')}}"
+                            >
+                              <span class="truncate">{{row.name}}</span>
+                            </button>
+                          {{else}}
+                            <div class="brp-effects-refresh-card-name">
+                              <span class="truncate">{{row.name}}</span>
+                            </div>
+                          {{/if}}
+
+                          {{#if row.hidden}}
+                            <span class="brp-effects-refresh-inline-badge is-hidden">
+                              <i class="fas fa-eye-slash"></i>
+                              <span>{{localize 'BRP.healthSilhouetteHidden'}}</span>
+                            </span>
+                          {{/if}}
+                        </div>
+
+                        <div class="brp-effects-refresh-card-source-row">
+                          {{#if row.parentActions.openSource}}
+                            <button
+                              type="button"
+                              class="brp-effects-refresh-source-link"
+                              data-action="{{row.parentActions.openSource.action}}"
+                              data-document-class="{{row.parentActions.openSource.documentClass}}"
+                              data-item-id="{{row.parentActions.openSource.itemId}}"
+                              data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'BRP.effectsActionOpenSource')}}"
+                            >
+                              {{row.source.label}}
+                            </button>
+                          {{else}}
+                            <span class="brp-effects-refresh-source-text">{{row.source.label}}</span>
+                          {{/if}}
+
+                          {{#if row.duration.hasTimerNote}}
+                            <span class="brp-effects-refresh-card-meta-dot" aria-hidden="true">&middot;</span>
+                            <span class="brp-effects-refresh-card-timer">{{row.duration.timerNote}}</span>
+                          {{/if}}
+                        </div>
+                      </div>
+
+                      <div class="brp-effects-refresh-card-target">
+                        <span class="brp-effects-refresh-card-target-category">{{row.targetCategoryLabel}}</span>
+                        <span class="brp-effects-refresh-card-target-name">{{row.targetLabel}}</span>
+                      </div>
+
+                      <div class="brp-effects-refresh-card-modifier is-{{row.modifier.signClass}}">
+                        <span class="brp-effects-refresh-card-modifier-label">{{row.modifier.modeLabel}}</span>
+                        <span class="brp-effects-refresh-card-modifier-value">{{row.modifier.valueDisplay}}</span>
+                      </div>
+
+                      <div class="brp-effects-refresh-card-duration">
+                        <span class="brp-effects-refresh-duration-badge is-{{row.duration.id}}">
+                          {{#if (eq row.duration.id 'permanent')}}<i class="fas fa-lock"></i>{{/if}}
+                          {{#if (eq row.duration.id 'timed')}}<i class="fas fa-clock"></i>{{/if}}
+                          {{#if (eq row.duration.id 'conditional')}}<i class="fas fa-link"></i>{{/if}}
+                          <span>{{row.duration.label}}</span>
+                        </span>
+                      </div>
+
+                      <div class="brp-effects-refresh-card-actions {{#unless row.parentActions.toggleActive}}{{#unless row.rowActions.menu}}is-empty{{/unless}}{{/unless}}">
+                        {{#if row.parentActions.toggleActive}}
+                          <button
+                            type="button"
+                            class="brp-effects-refresh-toggle {{#if row.parentActions.toggleActive.active}}is-on{{/if}} {{#if row.parentActions.toggleActive.disabled}}is-disabled{{/if}}"
+                            {{#if row.parentActions.toggleActive.disabled}}disabled{{else}}data-action="{{row.parentActions.toggleActive.action}}" data-effect-id="{{row.parentActions.toggleActive.effectId}}" data-parent-id="{{row.parentActions.toggleActive.parentId}}"{{/if}}
+                            aria-pressed="{{#if row.parentActions.toggleActive.active}}true{{else}}false{{/if}}"
+                            data-tooltip="{{row.parentActions.toggleActive.label}}"
+                          >
+                            <span class="brp-effects-refresh-toggle-knob"></span>
+                          </button>
+                        {{/if}}
+
+                        {{#if row.rowActions.menu}}
+                          <button
+                            type="button"
+                            class="brp-effects-refresh-card-action"
+                            data-action="{{row.rowActions.menu.action}}"
+                            data-row-id="{{row.rowActions.menu.rowId}}"
+                            data-parent-id="{{row.rowActions.menu.parentId}}"
+                            data-effect-id="{{row.rowActions.menu.effectId}}"
+                            data-change-index="{{row.rowActions.menu.changeIndex}}"
+                            data-tooltip="{{localize 'BRP.options'}}"
+                          >
+                            <i class="fas fa-ellipsis-h"></i>
+                          </button>
+                        {{/if}}
+                      </div>
+                    </li>
+                  {{/each}}
+                </ol>
+              </div>
+            </section>
+          {{/each}}
+        </div>
+      {{/if}}
+
+      {{#if effects.emptyState.active}}
+        <div class="brp-effects-refresh-empty">{{effects.emptyState.message}}</div>
+      {{/if}}
+
+      <div class="brp-effects-refresh-modal-overlay" data-effects-modal-overlay hidden>
+        <section class="brp-effects-refresh-modal" role="dialog" aria-modal="true" aria-labelledby="brp-effects-refresh-modal-title">
+          <header class="brp-effects-refresh-modal-header">
+            <h3 id="brp-effects-refresh-modal-title">
+              <i class="fas fa-bolt"></i>
+              <span>{{effects.toolbar.addAction.label}} {{localize 'BRP.effect'}}</span>
+            </h3>
+
+            <button type="button" class="brp-effects-refresh-modal-close" data-action="effectsModalClose" data-tooltip="{{localize 'BRP.closeCard'}}">
+              <i class="fas fa-times"></i>
+            </button>
+          </header>
+
+          <div class="brp-effects-refresh-modal-body">
+            <section class="brp-effects-refresh-field-group">
+              <div class="brp-effects-refresh-field-group-title">Identification</div>
+
+              <label class="brp-effects-refresh-field">
+                <span>{{localize 'BRP.name'}}</span>
+                <input type="text" value="" data-effects-field="name" placeholder="{{localize 'BRP.name'}}" />
+              </label>
+
+              <div class="brp-effects-refresh-field-row is-two">
+                <label class="brp-effects-refresh-field">
+                  <span>Icon</span>
+                  <input type="text" value="" data-effects-field="icon" placeholder="icons/svg/aura.svg" />
+                </label>
+              </div>
+
+              <label class="brp-effects-refresh-field">
+                <span>{{localize 'BRP.description'}}</span>
+                <textarea data-effects-field="description"></textarea>
+              </label>
+            </section>
+
+            <section class="brp-effects-refresh-field-group">
+              <div class="brp-effects-refresh-field-group-title">
+                <span>Target &amp; modifier</span>
+                {{#if effects.builder.supportsAdvancedTarget}}
+                  <button type="button" class="brp-effects-refresh-advanced-toggle" data-action="effectsBuilderToggleAdvanced" aria-pressed="false">
+                    {{localize 'BRP.effectsBuilderAdvancedMode'}}
+                  </button>
+                {{/if}}
+              </div>
+
+              <div class="brp-effects-refresh-simple-target-picker" data-effects-builder-simple>
+                <div class="brp-effects-refresh-field-row is-target">
+                  <label class="brp-effects-refresh-field">
+                    <span>{{localize 'BRP.effectsBuilderCategory'}}</span>
+                    <select data-effects-field="categoryId">
+                      {{#each effects.builder.categories as |category|}}
+                        <option value="{{category.id}}" {{#if (eq category.id @root.effectsView.builder.defaults.categoryId)}}selected{{/if}}>{{category.label}}</option>
+                      {{/each}}
+                    </select>
+                  </label>
+
+                  <label class="brp-effects-refresh-field">
+                    <span>{{localize 'BRP.effectsBuilderTarget'}}</span>
+                    <select data-effects-field="targetId">
+                      {{#each effects.builder.categories as |category|}}
+                        {{#if @first}}
+                          {{#each category.options as |option|}}
+                            <option value="{{option.id}}" {{#if (eq option.id @root.effectsView.builder.defaults.targetId)}}selected{{/if}}>{{option.label}}</option>
+                          {{/each}}
+                        {{/if}}
+                      {{/each}}
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div class="brp-effects-refresh-advanced-target-picker" data-effects-builder-advanced hidden>
+                <label class="brp-effects-refresh-field">
+                  <span>{{localize 'BRP.effectsBuilderRawPath'}}</span>
+                  <input type="text" value="" data-effects-field="rawPath" placeholder="system.stats.str.effects" />
+                </label>
+              </div>
+
+              <div class="brp-effects-refresh-field-row is-modifier">
+                <label class="brp-effects-refresh-field">
+                  <span>{{localize 'BRP.inventoryBonusMode'}}</span>
+                  <select data-effects-field="mode">
+                    {{#each effects.builder.modes as |mode|}}
+                      <option value="{{mode.mode}}" data-mode-id="{{mode.id}}" {{#if (eq mode.mode @root.effectsView.builder.defaults.mode)}}selected{{/if}}>{{mode.label}}</option>
+                    {{/each}}
+                  </select>
+                </label>
+
+                <label class="brp-effects-refresh-field">
+                  <span>{{localize 'BRP.value'}}</span>
+                  <input type="text" value="0" data-effects-field="value" />
+                </label>
+
+                <label class="brp-effects-refresh-field">
+                  <span>{{localize 'BRP.effectsBuilderPriority'}}</span>
+                  <input type="number" value="{{effects.builder.defaults.priority}}" data-effects-field="priority" />
+                </label>
+              </div>
+
+              <div class="brp-effects-refresh-preview">
+                <span class="brp-effects-refresh-preview-label">Preview</span>
+                <span class="brp-effects-refresh-preview-text">
+                  {{#each effects.builder.categories as |category|}}
+                    {{#if @first}}
+                      <span class="brp-effects-refresh-preview-target">
+                        {{category.label}}:
+                        {{#each category.options as |option|}}{{#if @first}}{{option.label}}{{/if}}{{/each}}
+                      </span>
+                    {{/if}}
+                  {{/each}}
+                  <span class="brp-effects-refresh-preview-modifier">
+                    +0
+                    {{#each effects.builder.modes as |mode|}}{{#if @first}}({{mode.label}}){{/if}}{{/each}}
+                  </span>
+                </span>
+              </div>
+            </section>
+
+            <section class="brp-effects-refresh-field-group">
+              <div class="brp-effects-refresh-field-group-title">{{localize 'BRP.duration'}}</div>
+
+              <div class="brp-effects-refresh-field-row is-duration">
+                <label class="brp-effects-refresh-field">
+                  <span>{{localize 'BRP.duration'}}</span>
+                  <select data-effects-field="durationId">
+                    {{#each effects.builder.durations as |duration|}}
+                      <option value="{{duration.id}}" {{#if (eq duration.id @root.effectsView.builder.defaults.durationId)}}selected{{/if}}>{{duration.label}}</option>
+                    {{/each}}
+                  </select>
+                </label>
+
+                <label class="brp-effects-refresh-field" data-effects-timer-note hidden>
+                  <span>{{localize 'BRP.effectsBuilderTimerNote'}}</span>
+                  <input type="text" value="" data-effects-field="timerNote" placeholder="3 rounds" />
+                </label>
+              </div>
+            </section>
+
+            <section class="brp-effects-refresh-field-group">
+              <div class="brp-effects-refresh-field-group-title">Visibility</div>
+
+              <label class="brp-effects-refresh-checkbox">
+                <input type="checkbox" data-effects-field="hidden" />
+                <span>{{localize 'BRP.effectsFilterHidden'}}</span>
+              </label>
+
+              <label class="brp-effects-refresh-checkbox">
+                <input type="checkbox" data-effects-field="active" checked />
+                <span>{{localize 'BRP.active'}}</span>
+              </label>
+            </section>
+          </div>
+
+          <footer class="brp-effects-refresh-modal-footer">
+            <button type="button" class="brp-effects-refresh-modal-button" data-action="effectsModalClose">Cancel</button>
+            <button type="button" class="brp-effects-refresh-modal-button is-primary {{#if effects.readOnly}}is-disabled{{/if}}" {{#if effects.readOnly}}disabled{{else}}data-action="effectsBuilderSave"{{/if}}>{{localize 'BRP.confirm'}}</button>
+          </footer>
+        </section>
+      </div>
+
+      <aside class="brp-effects-refresh-context-menu" data-effects-context-menu hidden>
+        <button type="button" class="brp-effects-refresh-context-item" data-effects-menu-item="edit">
+          <i class="fas fa-pen"></i>
+          <span>{{localize 'BRP.effectsActionEdit'}}</span>
+        </button>
+
+        <button type="button" class="brp-effects-refresh-context-item" data-effects-menu-item="toggle-hidden">
+          <i class="fas fa-eye-slash"></i>
+          <span>{{localize 'BRP.effectsActionToggleHidden'}}</span>
+        </button>
+
+        <button type="button" class="brp-effects-refresh-context-item" data-effects-menu-item="duplicate">
+          <i class="fas fa-copy"></i>
+          <span>{{localize 'BRP.duplicate'}}</span>
+        </button>
+
+        <button type="button" class="brp-effects-refresh-context-item" data-effects-menu-item="open-source">
+          <i class="fas fa-arrow-up-right-from-square"></i>
+          <span>{{localize 'BRP.effectsActionOpenSource'}}</span>
+        </button>
+
+        <button type="button" class="brp-effects-refresh-context-item" data-effects-menu-item="open-effect">
+          <i class="fas fa-bolt"></i>
+          <span>{{localize 'BRP.effectsActionOpenEffect'}}</span>
+        </button>
+
+        <div class="brp-effects-refresh-context-divider"></div>
+
+        <button type="button" class="brp-effects-refresh-context-item is-danger" data-effects-menu-item="delete">
+          <i class="fas fa-trash"></i>
+          <span>{{localize 'BRP.delete'}}</span>
+        </button>
+      </aside>
+    </section>
+  {{/with}}
 </section>

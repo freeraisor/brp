@@ -1,0 +1,51 @@
+<form class="brp" id="apply-damage-form">
+  <input type="hidden" name="ballisticArmor" value="{{#if ballisticArmor}}1{{else}}0{{/if}}"/>
+
+  {{#if showLocation}}
+    <div class="flexcol">
+      <div class="stat-name darkred centre">{{localize 'BRP.hit-location'}}</div>
+      <div class="flexrow">
+        <select class="stat-name centre" data-handle-change name="locationId">
+          {{selectOptions locations selected=selectedLocationId}}
+        </select>
+      </div>
+    </div>
+  {{/if}}
+
+  <div class="flexcol">
+    <div class="stat-name darkred centre">{{localize 'BRP.damage'}}</div>
+    <div class="flexrow">
+      <input class="stat-name centre" name="rawDamage" type="number" min="0" value="{{rawDamage}}" autofocus/>
+    </div>
+  </div>
+
+  <div class="flexcol">
+    <div class="stat-name darkred centre">{{localize 'BRP.healthDamageType'}}</div>
+    <div class="flexrow">
+      <select class="stat-name centre" data-handle-change name="damageType">
+        {{selectOptions damageTypes selected=selectedDamageType}}
+      </select>
+    </div>
+  </div>
+
+  <div class="flexcol">
+    <div class="stat-name darkred centre">{{localize 'BRP.healthWoundName'}}</div>
+    <div class="flexrow">
+      <input class="stat-name centre" name="woundName" type="text" placeholder="{{localize 'BRP.wound'}}"/>
+    </div>
+  </div>
+
+  <div class="flexcol">
+    <label class="stat-name centre">
+      <input type="checkbox" name="appliesArmor" {{checked appliesArmor}}/>
+      {{#if ballisticArmor}}{{localize 'BRP.ballistic'}}{{else}}{{localize 'BRP.healthApplyArmor'}}{{/if}}
+    </label>
+  </div>
+
+  <div class="flexcol">
+    <div class="stat-name darkred centre">{{localize 'BRP.description'}}</div>
+    <div class="flexrow">
+      <textarea class="stat-name" name="description" rows="3"></textarea>
+    </div>
+  </div>
+</form>

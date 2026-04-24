@@ -1,11 +1,12 @@
-//import { addBRPIDSheetHeaderButton } from '../../brpid/brpid-button.mjs'
-import { BRPItemSheetV2 } from "./base-item-sheet.mjs"
+import { BRPItemSheetV2 } from "./base-item-sheet.mjs";
+import {
+  buildStandardItemSheetParts,
+  configureStandardItemSheetParts,
+  prepareStandardItemSheetContext,
+  prepareStandardItemSheetPartContext
+} from './shared/standard-detail-sheet.mjs';
 
 export class BRPAllegianceSheet extends BRPItemSheetV2 {
-  constructor(options = {}) {
-    super(options)
-  }
-
   static DEFAULT_OPTIONS = {
     classes: ['allegiance'],
     position: {
@@ -14,130 +15,68 @@ export class BRPAllegianceSheet extends BRPItemSheetV2 {
     },
   }
 
-  static PARTS = {
-    header: { template: 'systems/brp/templates/item/item.header.hbs' },
-    tabs: { template: 'systems/brp/templates/global/parts/tab-navigation.hbs' },
-    details: {
-      template: 'systems/brp/templates/item/allegiance.detail.hbs',
-      scrollable: ['']
-    },
-    benefits: { template: 'systems/brp/templates/item/allegiance.benefits.hbs' },
-    description: { template: 'systems/brp/templates/item/item.description.hbs' },
-    gmNotes: { template: 'systems/brp/templates/item/item.gmnotes.hbs' }
-  }
+  static PARTS = buildStandardItemSheetParts('systems/brp/templates/item/allegiance.detail.hbs', {
+    benefits: { template: 'systems/brp/templates/item/allegiance.benefits.hbs' }
+  });
 
   async _prepareContext(options) {
-    let context = await super._prepareContext(options)
-    context.tabs = this._getTabs(options.parts);
-    return context
+    const context = await super._prepareContext(options);
+    context.rankTextValue = this.item.system.rankText || this.item.system.rank || '';
+    context.enemyIdValue = this.item.system.enemyId || '';
+    context.enemyAllegianceOptions = prepareEnemyAllegianceOptions(this.item);
+    return prepareStandardItemSheetContext(this, options, context, {
+      tabLabels: {
+        benefits: 'BRP.benefits'
+      }
+    });
   }
 
-  /** @override */
   async _preparePartContext(partId, context) {
-    switch (partId) {
-      case 'details':
-        context.tab = context.tabs[partId];
-        break;
-      case 'description':
-        context.tab = context.tabs[partId];
-        context.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-          this.item.system.description,
-          {
-            secrets: this.document.isOwner,
-            rollData: this.document.getRollData(),
-            relativeTo: this.document,
-          }
-        );
-        break;
-      case 'gmNotes':
-        context.tab = context.tabs[partId];
-        context.enrichedGMDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-          this.item.system.gmDescription,
-          {
-            secrets: this.document.isOwner,
-            rollData: this.document.getRollData(),
-            relativeTo: this.document,
-          }
-        );
-        break;
-      case 'benefits':
-        context.tab = context.tabs[partId];
-        context.enrichedBenefits = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-          this.item.system.benefits,
-          {
-            secrets: this.document.isOwner,
-            rollData: this.document.getRollData(),
-            relativeTo: this.document,
-          }
-        );
-        break;
-    }
-    return context;
-  }
-
-  _getTabs(parts) {
-    const tabGroup = 'primary';
-    //Default tab
-    if (!this.tabGroups[tabGroup]) {
-      if (game.settings.get('brp','defaultTab')) {
-        this.tabGroups[tabGroup] = 'description';
-      }  else {
-        this.tabGroups[tabGroup] = 'details';
+    return prepareStandardItemSheetPartContext(this, partId, context, {
+      enrichedParts: {
+        description: {
+          fieldPath: 'system.description',
+          contextKey: 'enrichedDescription'
+        },
+        gmNotes: {
+          fieldPath: 'system.gmDescription',
+          contextKey: 'enrichedGMDescription'
+        },
+        benefits: {
+          fieldPath: 'system.benefits',
+          contextKey: 'enrichedBenefits'
+        }
       }
-    }
-    return parts.reduce((tabs, partId) => {
-      const tab = {
-        cssClass: '',
-        group: tabGroup,
-        id: '',
-        icon: '',
-        label: 'BRP.',
-      };
-      switch (partId) {
-        case 'header':
-        case 'tabs':
-          return tabs;
-        case 'details':
-          tab.id = 'details';
-          tab.label += 'details';
-          break;
-        case 'benefits':
-          tab.id = 'benefits';
-          tab.label += 'benefits';
-          break;
-        case 'description':
-          tab.id = 'description';
-          tab.label += 'description';
-          break;
-        case 'gmNotes':
-          tab.id = 'gmNotes';
-          tab.label += 'gmNotes';
-          break;
-      }
-      if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = 'active';
-      tabs[partId] = tab;
-      return tabs;
-    }, {});
+    });
   }
 
   _configureRenderOptions(options) {
     super._configureRenderOptions(options);
-    //Only show GM tab if you are GM
-    options.parts = ['header', 'tabs', 'details', 'benefits', 'description'];
-    if (game.user.isGM) {
-      options.parts.push('gmNotes');
-    }
+    configureStandardItemSheetParts(options, {
+      extraParts: ['benefits']
+    });
+  }
+}
+
+function prepareEnemyAllegianceOptions(item) {
+  const options = {
+    '': '-'
+  };
+  const actor = item.parent instanceof Actor ? item.parent : null;
+  if (!actor) return options;
+
+  const currentEnemyId = String(item.system?.enemyId ?? '').trim();
+  const allegiances = actor.items
+    .filter(candidate => candidate.type === 'allegiance' && candidate.id !== item.id)
+    .sort((left, right) => left.name.localeCompare(right.name));
+
+  for (const allegiance of allegiances) {
+    options[allegiance.id] = allegiance.name;
   }
 
-  //Activate event listeners using the prepared sheet HTML
-  _onRender(context, _options) {
+  if (currentEnemyId && !Object.hasOwn(options, currentEnemyId)) {
+    options[currentEnemyId] = `[Missing link] ${currentEnemyId}`;
   }
 
-
-  //-----------------------ACTIONS-----------------------------------
-
-
-
-
-
+  return options;
 }

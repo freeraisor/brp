@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>BRP Character Sheet — Layout Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-base: #1a1210;
+  --bg-card: #241a18;
+  --bg-elevated: #2d211f;
+  --bg-hover: #3a2a26;
+  --border: #4a1f1f;
+  --border-soft: #33211f;
+  --red: #c8302e;
+  --red-bright: #e24b4a;
+  --red-muted: #8a2a28;
+  --mint: #9ad8c4;
+  --mint-dim: #6fa894;
+  --blue: #5b8fd8;
+  --amber: #d4a04a;
+  --green: #7fb355;
+  --text: #e8e2dc;
+  --text-dim: #a89d94;
+  --text-muted: #6e6560;
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.sheet {
+  max-width: 1280px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  height: calc(100vh - 40px);
+  min-height: 720px;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--bg-base);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.workspace {
+  flex: 1;
+  min-width: 0;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.rail {
+  width: 52px;
+  background: var(--bg-base);
+  border-left: 1px solid var(--border);
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.avatar {
+  aspect-ratio: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.identity { text-align: center; }
+
+.identity .name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red-bright);
+}
+
+.identity .sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 10px 4px;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.status-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.status-icon:hover {
+  background: var(--bg-hover);
+  color: var(--text-dim);
+}
+
+.status-icon.active {
+  color: var(--red-bright);
+  background: rgba(226, 75, 74, 0.12);
+}
+
+.status-icon .tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  white-space: nowrap;
+  border-radius: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 20;
+}
+
+.status-icon:hover .tip { opacity: 1; }
+
+.resource { display: flex; flex-direction: column; gap: 6px; }
+
+.resource-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.resource-head .label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+}
+
+.resource-head .value {
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  height: 8px;
+  background: var(--bg-card);
+  border-radius: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+}
+
+.bar.big { height: 12px; }
+.bar-fill { height: 100%; transition: width 0.3s; }
+
+.resource.compact .resource-head .label { font-size: 10px; letter-spacing: 1.5px; color: var(--text-dim); }
+.resource.compact .resource-head .value { font-size: 11px; color: var(--text-dim); }
+.resource.compact .bar { height: 4px; }
+
+.divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+.scroll-hint {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-align: center;
+  text-transform: uppercase;
+  padding-top: 8px;
+  opacity: 0.5;
+  margin-top: auto;
+}
+
+.rail-btn {
+  width: 52px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  position: relative;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+
+.rail-btn:hover {
+  color: var(--text-dim);
+  background: var(--bg-card);
+}
+
+.rail-btn.active {
+  color: var(--mint);
+  background: var(--bg-card);
+  border-left-color: var(--mint);
+}
+
+.rail-btn .tooltip {
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text);
+  white-space: nowrap;
+  border-radius: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 10;
+}
+
+.rail-btn:hover .tooltip { opacity: 1; }
+
+.tab-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--mint);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tab-title .lock {
+  margin-left: auto;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.char-section-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.char-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.char-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.char-card:hover {
+  border-color: var(--red-muted);
+  background: var(--bg-card);
+}
+
+.char-card .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.char-card .skill-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.char-card .percent {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--mint);
+  font-variant-numeric: tabular-nums;
+}
+
+.char-card .base {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.search {
+  flex: 1;
+  position: relative;
+}
+
+.search input {
+  width: 100%;
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  color: var(--text);
+  padding: 8px 12px 8px 34px;
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search input:focus { border-color: var(--red-muted); }
+.search input::placeholder { color: var(--text-muted); }
+
+.search .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  width: 16px;
+  height: 16px;
+}
+
+.btn {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  padding: 0 12px;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+
+.btn:hover {
+  border-color: var(--red-muted);
+  color: var(--red-bright);
+}
+
+.btn svg { width: 14px; height: 14px; }
+
+.category {
+  margin-bottom: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.category-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--bg-base);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.category-head:hover { background: var(--bg-card); }
+
+.category-head .cat-drag {
+  color: transparent;
+  cursor: grab;
+  font-size: 12px;
+  line-height: 0.8;
+  letter-spacing: -1px;
+}
+
+.category-head:hover .cat-drag { color: var(--text-muted); }
+
+.category-head .chevron {
+  width: 12px;
+  height: 12px;
+  color: var(--text-dim);
+  transition: transform 0.15s;
+}
+
+.category.collapsed .chevron { transform: rotate(-90deg); }
+
+.category-head .title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+  flex: 1;
+}
+
+.category-head .count {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: 1px 8px;
+  border-radius: 10px;
+}
+
+.category-body {
+  padding: 4px;
+  background: var(--bg-base);
+  border-top: 1px solid var(--border-soft);
+}
+
+.category.collapsed .category-body { display: none; }
+
+.skill {
+  display: grid;
+  grid-template-columns: 14px 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.skill:hover { background: var(--bg-hover); }
+
+.skill.favorite {
+  background: linear-gradient(90deg, rgba(212, 160, 74, 0.12), transparent 60%);
+  border-left: 2px solid var(--amber);
+  padding-left: 8px;
+}
+
+.skill.favorite:hover {
+  background: linear-gradient(90deg, rgba(212, 160, 74, 0.2), rgba(58, 42, 38, 0.5) 60%);
+}
+
+.skill .skill-drag {
+  color: transparent;
+  cursor: grab;
+  font-size: 12px;
+  line-height: 0.8;
+  letter-spacing: -1px;
+  user-select: none;
+}
+
+.skill:hover .skill-drag { color: var(--text-muted); }
+
+.skill .name-block {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  flex-wrap: nowrap;
+}
+
+.skill .name {
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skill .spec {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.skill .star {
+  color: var(--amber);
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+.skill .exp-check {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--border);
+  border-radius: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: var(--bg-card);
+  transition: all 0.12s;
+}
+
+.skill .exp-check:hover { border-color: var(--mint-dim); }
+
+.skill .exp-check.checked {
+  background: var(--mint);
+  border-color: var(--mint);
+}
+
+.skill .exp-check.checked::after {
+  content: "";
+  width: 8px;
+  height: 4px;
+  border-left: 2px solid var(--bg-base);
+  border-bottom: 2px solid var(--bg-base);
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+
+.skill .percent {
+  background: rgba(154, 216, 196, 0.08);
+  color: var(--mint);
+  border: 1px solid var(--mint-dim);
+  padding: 3px 10px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  min-width: 50px;
+  text-align: center;
+}
+
+.ctx {
+  position: fixed;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  min-width: 180px;
+  padding: 4px;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.ctx-item {
+  padding: 7px 14px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.5px;
+}
+
+.ctx-item svg { width: 14px; height: 14px; }
+.ctx-item:hover { background: var(--red-muted); }
+.ctx-item.danger { color: var(--red-bright); }
+.ctx-item.danger:hover { background: var(--red-muted); color: #fff; }
+.ctx-divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+.sidebar::-webkit-scrollbar, .workspace::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-track, .workspace::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb, .workspace::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover, .workspace::-webkit-scrollbar-thumb:hover {
+  background: var(--red-muted);
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <aside class="sidebar">
+    <div class="avatar">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+      </svg>
+    </div>
+
+    <div class="identity">
+      <div class="name">Арсэн</div>
+      <div class="sub">Pilot · 27</div>
+    </div>
+
+    <div class="status-row">
+      <div class="status-icon active" data-cond="bleeding">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1 3-6 9-6 13a6 6 0 0 0 12 0c0-4-5-10-6-13z"/></svg>
+        <span class="tip">Bleeding</span>
+      </div>
+      <div class="status-icon" data-cond="stunned">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 9l2 2m0-2l-2 2M14 9l2 2m0-2l-2 2"/><path d="M9 16c1-1 4-1 6 0"/></svg>
+        <span class="tip">Stunned</span>
+      </div>
+      <div class="status-icon active" data-cond="prone">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18"/><circle cx="7" cy="14" r="2"/><path d="M9 14h10"/></svg>
+        <span class="tip">Prone</span>
+      </div>
+      <div class="status-icon" data-cond="grappled">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6a3 3 0 0 0 6 0V5"/><path d="M18 3v6a3 3 0 0 1-6 0"/><path d="M6 15a6 6 0 0 0 12 0"/></svg>
+        <span class="tip">Grappled</span>
+      </div>
+      <div class="status-icon" data-cond="unconscious">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h5l-4 4h4"/><path d="M14 14h5l-4 4h4"/></svg>
+        <span class="tip">Unconscious</span>
+      </div>
+      <div class="status-icon" data-cond="dying">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/><path d="M4 15c-1 5 2 7 8 7s9-2 8-7c-1-4-3-11-8-11s-7 7-8 11z"/></svg>
+        <span class="tip">Dying</span>
+      </div>
+    </div>
+
+    <div class="resource">
+      <div class="resource-head">
+        <span class="label">Hit points</span>
+        <span class="value" style="color: var(--red-bright)">12 / 20</span>
+      </div>
+      <div class="bar big"><div class="bar-fill" style="width:60%; background: var(--red-bright)"></div></div>
+    </div>
+
+    <div class="resource">
+      <div class="resource-head">
+        <span class="label">Power points</span>
+        <span class="value" style="color: var(--blue)">10 / 10</span>
+      </div>
+      <div class="bar big"><div class="bar-fill" style="width:100%; background: var(--blue)"></div></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="resource compact">
+      <div class="resource-head">
+        <span class="label">Fatigue</span>
+        <span class="value">16 / 16</span>
+      </div>
+      <div class="bar"><div class="bar-fill" style="width:100%; background: var(--amber)"></div></div>
+    </div>
+
+    <div class="resource compact">
+      <div class="resource-head">
+        <span class="label">Sanity</span>
+        <span class="value">5 / 5</span>
+      </div>
+      <div class="bar"><div class="bar-fill" style="width:100%; background: var(--green)"></div></div>
+    </div>
+
+    <div class="resource compact">
+      <div class="resource-head">
+        <span class="label">Resource</span>
+        <span class="value" style="color: var(--text-muted)">0 / 0</span>
+      </div>
+      <div class="bar"></div>
+    </div>
+
+    <div class="scroll-hint">scrolls independently</div>
+  </aside>
+
+  <main class="workspace">
+    <div class="tab-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+        <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+        <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+      </svg>
+      Skills
+      <span class="lock">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        Locked
+      </span>
+    </div>
+
+    <div class="char-section-label">Characteristic skills</div>
+    <div class="char-grid">
+      <div class="char-card" data-skill="effort"><div class="top"><span class="skill-name">Effort</span><span class="percent">55%</span></div><div class="base">STR · 11</div></div>
+      <div class="char-card" data-skill="stamina"><div class="top"><span class="skill-name">Stamina</span><span class="percent">50%</span></div><div class="base">CON · 10</div></div>
+      <div class="char-card" data-skill="idea"><div class="top"><span class="skill-name">Idea</span><span class="percent">65%</span></div><div class="base">INT · 13</div></div>
+      <div class="char-card" data-skill="damage-mod"><div class="top"><span class="skill-name">Damage</span><span class="percent">+0</span></div><div class="base">SIZ · 10</div></div>
+      <div class="char-card" data-skill="luck"><div class="top"><span class="skill-name">Luck</span><span class="percent">50%</span></div><div class="base">POW · 10</div></div>
+      <div class="char-card" data-skill="agility"><div class="top"><span class="skill-name">Agility</span><span class="percent">55%</span></div><div class="base">DEX · 11</div></div>
+      <div class="char-card" data-skill="charm"><div class="top"><span class="skill-name">Charm</span><span class="percent">55%</span></div><div class="base">CHA · 11</div></div>
+      <div class="char-card" data-skill="knowledge"><div class="top"><span class="skill-name">Knowledge</span><span class="percent">60%</span></div><div class="base">EDU · 12</div></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="search" placeholder="Поиск навыка..." id="skill-search">
+      </div>
+      <button class="btn" id="sort-btn" title="Sort order">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+        <span id="sort-label">A-Z</span>
+      </button>
+      <button class="btn" id="add-btn" title="Add skill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+    </div>
+
+    <div id="categories">
+
+      <div class="category" data-category="combat">
+        <div class="category-head">
+          <span class="cat-drag">⁝⁝</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          <span class="title">Combat</span>
+          <span class="count">5</span>
+        </div>
+        <div class="category-body">
+          <div class="skill favorite" data-skill="pistol"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Pistol</span><span class="spec">Пистолет</span><span class="star">★</span></div><div class="exp-check"></div><div class="percent">42%</div></div>
+          <div class="skill" data-skill="brawl"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Brawl</span><span class="spec">Рукопашный бой</span></div><div class="exp-check"></div><div class="percent">27%</div></div>
+          <div class="skill" data-skill="grapple"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Grapple</span><span class="spec">Захват</span></div><div class="exp-check checked"></div><div class="percent">27%</div></div>
+          <div class="skill" data-skill="dodge"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Dodge</span></div><div class="exp-check"></div><div class="percent">22%</div></div>
+          <div class="skill" data-skill="parry"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Parry</span></div><div class="exp-check"></div><div class="percent">25%</div></div>
+        </div>
+      </div>
+
+      <div class="category" data-category="communication">
+        <div class="category-head">
+          <span class="cat-drag">⁝⁝</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          <span class="title">Communication</span>
+          <span class="count">4</span>
+        </div>
+        <div class="category-body">
+          <div class="skill" data-skill="fast-talk"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Fast talk</span><span class="spec">Быстрая речь</span></div><div class="exp-check"></div><div class="percent">15%</div></div>
+          <div class="skill" data-skill="persuade"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Persuade</span><span class="spec">Убеждение</span></div><div class="exp-check"></div><div class="percent">15%</div></div>
+          <div class="skill" data-skill="bargain"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Bargain</span></div><div class="exp-check"></div><div class="percent">15%</div></div>
+          <div class="skill" data-skill="command"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Command</span></div><div class="exp-check"></div><div class="percent">5%</div></div>
+        </div>
+      </div>
+
+      <div class="category" data-category="physical">
+        <div class="category-head">
+          <span class="cat-drag">⁝⁝</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          <span class="title">Physical</span>
+          <span class="count">4</span>
+        </div>
+        <div class="category-body">
+          <div class="skill" data-skill="climb"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Climb</span></div><div class="exp-check"></div><div class="percent">40%</div></div>
+          <div class="skill" data-skill="jump"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Jump</span></div><div class="exp-check"></div><div class="percent">25%</div></div>
+          <div class="skill" data-skill="swim"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Swim</span></div><div class="exp-check"></div><div class="percent">25%</div></div>
+          <div class="skill" data-skill="stealth"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Stealth</span></div><div class="exp-check"></div><div class="percent">10%</div></div>
+        </div>
+      </div>
+
+      <div class="category" data-category="perception">
+        <div class="category-head">
+          <span class="cat-drag">⁝⁝</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          <span class="title">Perception</span>
+          <span class="count">3</span>
+        </div>
+        <div class="category-body">
+          <div class="skill" data-skill="listen"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Listen</span></div><div class="exp-check"></div><div class="percent">25%</div></div>
+          <div class="skill" data-skill="spot"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Spot</span></div><div class="exp-check checked"></div><div class="percent">25%</div></div>
+          <div class="skill" data-skill="track"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Track</span></div><div class="exp-check"></div><div class="percent">10%</div></div>
+        </div>
+      </div>
+
+      <div class="category" data-category="knowledge">
+        <div class="category-head">
+          <span class="cat-drag">⁝⁝</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          <span class="title">Knowledge</span>
+          <span class="count">3</span>
+        </div>
+        <div class="category-body">
+          <div class="skill favorite" data-skill="knowledge-space-law"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Knowledge</span><span class="spec">Космическое право</span><span class="star">★</span></div><div class="exp-check"></div><div class="percent">50%</div></div>
+          <div class="skill" data-skill="insight"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Insight</span></div><div class="exp-check"></div><div class="percent">5%</div></div>
+          <div class="skill" data-skill="research"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Research</span></div><div class="exp-check"></div><div class="percent">25%</div></div>
+        </div>
+      </div>
+
+      <div class="category" data-category="technical">
+        <div class="category-head">
+          <span class="cat-drag">⁝⁝</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          <span class="title">Technical</span>
+          <span class="count">4</span>
+        </div>
+        <div class="category-body">
+          <div class="skill favorite" data-skill="pilot-spacecraft"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Pilot</span><span class="spec">Космический корабль</span><span class="star">★</span></div><div class="exp-check checked"></div><div class="percent">70%</div></div>
+          <div class="skill" data-skill="drive"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Drive</span></div><div class="exp-check"></div><div class="percent">20%</div></div>
+          <div class="skill" data-skill="repair"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">Repair</span></div><div class="exp-check"></div><div class="percent">15%</div></div>
+          <div class="skill" data-skill="first-aid"><span class="skill-drag">⁝⁝</span><div class="name-block"><span class="name">First aid</span></div><div class="exp-check"></div><div class="percent">30%</div></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <nav class="rail">
+    <div class="rail-btn active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg><span class="tooltip">Skills</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14.5 17.5L3 6V3h3l11.5 11.5z"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M21 3v3L9.5 17.5"/><path d="M8 14l-4 4"/></svg><span class="tooltip">Combat</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg><span class="tooltip">Health</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg><span class="tooltip">Items</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span class="tooltip">Character</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="7" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/><circle cx="17" cy="8" r="3"/><path d="M22 20c0-2.76-2.24-5-5-5"/></svg><span class="tooltip">Social</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="tooltip">Story</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg><span class="tooltip">Effects</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg><span class="tooltip">Dev</span></div>
+  </nav>
+
+</div>
+
+<script>
+document.querySelectorAll('.category-head').forEach(head => {
+  head.addEventListener('click', e => {
+    if (e.target.closest('.cat-drag')) return;
+    head.parentElement.classList.toggle('collapsed');
+  });
+});
+
+document.querySelectorAll('.skill').forEach(row => {
+  row.addEventListener('click', e => {
+    if (e.target.closest('.skill-drag') || e.target.closest('.exp-check')) return;
+    const name = row.querySelector('.name').textContent;
+    const spec = row.querySelector('.spec');
+    const pct = row.querySelector('.percent').textContent;
+    const label = spec ? `${name} (${spec.textContent})` : name;
+    console.log(`[ROLL] ${label} — target ${pct}`);
+    row.style.transition = 'background 0.08s';
+    const prev = row.style.background;
+    row.style.background = 'rgba(154, 216, 196, 0.25)';
+    setTimeout(() => { row.style.background = prev; }, 180);
+  });
+});
+
+document.querySelectorAll('.exp-check').forEach(cb => {
+  cb.addEventListener('click', e => { e.stopPropagation(); cb.classList.toggle('checked'); });
+});
+
+document.querySelectorAll('.status-icon').forEach(ic => {
+  ic.addEventListener('click', () => ic.classList.toggle('active'));
+  ic.addEventListener('contextmenu', e => { e.preventDefault(); ic.classList.remove('active'); });
+});
+
+document.querySelectorAll('.char-card').forEach(c => {
+  c.addEventListener('click', () => {
+    const name = c.querySelector('.skill-name').textContent;
+    const pct = c.querySelector('.percent').textContent;
+    console.log(`[ROLL] ${name} — target ${pct}`);
+    c.style.outline = '1px solid var(--mint)';
+    setTimeout(() => { c.style.outline = ''; }, 180);
+  });
+});
+
+const ctxMenu = document.createElement('div');
+ctxMenu.className = 'ctx';
+ctxMenu.style.display = 'none';
+ctxMenu.innerHTML = `
+  <div class="ctx-item" data-action="favorite">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+    <span class="ctx-label">Mark as favorite</span>
+  </div>
+  <div class="ctx-item" data-action="duplicate">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+    Duplicate
+  </div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item danger" data-action="delete">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+    Delete
+  </div>
+`;
+document.body.appendChild(ctxMenu);
+
+let ctxTarget = null;
+
+document.querySelectorAll('.skill').forEach(row => {
+  row.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    ctxTarget = row;
+    const isFav = row.classList.contains('favorite');
+    ctxMenu.querySelector('[data-action="favorite"] .ctx-label').textContent = isFav ? 'Unmark favorite' : 'Mark as favorite';
+    ctxMenu.style.display = 'block';
+    const w = 180, h = 100;
+    const x = Math.min(e.clientX, window.innerWidth - w - 10);
+    const y = Math.min(e.clientY, window.innerHeight - h - 10);
+    ctxMenu.style.left = x + 'px';
+    ctxMenu.style.top = y + 'px';
+  });
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ctx')) ctxMenu.style.display = 'none';
+});
+
+ctxMenu.addEventListener('click', e => {
+  const item = e.target.closest('.ctx-item');
+  if (!item || !ctxTarget) return;
+  const action = item.dataset.action;
+  if (action === 'favorite') {
+    ctxTarget.classList.toggle('favorite');
+    let star = ctxTarget.querySelector('.star');
+    if (ctxTarget.classList.contains('favorite') && !star) {
+      star = document.createElement('span');
+      star.className = 'star';
+      star.textContent = '★';
+      ctxTarget.querySelector('.name-block').appendChild(star);
+    } else if (!ctxTarget.classList.contains('favorite') && star) {
+      star.remove();
+    }
+  }
+  if (action === 'delete') ctxTarget.remove();
+  if (action === 'duplicate') {
+    const clone = ctxTarget.cloneNode(true);
+    clone.classList.remove('favorite');
+    const st = clone.querySelector('.star'); if (st) st.remove();
+    ctxTarget.parentElement.insertBefore(clone, ctxTarget.nextSibling);
+    wireRow(clone);
+  }
+  ctxMenu.style.display = 'none';
+});
+
+function wireRow(row) {
+  row.addEventListener('click', e => {
+    if (e.target.closest('.skill-drag') || e.target.closest('.exp-check')) return;
+    row.style.background = 'rgba(154, 216, 196, 0.25)';
+    setTimeout(() => { row.style.background = ''; }, 180);
+  });
+  row.querySelector('.exp-check').addEventListener('click', e => { e.stopPropagation(); e.currentTarget.classList.toggle('checked'); });
+  row.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    ctxTarget = row;
+    ctxMenu.style.display = 'block';
+    ctxMenu.style.left = e.clientX + 'px';
+    ctxMenu.style.top = e.clientY + 'px';
+  });
+}
+
+document.getElementById('skill-search').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  document.querySelectorAll('.category').forEach(cat => {
+    let hasMatch = false;
+    cat.querySelectorAll('.skill').forEach(sk => {
+      const text = sk.textContent.toLowerCase();
+      const match = !q || text.includes(q);
+      sk.style.display = match ? '' : 'none';
+      if (match) hasMatch = true;
+    });
+    cat.style.display = hasMatch ? '' : 'none';
+    if (q && hasMatch) cat.classList.remove('collapsed');
+  });
+});
+
+const sortModes = ['A-Z', 'Z-A', '%↓', '%↑'];
+let sortIdx = 0;
+document.getElementById('sort-btn').addEventListener('click', () => {
+  sortIdx = (sortIdx + 1) % sortModes.length;
+  document.getElementById('sort-label').textContent = sortModes[sortIdx];
+  document.querySelectorAll('.category-body').forEach(body => {
+    const rows = Array.from(body.querySelectorAll('.skill'));
+    rows.sort((a, b) => {
+      const na = a.querySelector('.name').textContent;
+      const nb = b.querySelector('.name').textContent;
+      const sa = a.querySelector('.spec'); const sb = b.querySelector('.spec');
+      const pa = parseInt(a.querySelector('.percent').textContent);
+      const pb = parseInt(b.querySelector('.percent').textContent);
+      if (sortModes[sortIdx] === 'A-Z') {
+        if (na !== nb) return na.localeCompare(nb);
+        return (sa?.textContent || '').localeCompare(sb?.textContent || '');
+      }
+      if (sortModes[sortIdx] === 'Z-A') {
+        if (na !== nb) return nb.localeCompare(na);
+        return (sb?.textContent || '').localeCompare(sa?.textContent || '');
+      }
+      if (sortModes[sortIdx] === '%↓') return pb - pa;
+      if (sortModes[sortIdx] === '%↑') return pa - pb;
+      return 0;
+    });
+    rows.forEach(r => body.appendChild(r));
+  });
+});
+
+document.getElementById('add-btn').addEventListener('click', () => {
+  console.log('[ADD] open new skill dialog');
+});
+
+document.querySelectorAll('.rail-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

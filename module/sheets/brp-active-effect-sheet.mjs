@@ -1,4 +1,9 @@
 import { BRPActiveEffect } from "../apps/active-effect.mjs"
+import {
+  normalizeActorEffectChange,
+  resolveEffectOriginDocument
+} from "../actor/effects/effect-compatibility.mjs";
+import { reverseEffectTarget } from "../actor/effects/effect-target-registry.mjs";
 
 export class BRPActiveEffectSheet {
   static getItemEffectsFromSheet(document) {
@@ -49,9 +54,10 @@ export class BRPActiveEffectSheet {
     if (effectData.effect) {
       for (const change of effectData.effect.changes) {
         if (change.mode === CONST.ACTIVE_EFFECT_MODES.ADD) {
+          const target = reverseEffectTarget(document.parent ?? null, change.key);
           effectChanges.push({
             key: change.key,
-            name: effectKeys[change.key] ?? change.key,
+            name: effectKeys[change.key] ?? target?.label ?? change.key,
             negative: (change.value < 0),
             value: Math.abs(change.value)
           })
@@ -66,25 +72,39 @@ export class BRPActiveEffectSheet {
   }
 
   static async getActorEffectsFromSheet(document) {
-    const effectKeys = foundry.utils.duplicate(CONFIG.BRP.keysActiveEffects)
-    let aEffects = this.getItemEffectsFromSheet(document)
-    let effects = []
-    for (let eff of aEffects) {
-      let brpAE = await fromUuid(eff.uuid)
-      let item = await fromUuid(brpAE.origin)
-      if (item) {
-        for (let chng of brpAE.changes) {
-          effects.push({
-            id: item.id,
-            sourceName: item.name,
-            key: chng.key,
-            name: game.i18n.localize((effectKeys[chng.key] ?? chng.key)),
-            value: chng.value,
-            isActive: brpAE.active ?? false
-          })
-        }
+    const effects = []
+    const originCache = new Map()
+
+    for (const activeEffect of document.effects ?? []) {
+      const item = await resolveEffectOriginDocument(activeEffect, originCache)
+      if (!(item instanceof Item)) continue;
+
+      for (const change of activeEffect.changes ?? []) {
+        const normalized = normalizeActorEffectChange(activeEffect, change, document, {
+          sourceDocument: item
+        });
+
+        effects.push({
+          id: item.id,
+          sourceId: item.id,
+          sourceUuid: item.uuid,
+          effectId: activeEffect.id,
+          effectUuid: activeEffect.uuid,
+          parentId: activeEffect.parent?.id ?? document.id,
+          sourceName: normalized.sourceLabel || item.name,
+          sourceType: normalized.sourceType,
+          targetType: normalized.targetType,
+          durationType: normalized.durationType,
+          timerNote: normalized.timerNote,
+          hidden: normalized.hidden,
+          key: normalized.key,
+          name: normalized.name,
+          value: normalized.value,
+          isActive: normalized.isActive
+        })
       }
     }
+
     return effects
   }
 

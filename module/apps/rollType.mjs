@@ -221,47 +221,59 @@ export class BRPRollType {
     let label = ""
     switch (prop) {
       case "cap":
-        AVform = actor.system.avr1
-        label = game.i18n.localize('BRP.armour')
+        if (event.shiftKey) {
+          AVform = actor.system.avr2 || actor.system.av2
+          label = game.i18n.localize('BRP.ballistic')
+        } else {
+          AVform = actor.system.avr1 || actor.system.av1
+          label = game.i18n.localize('BRP.armour')
+        }
         break
       case "cbap":
-        AVform = actor.system.avr2
+        AVform = actor.system.avr2 || actor.system.av2
         label = game.i18n.localize('BRP.ballistic')
         break
       case "ap":
         let item = actor.items.get(detail.itemId)
+        if (!item) return
         if (event.shiftKey) {
-          AVform = item.system.avr2
+          AVform = item.system.avr2 || item.system.av2
           label = item.name + ": " + game.i18n.localize('BRP.ballistic')
         } else {
-          AVform = item.system.avr1
+          AVform = item.system.avr1 || item.system.av1
           label = item.name + ": " + game.i18n.localize('BRP.armour')
         }
         break
       case "nap":
       case "nbap":
         let hitLoc = actor.items.get(event.target.closest('.item').dataset.itemId)
+        if (!hitLoc) return
         if (prop === 'nap') {
-          AVform = hitLoc.system.apRnd
+          AVform = hitLoc.system.apRnd || hitLoc.system.ap
           label = hitLoc.name + ": " + game.i18n.localize('BRP.armour')
         } else {
-          AVform = hitLoc.system.bapRnd
+          AVform = hitLoc.system.bapRnd || hitLoc.system.bap
           label = hitLoc.name + ": " + game.i18n.localize('BRP.ballistic')
         }
         break
       case "ncap":
-        AVform = actor.system.apRnd
-        label = game.i18n.localize('BRP.armour')
+        if (event.shiftKey) {
+          AVform = actor.system.bapRnd || actor.system.bap
+          label = game.i18n.localize('BRP.ballistic')
+        } else {
+          AVform = actor.system.apRnd || actor.system.ap
+          label = game.i18n.localize('BRP.armour')
+        }
         break
       case "ncbap":
-        AVform = actor.system.bapRnd
+        AVform = actor.system.bapRnd || actor.system.bap
         label = game.i18n.localize('BRP.ballistic')
         break
       default:
         return
     }
     //If the Armour Value is blank then don't make the roll
-
+    AVform = String(AVform ?? '').trim()
     if (AVform === "") { return }
     BRPCheck._trigger({
       rollType: 'AR',

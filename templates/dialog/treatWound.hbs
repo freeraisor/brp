@@ -1,4 +1,11 @@
-<form class="brp" id="treat-wound-form">
+<form class="brp brp-healing-dialog" id="treat-wound-form">
+  {{#if selectedWoundName}}
+    <div class="flexcol brp-healing-selected-wound">
+      <div class="stat-name darkred centre">{{localize 'BRP.wound'}}</div>
+      <div class="brp-healing-selected-wound-name">{{selectedWoundName}}</div>
+    </div>
+  {{/if}}
+
   <div class="flexcol">
     <div class="stat-name darkred centre">{{localize 'BRP.healPrompt'}}</div>
     <div class="flexrow">
@@ -28,5 +35,20 @@
     </div>
   {{/if}}
 
+  <div class="flexcol">
+    <div class="stat-name darkred centre">{{localize 'BRP.healingResult'}}</div>
+    <div class="flexrow">
+      <select class="stat-name centre" data-handle-change name="result">
+        {{selectOptions resultLevels}}
+      </select>
+    </div>
+  </div>
+
+  <div class="flexcol">
+    <div class="stat-name darkred centre">{{localize 'BRP.notes'}}</div>
+    <div class="flexrow">
+      <textarea class="brp-healing-note" name="note" rows="3"></textarea>
+    </div>
+  </div>
 
 </form>

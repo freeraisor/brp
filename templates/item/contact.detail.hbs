@@ -1,0 +1,29 @@
+<section class="item tab details {{tab.cssClass}}" data-group="primary" data-tab="details">
+  <div class="item-title"> {{localize 'BRP.details'}}:</div>
+  <div class="armour-scores">
+    <div class="skill-display new-row">{{localize 'BRP.role'}}</div>
+    <div class="weapon-input centre"><input name="system.role" type="text" value="{{item.system.role}}" /></div>
+    <div class="skill-display">{{localize 'BRP.location'}}</div>
+    <div class="weapon-input centre"><input name="system.location" type="text" value="{{item.system.location}}" /></div>
+    <div class="skill-display new-row">{{localize 'BRP.relation'}}</div>
+    <div class="weapon-input centre">
+      <select name="system.relation">
+        {{selectOptions relationOptions selected=contactRelation}}
+      </select>
+    </div>
+    <div class="skill-display">{{localize 'BRP.linkedActor'}}</div>
+    <div class="weapon-input centre">
+      <select name="system.linkedActorUuid">
+        {{selectOptions linkedActorOptions selected=linkedActorUuid}}
+      </select>
+    </div>
+    <div class="skill-display new-row">{{localize 'BRP.view'}}</div>
+    <div class="weapon-input centre">
+      {{#if linkedActor}}
+        <button type="button" data-action="contactOpenLinkedActor">{{linkedActor.name}}</button>
+      {{else}}
+        <span>-</span>
+      {{/if}}
+    </div>
+  </div>
+</section>

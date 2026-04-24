@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>BRP Character Sheet — Items Tab Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-base: #1a1210;
+  --bg-card: #241a18;
+  --bg-elevated: #2d211f;
+  --bg-hover: #3a2a26;
+  --border: #4a1f1f;
+  --border-soft: #33211f;
+  --red: #c8302e;
+  --red-bright: #e24b4a;
+  --red-muted: #8a2a28;
+  --mint: #9ad8c4;
+  --mint-dim: #6fa894;
+  --blue: #5b8fd8;
+  --blue-dim: #3d6a9c;
+  --amber: #d4a04a;
+  --amber-dim: #8c6a2e;
+  --green: #7fb355;
+  --purple: #a77bc4;
+  --text: #e8e2dc;
+  --text-dim: #a89d94;
+  --text-muted: #6e6560;
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.sheet {
+  max-width: 1280px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  height: calc(100vh - 40px);
+  min-height: 760px;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--bg-base);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.workspace {
+  flex: 1;
+  min-width: 0;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.rail {
+  width: 52px;
+  background: var(--bg-base);
+  border-left: 1px solid var(--border);
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.avatar { aspect-ratio: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+.identity { text-align: center; }
+.identity .name { font-family: var(--font-display); font-size: 18px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--red-bright); }
+.identity .sub { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+.status-row { display: flex; justify-content: space-between; gap: 4px; padding: 10px 4px; border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+.status-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 3px; color: var(--text-muted); }
+.status-icon.active { color: var(--red-bright); background: rgba(226, 75, 74, 0.12); }
+
+.resource { display: flex; flex-direction: column; gap: 6px; }
+.resource-head { display: flex; justify-content: space-between; align-items: baseline; }
+.resource-head .label { font-family: var(--font-display); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); font-weight: 600; }
+.resource-head .value { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.bar { height: 8px; background: var(--bg-card); border-radius: 1px; overflow: hidden; border: 1px solid var(--border-soft); }
+.bar.big { height: 12px; }
+.bar-fill { height: 100%; transition: width 0.3s; }
+.resource.compact .resource-head .label { font-size: 10px; letter-spacing: 1.5px; color: var(--text-dim); }
+.resource.compact .resource-head .value { font-size: 11px; color: var(--text-dim); }
+.resource.compact .bar { height: 4px; }
+.divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+.rail-btn { width: 52px; height: 48px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; position: relative; border-left: 3px solid transparent; transition: all 0.15s; }
+.rail-btn:hover { color: var(--text-dim); background: var(--bg-card); }
+.rail-btn.active { color: var(--mint); background: var(--bg-card); border-left-color: var(--mint); }
+.rail-btn .tooltip { position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); background: var(--bg-elevated); border: 1px solid var(--border); padding: 4px 10px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text); white-space: nowrap; border-radius: 2px; opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 10; }
+.rail-btn:hover .tooltip { opacity: 1; }
+
+.tab-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--mint); padding-bottom: 12px; margin-bottom: 16px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 12px; }
+.tab-title .lock { margin-left: auto; font-size: 10px; letter-spacing: 2px; color: var(--text-muted); font-family: var(--font-body); font-weight: 400; display: flex; align-items: center; gap: 6px; }
+
+.items-header {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.enc-panel {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 12px 14px;
+}
+
+.enc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.enc-head .label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+}
+
+.enc-head .value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.enc-head .zone-tag {
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.enc-head .zone-tag.light { background: rgba(127, 179, 85, 0.15); color: var(--green); }
+.enc-head .zone-tag.medium { background: rgba(212, 160, 74, 0.15); color: var(--amber); }
+.enc-head .zone-tag.heavy { background: rgba(226, 75, 74, 0.15); color: var(--red-bright); }
+.enc-head .zone-tag.over { background: rgba(226, 75, 74, 0.3); color: var(--red-bright); border: 1px solid var(--red-bright); }
+
+.enc-bar-wrap {
+  position: relative;
+  height: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.enc-bar-fill {
+  height: 100%;
+  transition: width 0.3s, background 0.3s;
+}
+
+.enc-marker {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--text-muted);
+  opacity: 0.6;
+}
+
+.enc-marker::after {
+  content: attr(data-label);
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.enc-zones {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.enc-zones span { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.enc-zones .pen { color: var(--text-dim); font-weight: 500; }
+
+.currency-panel {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.currency-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.currency-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  padding: 5px 10px;
+  border-radius: 2px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.currency-pill:hover { border-color: var(--amber-dim); }
+
+.currency-pill .cur-icon {
+  display: flex;
+  align-items: center;
+  color: var(--amber);
+}
+
+.currency-pill .cur-name {
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.currency-pill .cur-amount { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; margin-left: 4px; }
+
+.currency-pill.credit .cur-icon { color: var(--blue); }
+.currency-pill.crypto .cur-icon { color: var(--purple); }
+.currency-pill.gem .cur-icon { color: var(--mint); }
+
+.add-currency-btn {
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px dashed var(--border-soft);
+  color: var(--text-muted);
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.add-currency-btn:hover { border-color: var(--amber-dim); border-style: solid; color: var(--amber); }
+.add-currency-btn svg { width: 12px; height: 12px; }
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.search { flex: 1; position: relative; }
+.search input {
+  width: 100%;
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  color: var(--text);
+  padding: 8px 12px 8px 34px;
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search input:focus { border-color: var(--red-muted); }
+.search input::placeholder { color: var(--text-muted); }
+.search .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; width: 16px; height: 16px; }
+
+.tool-btn {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  padding: 0 12px;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+
+.tool-btn:hover { border-color: var(--red-muted); color: var(--red-bright); }
+.tool-btn.active { border-color: var(--mint-dim); color: var(--mint); background: rgba(154, 216, 196, 0.06); }
+.tool-btn svg { width: 14px; height: 14px; }
+.tool-btn .filter-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--mint);
+  color: var(--bg-base);
+  font-size: 9px;
+  font-weight: 700;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-panel {
+  display: none;
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px 20px;
+}
+
+.filter-panel.show { display: grid; }
+
+.filter-group { display: flex; flex-direction: column; gap: 6px; }
+
+.filter-group .fg-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-checkbox input { width: 13px; height: 13px; margin: 0; accent-color: var(--mint); cursor: pointer; }
+.filter-checkbox:hover { color: var(--text); }
+
+.section { margin-bottom: 20px; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding-top: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-header .chevron { width: 12px; height: 12px; color: var(--text-muted); transition: transform 0.15s; }
+.section.collapsed .chevron { transform: rotate(-90deg); }
+
+.section-header .title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+}
+
+.section-header .count {
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: 1px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+}
+
+.section-header .line { flex: 1; height: 1px; background: var(--border-soft); }
+.section-header .actions { display: flex; gap: 6px; }
+
+.section-body { display: flex; flex-direction: column; gap: 4px; }
+.section.collapsed .section-body { display: none; }
+
+.section-sort-label {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  padding: 0 4px;
+}
+
+.sort-pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sort-pill:hover { border-color: var(--mint-dim); color: var(--mint); }
+.sort-pill svg { width: 10px; height: 10px; }
+
+/* ITEM ROW (base for weapons, armor, others) */
+.item {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.item:hover { border-color: var(--border); }
+.item.equipped { border-left: 2px solid var(--mint); }
+.item.carried-off { opacity: 0.55; }
+.item.empty { opacity: 0.4; }
+.item.expanded { border-color: var(--red-muted); }
+
+.item-row {
+  display: grid;
+  grid-template-columns: 12px 36px 1fr auto auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.item-row .handle {
+  color: transparent;
+  cursor: grab;
+  font-size: 12px;
+  letter-spacing: -1px;
+  user-select: none;
+}
+
+.item:hover .item-row .handle { color: var(--text-muted); }
+
+.item-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  color: var(--text-dim);
+}
+
+.item-icon svg { width: 20px; height: 20px; }
+
+.item.weapon .item-icon { color: var(--amber); }
+.item.armor .item-icon { color: var(--blue); }
+.item.container .item-icon { color: var(--mint); }
+.item.consumable .item-icon { color: var(--green); }
+.item.tool .item-icon { color: var(--purple); }
+.item.equipment .item-icon { color: var(--text-dim); }
+.item.loot .item-icon { color: var(--amber); }
+
+.item-name-block { min-width: 0; }
+
+.item-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.item.empty .item-name { text-decoration: line-through; color: var(--text-muted); }
+
+.item-name .star { color: var(--amber); font-size: 11px; }
+
+.item-type-badge {
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.item-meta {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  display: flex;
+  gap: 10px;
+}
+
+.item-stats { display: flex; gap: 8px; align-items: center; }
+
+.item-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 3px 8px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.item-stat .stat-label {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.item-stat .stat-value {
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  margin-top: 1px;
+}
+
+.item-stat.ap .stat-value { color: var(--blue); }
+.item-stat.dmg .stat-value { color: var(--red-bright); }
+.item-stat.qty .stat-value { color: var(--text); }
+.item-stat.uses .stat-value { color: var(--green); }
+.item-stat.enc .stat-value { color: var(--text-dim); }
+
+.item-actions { display: flex; gap: 4px; }
+
+.iact-btn {
+  width: 28px;
+  height: 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.iact-btn:hover { border-color: var(--red-muted); color: var(--text); background: var(--bg-hover); }
+.iact-btn svg { width: 13px; height: 13px; }
+.iact-btn.active { color: var(--mint); border-color: var(--mint-dim); background: rgba(154, 216, 196, 0.08); }
+.iact-btn.use { color: var(--green); }
+.iact-btn.use:hover { border-color: var(--green); }
+.iact-btn.carry.active { color: var(--amber); border-color: var(--amber-dim); background: rgba(212, 160, 74, 0.08); }
+.iact-btn .tip {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  white-space: nowrap;
+  border-radius: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 10;
+}
+.iact-btn:hover .tip { opacity: 1; }
+
+.item-chevron {
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.item-chevron svg { width: 12px; height: 12px; }
+.item.expanded .item-chevron { transform: rotate(180deg); }
+
+.item-details {
+  display: none;
+  padding: 10px 16px 12px 62px;
+  border-top: 1px solid var(--border-soft);
+  background: rgba(0, 0, 0, 0.15);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.item.expanded .item-details { display: block; }
+
+.item-details .desc {
+  font-style: italic;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.item-details .detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 16px;
+  font-size: 11px;
+}
+
+.detail-row { display: flex; gap: 6px; }
+.detail-row .dlabel { font-size: 9px; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; }
+.detail-row .dval { color: var(--text-dim); }
+
+/* CONTAINER */
+.container-body {
+  display: none;
+  padding: 4px 12px 10px 50px;
+  background: rgba(154, 216, 196, 0.03);
+  border-top: 1px solid var(--border-soft);
+}
+
+.item.container.expanded .container-body { display: block; }
+
+.container-items {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 6px;
+}
+
+.container-empty {
+  text-align: center;
+  padding: 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
+
+.container-info {
+  display: flex;
+  gap: 12px;
+  padding: 5px 8px;
+  background: var(--bg-card);
+  border-radius: 2px;
+  margin-bottom: 6px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+}
+
+.container-info .ci-val { color: var(--text); font-weight: 500; }
+.container-info .ci-val.mint { color: var(--mint); }
+
+.container-drop-zone {
+  border: 1px dashed var(--border-soft);
+  border-radius: 2px;
+  padding: 8px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 4px;
+  transition: all 0.15s;
+}
+
+.container-drop-zone:hover { border-color: var(--mint-dim); color: var(--mint); }
+
+/* NESTED CONTAINER */
+.item.nested-1 { margin-left: 0; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center; z-index: 100; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 3px; padding: 20px 22px; width: 420px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8); }
+.modal h3 { font-family: var(--font-display); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--red-bright); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-soft); }
+
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 10px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
+.field input, .field select { width: 100%; background: var(--bg-base); border: 1px solid var(--border-soft); color: var(--text); padding: 7px 10px; font-family: inherit; font-size: 12px; border-radius: 2px; outline: none; }
+.field input:focus, .field select:focus { border-color: var(--mint-dim); }
+
+.icon-picker { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.icon-choice { background: var(--bg-base); border: 1px solid var(--border-soft); border-radius: 2px; padding: 8px; cursor: pointer; color: var(--text-dim); display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.icon-choice:hover { border-color: var(--amber-dim); color: var(--amber); }
+.icon-choice.selected { border-color: var(--amber); color: var(--amber); background: rgba(212, 160, 74, 0.08); }
+.icon-choice svg { width: 18px; height: 18px; }
+
+.modal-buttons { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-soft); }
+.modal-buttons button { background: var(--bg-base); border: 1px solid var(--border-soft); color: var(--text); padding: 8px 18px; font-family: inherit; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 2px; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+.modal-buttons button:hover { border-color: var(--red-muted); }
+.modal-buttons button.primary { background: var(--mint); color: var(--bg-base); border-color: var(--mint); font-weight: 600; }
+.modal-buttons button.primary:hover { background: var(--mint-dim); }
+.modal-buttons button.danger { background: var(--red); color: var(--text); border-color: var(--red); font-weight: 600; }
+.modal-buttons button.danger:hover { background: var(--red-bright); }
+
+.split-slider { display: flex; align-items: center; gap: 10px; }
+.split-slider input[type="range"] { flex: 1; accent-color: var(--mint); }
+.split-slider .split-val { font-size: 14px; font-weight: 600; color: var(--mint); font-variant-numeric: tabular-nums; min-width: 32px; text-align: center; }
+
+/* CONTEXT MENU */
+.ctx { position: fixed; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 2px; min-width: 180px; padding: 4px; z-index: 120; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); display: none; }
+.ctx.show { display: block; }
+.ctx-item { padding: 7px 12px; font-size: 12px; color: var(--text); cursor: pointer; border-radius: 1px; display: flex; align-items: center; gap: 10px; letter-spacing: 0.3px; }
+.ctx-item svg { width: 13px; height: 13px; color: var(--text-muted); }
+.ctx-item:hover { background: var(--red-muted); }
+.ctx-item:hover svg { color: var(--text); }
+.ctx-item.danger { color: var(--red-bright); }
+.ctx-item.danger:hover { background: var(--red-muted); color: #fff; }
+.ctx-divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+.chat-log { position: fixed; bottom: 20px; right: 20px; max-width: 380px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 3px; padding: 12px 14px; font-size: 12px; color: var(--text-dim); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; z-index: 150; }
+.chat-log.show { opacity: 1; transform: translateY(0); }
+.chat-log .chat-head { font-family: var(--font-display); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mint); margin-bottom: 4px; }
+
+.workspace::-webkit-scrollbar { width: 6px; }
+.workspace::-webkit-scrollbar-track { background: transparent; }
+.workspace::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.workspace::-webkit-scrollbar-thumb:hover { background: var(--red-muted); }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <aside class="sidebar">
+    <div class="avatar">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+    </div>
+    <div class="identity">
+      <div class="name">Арсэн</div>
+      <div class="sub">Pilot · 27</div>
+    </div>
+    <div class="status-row">
+      <div class="status-icon" title="Bleeding"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1 3-6 9-6 13a6 6 0 0 0 12 0c0-4-5-10-6-13z"/></svg></div>
+      <div class="status-icon" title="Stunned"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 9l2 2m0-2l-2 2M14 9l2 2m0-2l-2 2"/></svg></div>
+      <div class="status-icon" title="Prone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18"/><circle cx="7" cy="14" r="2"/><path d="M9 14h10"/></svg></div>
+      <div class="status-icon" title="Grappled"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6a3 3 0 0 0 6 0V5"/><path d="M18 3v6a3 3 0 0 1-6 0"/><path d="M6 15a6 6 0 0 0 12 0"/></svg></div>
+      <div class="status-icon" title="Unconscious"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h5l-4 4h4"/><path d="M14 14h5l-4 4h4"/></svg></div>
+      <div class="status-icon" title="Dying"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/><path d="M4 15c-1 5 2 7 8 7s9-2 8-7c-1-4-3-11-8-11s-7 7-8 11z"/></svg></div>
+    </div>
+    <div class="resource">
+      <div class="resource-head"><span class="label">Hit points</span><span class="value" style="color: var(--red-bright)">18 / 20</span></div>
+      <div class="bar big"><div class="bar-fill" style="width:90%; background: var(--red-bright)"></div></div>
+    </div>
+    <div class="resource">
+      <div class="resource-head"><span class="label">Power points</span><span class="value" style="color: var(--blue)">10 / 10</span></div>
+      <div class="bar big"><div class="bar-fill" style="width:100%; background: var(--blue)"></div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Fatigue</span><span class="value">16 / 16</span></div><div class="bar"><div class="bar-fill" style="width:100%; background: var(--amber)"></div></div></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Sanity</span><span class="value">5 / 5</span></div><div class="bar"><div class="bar-fill" style="width:100%; background: var(--green)"></div></div></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Resource</span><span class="value" style="color: var(--text-muted)">0 / 0</span></div><div class="bar"></div></div>
+  </aside>
+
+  <main class="workspace">
+    <div class="tab-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+      Items
+      <span class="lock">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        Locked
+      </span>
+    </div>
+
+    <div class="items-header">
+      <div class="enc-panel">
+        <div class="enc-head">
+          <span class="label">Encumbrance</span>
+          <span class="value" id="enc-value">14.3 / 22</span>
+          <span class="zone-tag medium" id="enc-zone">Medium · -1p</span>
+        </div>
+        <div class="enc-bar-wrap">
+          <div class="enc-bar-fill" id="enc-fill" style="width: 65%; background: var(--amber)"></div>
+          <div class="enc-marker" style="left: 50%" data-label="Medium"></div>
+          <div class="enc-marker" style="left: 75%" data-label="Heavy"></div>
+        </div>
+        <div class="enc-zones">
+          <span>Light <span class="pen">0</span></span>
+          <span style="margin-left: 30%">Medium <span class="pen">-1p</span></span>
+          <span>Heavy <span class="pen">-2p</span></span>
+        </div>
+      </div>
+
+      <div class="currency-panel">
+        <span class="currency-label">Currency</span>
+        <div class="currency-pill" data-cur="credits">
+          <span class="cur-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/><text x="12" y="16" font-size="10" text-anchor="middle" fill="#241a18" font-weight="700">¢</text></svg></span>
+          <span class="cur-name">Credits</span>
+          <span class="cur-amount">1,240</span>
+        </div>
+        <div class="currency-pill credit" data-cur="card">
+          <span class="cur-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>
+          <span class="cur-name">Card</span>
+          <span class="cur-amount">4,500</span>
+        </div>
+        <div class="currency-pill gem" data-cur="crystals">
+          <span class="cur-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 10l8 12 8-12z"/></svg></span>
+          <span class="cur-name">Crystals</span>
+          <span class="cur-amount">3</span>
+        </div>
+        <div class="currency-pill crypto" data-cur="bits">
+          <span class="cur-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M10 7v10M14 7v10M7 10h9a2 2 0 0 1 0 4H7M7 14h10a2 2 0 0 1 0 4H7"/></svg></span>
+          <span class="cur-name">Bits</span>
+          <span class="cur-amount">120</span>
+        </div>
+        <button class="add-currency-btn" id="add-currency" title="Add currency type">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="search" placeholder="Search inventory..." id="search">
+      </div>
+      <button class="tool-btn" id="filter-btn" title="Filters" style="position: relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h18l-7 10v6l-4-2v-4z"/></svg>
+        Filters
+        <span class="filter-count" id="filter-count" style="display: none">0</span>
+      </button>
+      <button class="tool-btn" id="add-item-btn" title="Add item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+    </div>
+
+    <div class="filter-panel" id="filter-panel">
+      <div class="filter-group">
+        <span class="fg-label">By type</span>
+        <label class="filter-checkbox"><input type="checkbox" checked data-filter-type="weapon"> Weapons</label>
+        <label class="filter-checkbox"><input type="checkbox" checked data-filter-type="armor"> Armor</label>
+        <label class="filter-checkbox"><input type="checkbox" checked data-filter-type="container"> Containers</label>
+        <label class="filter-checkbox"><input type="checkbox" checked data-filter-type="consumable"> Consumables</label>
+        <label class="filter-checkbox"><input type="checkbox" checked data-filter-type="tool"> Tools</label>
+        <label class="filter-checkbox"><input type="checkbox" checked data-filter-type="equipment"> Equipment</label>
+        <label class="filter-checkbox"><input type="checkbox" checked data-filter-type="loot"> Loot</label>
+      </div>
+      <div class="filter-group">
+        <span class="fg-label">By state</span>
+        <label class="filter-checkbox"><input type="checkbox" id="f-equipped"> Equipped only</label>
+        <label class="filter-checkbox"><input type="checkbox" id="f-carried"> Carried only</label>
+        <label class="filter-checkbox"><input type="checkbox" id="f-favorite"> Favorites only</label>
+        <label class="filter-checkbox"><input type="checkbox" id="f-hide-empty" checked> Hide empty (qty = 0)</label>
+      </div>
+    </div>
+
+    <!-- WEAPONS SECTION -->
+    <div class="section" data-section="weapons">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Weapons</span>
+        <span class="count">3</span>
+        <button class="sort-pill" data-sort-section="weapons"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M9 18h6"/></svg><span>Custom</span></button>
+        <span class="line"></span>
+        <div class="actions">
+          <button class="iact-btn" data-section-add="weapon" title="Add weapon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+      <div class="section-body" data-section-body="weapons">
+        <!-- Weapons rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ARMOR SECTION -->
+    <div class="section" data-section="armor">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Armor</span>
+        <span class="count">4</span>
+        <button class="sort-pill" data-sort-section="armor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M9 18h6"/></svg><span>A-Z</span></button>
+        <span class="line"></span>
+        <div class="actions">
+          <button class="iact-btn" data-section-add="armor" title="Add armor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+      <div class="section-body" data-section-body="armor"></div>
+    </div>
+
+    <!-- OTHER SECTION -->
+    <div class="section" data-section="other">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Other</span>
+        <span class="count">8</span>
+        <button class="sort-pill" data-sort-section="other"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M9 18h6"/></svg><span>By type</span></button>
+        <span class="line"></span>
+        <div class="actions">
+          <button class="iact-btn" data-section-add="other" title="Add item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+      <div class="section-body" data-section-body="other"></div>
+    </div>
+
+  </main>
+
+  <nav class="rail">
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg><span class="tooltip">Skills</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14.5 17.5L3 6V3h3l11.5 11.5z"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M21 3v3L9.5 17.5"/><path d="M8 14l-4 4"/></svg><span class="tooltip">Combat</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg><span class="tooltip">Health</span></div>
+    <div class="rail-btn active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg><span class="tooltip">Items</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span class="tooltip">Character</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="7" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/><circle cx="17" cy="8" r="3"/><path d="M22 20c0-2.76-2.24-5-5-5"/></svg><span class="tooltip">Social</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="tooltip">Story</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg><span class="tooltip">Effects</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg><span class="tooltip">Dev</span></div>
+  </nav>
+</div>
+
+<!-- Context Menu -->
+<div class="ctx" id="ctx"></div>
+
+<!-- Split Stack Modal -->
+<div class="modal-overlay" id="split-modal">
+  <div class="modal" style="width: 360px">
+    <h3>Split stack</h3>
+    <div class="field">
+      <label>Amount to split off</label>
+      <div class="split-slider">
+        <input type="range" id="split-range" min="1" max="7" value="3">
+        <span class="split-val" id="split-val">3</span>
+      </div>
+      <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px">Remaining: <span id="split-remaining">4</span></div>
+    </div>
+    <div class="modal-buttons">
+      <button id="split-cancel">Cancel</button>
+      <button class="primary" id="split-confirm">Split</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Currency Modal -->
+<div class="modal-overlay" id="currency-modal">
+  <div class="modal">
+    <h3>Add currency type</h3>
+    <div class="field">
+      <label>Currency name</label>
+      <input type="text" id="cur-name" placeholder="e.g. Gold, Gems, Dollars">
+    </div>
+    <div class="field">
+      <label>Amount</label>
+      <input type="number" id="cur-amount" value="0" min="0">
+    </div>
+    <div class="field">
+      <label>Choose icon</label>
+      <div class="icon-picker" id="icon-picker"></div>
+    </div>
+    <div class="modal-buttons">
+      <button id="cur-cancel">Cancel</button>
+      <button class="primary" id="cur-create">Create</button>
+    </div>
+  </div>
+</div>
+
+<div class="chat-log" id="chat-log">
+  <div class="chat-head">Foundry chat</div>
+  <div class="chat-body" id="chat-body"></div>
+</div>
+
+<script>
+// ============ STATE ============
+const state = {
+  sortBy: { weapons: 'custom', armor: 'name', other: 'type' },
+  filters: {
+    types: ['weapon', 'armor', 'container', 'consumable', 'tool', 'equipment', 'loot'],
+    equipped: false,
+    carried: false,
+    favorite: false,
+    hideEmpty: true,
+    search: ''
+  },
+  character: { str: 11, carried_enc_total: 14.3, enc_multiplier: 2 },
+  expandedItems: new Set(),
+  expandedContainers: new Set(['container-backpack'])
+};
+
+// ============ DATA ============
+const items = [
+  // WEAPONS
+  { id: 'w1', type: 'weapon', name: 'Pistol, Laser', equipped: true, carried: true, enc: 1, stackable: false, quantity: 1, damage: '1D8', skill_pct: 75, range_m: 20, ammo_cur: 14, ammo_max: 20, mag_count: 2, notes: 'Standard sidearm. Uses energy cells.', favorite: true },
+  { id: 'w2', type: 'weapon', name: 'Combat knife', equipped: true, carried: true, enc: 0.3, stackable: false, quantity: 1, damage: '1D4+2', skill_pct: 40, range_m: null, notes: 'One-handed, balanced for throwing.', favorite: false },
+  { id: 'w3', type: 'weapon', name: 'Hunting bow', equipped: false, carried: true, enc: 1.5, stackable: false, quantity: 1, damage: '1D6+1', skill_pct: 55, range_m: 80, notes: 'Hand-made, slight balance issues.', favorite: false },
+
+  // ARMOR
+  { id: 'a1', type: 'armor', name: 'Combat helmet', equipped: true, carried: true, enc: 0.5, stackable: false, quantity: 1, ap_formula: '1D4+1', locations: ['Head'], hp: '5/5', notes: 'Standard issue.' },
+  { id: 'a2', type: 'armor', name: 'Kevlar vest, heavy', equipped: true, carried: true, enc: 2, stackable: false, quantity: 1, ap_formula: '2D6-2', locations: ['Chest', 'Abdomen'], hp: '12/12', skill_mods: '0/-5/0', notes: 'Military-grade ballistic protection.' },
+  { id: 'a3', type: 'armor', name: 'Tactical arm guards', equipped: true, carried: true, enc: 0.8, stackable: false, quantity: 1, ap_formula: '1D4', locations: ['Left Arm', 'Right Arm'], hp: '6/6', notes: 'Light guards for forearm protection.' },
+  { id: 'a4', type: 'armor', name: 'Leather jacket', equipped: false, carried: true, enc: 1.2, stackable: false, quantity: 1, ap_formula: '1D2', locations: ['Chest', 'Arms'], hp: '4/4', notes: 'Civilian fallback.' },
+
+  // CONTAINERS (in Other)
+  { id: 'c1', type: 'container', name: 'Military backpack', equipped: false, carried: true, enc: 1, stackable: false, quantity: 1, enc_reduction_pct: 20, capacity_enc: 25, contents: ['e1', 'e2', 'cons1', 'cons2', 'cons3'], notes: 'Standard issue, 45L volume.' },
+  { id: 'c2', type: 'container', name: 'Side pouch', equipped: false, carried: true, enc: 0.2, stackable: false, quantity: 1, enc_reduction_pct: 0, capacity_enc: 3, contents: ['loot1'], notes: 'Hip pouch.' },
+  { id: 'c3', type: 'container', name: 'Weapon case', equipped: false, carried: false, enc: 2, stackable: false, quantity: 1, enc_reduction_pct: 0, capacity_enc: 5, contents: [], notes: 'Locked in bunk storage.' },
+
+  // CONSUMABLES
+  { id: 'cons1', type: 'consumable', name: 'Med. Стим-пак', equipped: false, carried: true, container_id: 'c1', enc: 0.05, stackable: true, quantity: 3, use_effect: 'heal', notes: 'Single-use injector. Restores HP.', favorite: true },
+  { id: 'cons2', type: 'consumable', name: 'Med. Базовый медпакет', equipped: false, carried: true, container_id: 'c1', enc: 0.4, stackable: true, quantity: 8, use_effect: 'heal', notes: 'Bandages, antiseptic, painkillers.' },
+  { id: 'cons3', type: 'consumable', name: 'Бутылка рома', equipped: false, carried: true, container_id: 'c1', enc: 0.5, stackable: false, quantity: 1, use_effect: 'apply_status', notes: 'Induces drunk state. Restores 1D3 FP but penalty to DEX.' },
+  { id: 'cons4', type: 'consumable', name: 'Ration pack', equipped: false, carried: true, enc: 0.3, stackable: true, quantity: 0, use_effect: 'custom', notes: 'Dried food, 1 day.' },
+
+  // TOOLS
+  { id: 't1', type: 'tool', name: 'Multi-tool', equipped: false, carried: true, enc: 0.2, stackable: false, quantity: 1, skill_bonus: '+10% Repair', notes: 'Compact, works in zero-g.' },
+  { id: 't2', type: 'tool', name: 'Lockpicks', equipped: false, carried: true, enc: 0.1, stackable: false, quantity: 1, skill_bonus: '+5% Disguise', notes: 'Set of picks and tension wrenches.' },
+
+  // EQUIPMENT
+  { id: 'e1', type: 'equipment', name: 'Comlink, personal', equipped: false, carried: true, container_id: 'c1', enc: 0.1, stackable: false, quantity: 1, notes: 'Short-range radio, 5km.' },
+  { id: 'e2', type: 'equipment', name: 'Datapad', equipped: false, carried: true, container_id: 'c1', enc: 0.5, stackable: false, quantity: 1, notes: 'Encrypted storage, access codes.' },
+
+  // LOOT
+  { id: 'loot1', type: 'loot', name: 'Strange artifact', equipped: false, carried: true, container_id: 'c2', enc: 0.3, stackable: false, quantity: 1, value: 'Unknown', notes: 'Found in the derelict. Faintly warm to touch.', favorite: true }
+];
+
+// ============ ICONS ============
+const ITEM_ICONS = {
+  weapon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 17.5L3 6V3h3l11.5 11.5z"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/></svg>`,
+  armor: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 3v7c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5l8-3z"/></svg>`,
+  container: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8v12h16V8"/><path d="M2 8l2-4h16l2 4"/><path d="M10 12h4"/></svg>`,
+  consumable: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 5h12l-1 2H7z"/><path d="M7 7l1 12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l1-12"/><path d="M10 12h4"/></svg>`,
+  tool: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 6l4 4-10 10-4-4z"/><path d="M14 6l3-3 3 3-3 3z"/></svg>`,
+  equipment: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+  loot: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>`
+};
+
+const CURRENCY_ICONS = [
+  { id: 'coin', svg: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/><text x="12" y="16" font-size="10" text-anchor="middle" fill="#241a18" font-weight="700">$</text></svg>` },
+  { id: 'bill', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="1"/><circle cx="12" cy="12" r="2"/></svg>` },
+  { id: 'card', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>` },
+  { id: 'crypto', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M10 7v10M14 7v10M7 10h9a2 2 0 0 1 0 4H7M7 14h10a2 2 0 0 1 0 4H7"/></svg>` },
+  { id: 'gem', svg: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 10l8 12 8-12z"/></svg>` },
+  { id: 'token', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 22 8 22 16 12 22 2 16 2 8"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>` }
+];
+
+// ============ RENDER ============
+function matchesFilters(item) {
+  const f = state.filters;
+  if (!f.types.includes(item.type)) return false;
+  if (f.equipped && !item.equipped) return false;
+  if (f.carried && !item.carried) return false;
+  if (f.favorite && !item.favorite) return false;
+  if (f.hideEmpty && item.stackable && item.quantity === 0) return false;
+  if (f.search && !item.name.toLowerCase().includes(f.search.toLowerCase()) && !(item.notes || '').toLowerCase().includes(f.search.toLowerCase())) return false;
+  return true;
+}
+
+function sortItems(list, mode) {
+  const copy = [...list];
+  if (mode === 'name') copy.sort((a, b) => a.name.localeCompare(b.name));
+  else if (mode === 'name-desc') copy.sort((a, b) => b.name.localeCompare(a.name));
+  else if (mode === 'type') {
+    const order = ['weapon', 'armor', 'container', 'consumable', 'tool', 'equipment', 'loot'];
+    copy.sort((a, b) => (order.indexOf(a.type) - order.indexOf(b.type)) || a.name.localeCompare(b.name));
+  } else if (mode === 'enc-desc') copy.sort((a, b) => (b.enc || 0) - (a.enc || 0));
+  else if (mode === 'enc-asc') copy.sort((a, b) => (a.enc || 0) - (b.enc || 0));
+  return copy;
+}
+
+function renderItem(item, depth = 0) {
+  const isContainer = item.type === 'container';
+  const expanded = state.expandedItems.has(item.id);
+  const containerExpanded = isContainer && state.expandedContainers.has(item.id);
+
+  const classes = ['item', item.type];
+  if (item.equipped) classes.push('equipped');
+  if (!item.carried) classes.push('carried-off');
+  if (item.stackable && item.quantity === 0) classes.push('empty');
+  if (expanded || containerExpanded) classes.push('expanded');
+  if (depth > 0) classes.push('nested-' + depth);
+
+  let statsHtml = '';
+  if (item.type === 'weapon') {
+    statsHtml = `
+      <div class="item-stat dmg"><div class="stat-label">DMG</div><div class="stat-value">${item.damage}</div></div>
+      <div class="item-stat"><div class="stat-label">%</div><div class="stat-value" style="color: var(--mint)">${item.skill_pct}%</div></div>
+      <div class="item-stat enc"><div class="stat-label">ENC</div><div class="stat-value">${item.enc}</div></div>
+    `;
+  } else if (item.type === 'armor') {
+    statsHtml = `
+      <div class="item-stat ap"><div class="stat-label">AP</div><div class="stat-value">${item.ap_formula}</div></div>
+      <div class="item-stat enc"><div class="stat-label">ENC</div><div class="stat-value">${item.enc}</div></div>
+    `;
+  } else if (item.type === 'container') {
+    const contents = (item.contents || []).map(id => items.find(i => i.id === id)).filter(Boolean);
+    const contentEnc = contents.reduce((s, i) => s + (i.enc || 0) * (i.quantity || 1), 0);
+    const effectiveEnc = item.enc + contentEnc * (1 - item.enc_reduction_pct / 100);
+    statsHtml = `
+      <div class="item-stat"><div class="stat-label">HOLDS</div><div class="stat-value">${contents.length}</div></div>
+      <div class="item-stat enc"><div class="stat-label">TOTAL ENC</div><div class="stat-value">${effectiveEnc.toFixed(1)}</div></div>
+    `;
+  } else if (item.type === 'consumable') {
+    statsHtml = `
+      <div class="item-stat qty"><div class="stat-label">QTY</div><div class="stat-value">${item.quantity}</div></div>
+      <div class="item-stat enc"><div class="stat-label">ENC</div><div class="stat-value">${item.enc}</div></div>
+    `;
+  } else {
+    statsHtml = `
+      ${item.stackable ? `<div class="item-stat qty"><div class="stat-label">QTY</div><div class="stat-value">${item.quantity}</div></div>` : ''}
+      <div class="item-stat enc"><div class="stat-label">ENC</div><div class="stat-value">${item.enc}</div></div>
+    `;
+  }
+
+  // ACTIONS
+  let actionsHtml = '';
+  if (item.type === 'weapon' || item.type === 'armor') {
+    actionsHtml += `<button class="iact-btn ${item.equipped ? 'active' : ''}" data-action="equip" data-item="${item.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span class="tip">${item.equipped ? 'Unequip' : 'Equip'}</span></button>`;
+  }
+  if (item.type === 'consumable') {
+    actionsHtml += `<button class="iact-btn use" data-action="use" data-item="${item.id}" ${item.quantity === 0 ? 'disabled style="opacity:0.3"' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 7"/></svg><span class="tip">Use</span></button>`;
+  }
+  actionsHtml += `<button class="iact-btn carry ${item.carried ? 'active' : ''}" data-action="carry" data-item="${item.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7l8 4 8-4M4 12l8 4 8-4M4 17l8 4 8-4"/></svg><span class="tip">${item.carried ? 'Carried' : 'Not carried'}</span></button>`;
+
+  const metaLines = [];
+  if (item.type === 'weapon' && item.ammo_max) metaLines.push(`AMMO ${item.ammo_cur}/${item.ammo_max}`);
+  if (item.type === 'armor' && item.locations) metaLines.push(item.locations.join(' · '));
+  if (item.type === 'consumable' && item.use_effect) metaLines.push('Effect: ' + item.use_effect);
+  if (item.type === 'tool' && item.skill_bonus) metaLines.push(item.skill_bonus);
+  if (item.type === 'container') metaLines.push(`${item.enc_reduction_pct}% ENC reduction · capacity ${item.capacity_enc}`);
+
+  const typeBadge = (item.type !== 'weapon' && item.type !== 'armor')
+    ? `<span class="item-type-badge">${item.type}</span>` : '';
+
+  let containerBodyHtml = '';
+  if (isContainer) {
+    const contents = (item.contents || []).map(id => items.find(i => i.id === id)).filter(Boolean);
+    const visibleContents = contents.filter(matchesFilters);
+    containerBodyHtml = `
+      <div class="container-body">
+        <div class="container-info">
+          <span>Capacity: <span class="ci-val">${contents.reduce((s, i) => s + (i.enc || 0) * (i.quantity || 1), 0).toFixed(1)}</span> / ${item.capacity_enc} ENC</span>
+          <span>Reduction: <span class="ci-val mint">${item.enc_reduction_pct}%</span></span>
+          <span>Nesting depth: <span class="ci-val">${depth + 1} / 3</span></span>
+        </div>
+        <div class="container-items">
+          ${visibleContents.length === 0
+            ? `<div class="container-empty">Container is empty</div>`
+            : visibleContents.map(i => renderItem(i, depth + 1)).join('')
+          }
+          <div class="container-drop-zone" data-drop-container="${item.id}">↓ Drop items here to add</div>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="${classes.join(' ')}" data-item="${item.id}" data-type="${item.type}">
+      <div class="item-row" data-row>
+        <span class="handle">⁝⁝</span>
+        <div class="item-icon">${ITEM_ICONS[item.type]}</div>
+        <div class="item-name-block">
+          <div class="item-name">
+            ${item.name}
+            ${item.favorite ? '<span class="star">★</span>' : ''}
+            ${typeBadge}
+          </div>
+          ${metaLines.length > 0 ? `<div class="item-meta">${metaLines.map(m => `<span>${m}</span>`).join('')}</div>` : ''}
+        </div>
+        <div class="item-stats">${statsHtml}</div>
+        <div class="item-actions">${actionsHtml}</div>
+        <div class="item-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+      </div>
+      ${!isContainer ? `
+        <div class="item-details">
+          ${item.notes ? `<div class="desc">${item.notes}</div>` : ''}
+          <div class="detail-grid">
+            <div class="detail-row"><span class="dlabel">Type</span><span class="dval">${item.type}</span></div>
+            <div class="detail-row"><span class="dlabel">ENC</span><span class="dval">${item.enc}</span></div>
+            ${item.stackable ? `<div class="detail-row"><span class="dlabel">Quantity</span><span class="dval">${item.quantity}</span></div>` : ''}
+            ${item.hp ? `<div class="detail-row"><span class="dlabel">HP</span><span class="dval">${item.hp}</span></div>` : ''}
+            ${item.skill_mods ? `<div class="detail-row"><span class="dlabel">Skill mods</span><span class="dval">${item.skill_mods}</span></div>` : ''}
+            ${item.value ? `<div class="detail-row"><span class="dlabel">Value</span><span class="dval">${item.value}</span></div>` : ''}
+          </div>
+        </div>
+      ` : containerBodyHtml}
+    </div>
+  `;
+}
+
+function renderAll() {
+  // WEAPONS
+  const weapons = items.filter(i => i.type === 'weapon' && !i.container_id).filter(matchesFilters);
+  document.querySelector('[data-section-body="weapons"]').innerHTML = sortItems(weapons, state.sortBy.weapons).map(i => renderItem(i)).join('');
+
+  // ARMOR
+  const armor = items.filter(i => i.type === 'armor' && !i.container_id).filter(matchesFilters);
+  document.querySelector('[data-section-body="armor"]').innerHTML = sortItems(armor, state.sortBy.armor).map(i => renderItem(i)).join('');
+
+  // OTHER (top level)
+  const others = items.filter(i => !['weapon', 'armor'].includes(i.type) && !i.container_id).filter(matchesFilters);
+  document.querySelector('[data-section-body="other"]').innerHTML = sortItems(others, state.sortBy.other).map(i => renderItem(i)).join('');
+
+  // Update counts
+  document.querySelector('[data-section="weapons"] .count').textContent = items.filter(i => i.type === 'weapon').length;
+  document.querySelector('[data-section="armor"] .count').textContent = items.filter(i => i.type === 'armor').length;
+  document.querySelector('[data-section="other"] .count').textContent = items.filter(i => !['weapon', 'armor'].includes(i.type)).length;
+
+  // ENC
+  const carriedItems = items.filter(i => i.carried);
+  let totalEnc = 0;
+  carriedItems.forEach(item => {
+    if (item.type === 'container') {
+      const contents = (item.contents || []).map(id => items.find(i => i.id === id)).filter(Boolean);
+      const contentEnc = contents.reduce((s, i) => s + (i.enc || 0) * (i.quantity || 1), 0);
+      totalEnc += item.enc + contentEnc * (1 - item.enc_reduction_pct / 100);
+    } else if (!item.container_id) {
+      totalEnc += item.enc * (item.stackable ? item.quantity : 1);
+    }
+  });
+
+  const maxEnc = state.character.str * state.character.enc_multiplier;
+  const pct = Math.min(100, (totalEnc / maxEnc) * 100);
+  document.getElementById('enc-value').textContent = `${totalEnc.toFixed(1)} / ${maxEnc}`;
+  document.getElementById('enc-fill').style.width = pct + '%';
+
+  const zoneEl = document.getElementById('enc-zone');
+  const lightMax = state.character.str;
+  const mediumMax = state.character.str * 1.5;
+  let zone, color, penalty;
+  if (totalEnc <= lightMax) { zone = 'Light'; color = 'var(--green)'; penalty = '0'; zoneEl.className = 'zone-tag light'; }
+  else if (totalEnc <= mediumMax) { zone = 'Medium'; color = 'var(--amber)'; penalty = '-1p'; zoneEl.className = 'zone-tag medium'; }
+  else if (totalEnc <= maxEnc) { zone = 'Heavy'; color = 'var(--red-bright)'; penalty = '-2p'; zoneEl.className = 'zone-tag heavy'; }
+  else { zone = 'Overload'; color = 'var(--red-bright)'; penalty = 'Impossible'; zoneEl.className = 'zone-tag over'; }
+  zoneEl.textContent = `${zone} · ${penalty}`;
+  document.getElementById('enc-fill').style.background = color;
+
+  attachHandlers();
+}
+
+// ============ HANDLERS ============
+function attachHandlers() {
+  document.querySelectorAll('.item').forEach(el => {
+    const row = el.querySelector('[data-row]');
+    if (!row) return;
+
+    row.addEventListener('click', e => {
+      if (e.target.closest('.iact-btn') || e.target.closest('.handle')) return;
+      if (e.target.closest('.item-chevron') || !e.target.closest('.container-body')) {
+        const id = el.dataset.item;
+        const item = items.find(i => i.id === id);
+        if (item?.type === 'container') {
+          if (state.expandedContainers.has(id)) state.expandedContainers.delete(id);
+          else state.expandedContainers.add(id);
+        } else {
+          if (state.expandedItems.has(id)) state.expandedItems.delete(id);
+          else state.expandedItems.add(id);
+        }
+        renderAll();
+      }
+    });
+
+    row.addEventListener('dblclick', e => {
+      if (e.target.closest('.iact-btn')) return;
+      const id = el.dataset.item;
+      const item = items.find(i => i.id === id);
+      showChat(`[ITEM WINDOW] Open detailed view for "${item?.name}" (Foundry item sheet)`);
+    });
+
+    row.addEventListener('contextmenu', e => {
+      if (e.target.closest('.iact-btn')) return;
+      e.preventDefault();
+      showContextMenu(e.clientX, e.clientY, el.dataset.item);
+    });
+  });
+
+  document.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = btn.dataset.item;
+      const item = items.find(i => i.id === id);
+      const action = btn.dataset.action;
+      if (action === 'equip') {
+        item.equipped = !item.equipped;
+        showChat(`${item.name} ${item.equipped ? 'equipped' : 'unequipped'}`);
+      } else if (action === 'carry') {
+        item.carried = !item.carried;
+        showChat(`${item.name} ${item.carried ? 'carried' : 'removed from carry'}`);
+      } else if (action === 'use') {
+        if (item.stackable) item.quantity = Math.max(0, item.quantity - 1);
+        showChat(`Used ${item.name}${item.stackable ? ` (${item.quantity} left)` : ''}. Effect: ${item.use_effect}`);
+      }
+      renderAll();
+    });
+  });
+}
+
+// ============ CONTEXT MENU ============
+function showContextMenu(x, y, itemId) {
+  const item = items.find(i => i.id === itemId);
+  if (!item) return;
+
+  const ctx = document.getElementById('ctx');
+  ctx.innerHTML = `
+    <div class="ctx-item" data-ctxaction="favorite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>${item.favorite ? 'Unmark favorite' : 'Mark as favorite'}</div>
+    <div class="ctx-item" data-ctxaction="duplicate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Duplicate</div>
+    ${item.stackable && item.quantity > 1 ? `<div class="ctx-item" data-ctxaction="split"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 10l7 7 7-7"/></svg>Split stack</div>` : ''}
+    <div class="ctx-item" data-ctxaction="edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Edit (unlock)</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item danger" data-ctxaction="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Delete</div>
+  `;
+  ctx.classList.add('show');
+  const rect = { w: 200, h: 200 };
+  ctx.style.left = Math.min(x, window.innerWidth - rect.w - 10) + 'px';
+  ctx.style.top = Math.min(y, window.innerHeight - rect.h - 10) + 'px';
+
+  ctx.querySelectorAll('[data-ctxaction]').forEach(i => {
+    i.addEventListener('click', () => {
+      const a = i.dataset.ctxaction;
+      if (a === 'favorite') { item.favorite = !item.favorite; }
+      else if (a === 'duplicate') {
+        const clone = { ...item, id: 'clone-' + Date.now(), favorite: false };
+        items.push(clone);
+        showChat(`Duplicated: ${item.name}`);
+      }
+      else if (a === 'split') openSplitModal(item);
+      else if (a === 'edit') showChat(`[EDIT] Opens unlock-mode editor for ${item.name}`);
+      else if (a === 'delete') {
+        const idx = items.indexOf(item);
+        if (idx >= 0) items.splice(idx, 1);
+        showChat(`Removed: ${item.name}`);
+      }
+      ctx.classList.remove('show');
+      renderAll();
+    });
+  });
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ctx')) document.getElementById('ctx').classList.remove('show');
+});
+
+// ============ SPLIT MODAL ============
+let splitTarget = null;
+function openSplitModal(item) {
+  splitTarget = item;
+  const range = document.getElementById('split-range');
+  range.max = item.quantity - 1;
+  range.value = Math.min(range.value, range.max);
+  updateSplitPreview();
+  document.getElementById('split-modal').classList.add('show');
+}
+
+function updateSplitPreview() {
+  const val = parseInt(document.getElementById('split-range').value);
+  document.getElementById('split-val').textContent = val;
+  document.getElementById('split-remaining').textContent = splitTarget.quantity - val;
+}
+
+document.getElementById('split-range').addEventListener('input', updateSplitPreview);
+document.getElementById('split-cancel').addEventListener('click', () => {
+  document.getElementById('split-modal').classList.remove('show');
+});
+document.getElementById('split-confirm').addEventListener('click', () => {
+  if (!splitTarget) return;
+  const split = parseInt(document.getElementById('split-range').value);
+  splitTarget.quantity -= split;
+  const clone = { ...splitTarget, id: 'split-' + Date.now(), quantity: split, favorite: false };
+  items.push(clone);
+  showChat(`Split ${split} × ${splitTarget.name} into separate stack`);
+  document.getElementById('split-modal').classList.remove('show');
+  renderAll();
+});
+
+// ============ CURRENCY MODAL ============
+let selectedIcon = 'coin';
+const iconPicker = document.getElementById('icon-picker');
+CURRENCY_ICONS.forEach(ic => {
+  const el = document.createElement('div');
+  el.className = 'icon-choice' + (ic.id === 'coin' ? ' selected' : '');
+  el.dataset.icon = ic.id;
+  el.innerHTML = ic.svg;
+  el.addEventListener('click', () => {
+    iconPicker.querySelectorAll('.icon-choice').forEach(x => x.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedIcon = ic.id;
+  });
+  iconPicker.appendChild(el);
+});
+
+document.getElementById('add-currency').addEventListener('click', () => {
+  document.getElementById('currency-modal').classList.add('show');
+});
+document.getElementById('cur-cancel').addEventListener('click', () => {
+  document.getElementById('currency-modal').classList.remove('show');
+});
+document.getElementById('cur-create').addEventListener('click', () => {
+  const name = document.getElementById('cur-name').value.trim();
+  const amount = parseInt(document.getElementById('cur-amount').value) || 0;
+  if (!name) return;
+  showChat(`Added currency: ${name} (${amount}, icon: ${selectedIcon})`);
+  document.getElementById('currency-modal').classList.remove('show');
+  document.getElementById('cur-name').value = '';
+  document.getElementById('cur-amount').value = '0';
+});
+
+// ============ TOOLBAR ============
+document.getElementById('search').addEventListener('input', e => {
+  state.filters.search = e.target.value;
+  renderAll();
+});
+
+document.getElementById('filter-btn').addEventListener('click', () => {
+  document.getElementById('filter-panel').classList.toggle('show');
+});
+
+document.querySelectorAll('[data-filter-type]').forEach(cb => {
+  cb.addEventListener('change', () => {
+    const type = cb.dataset.filterType;
+    if (cb.checked) {
+      if (!state.filters.types.includes(type)) state.filters.types.push(type);
+    } else {
+      state.filters.types = state.filters.types.filter(t => t !== type);
+    }
+    updateFilterCount();
+    renderAll();
+  });
+});
+
+document.getElementById('f-equipped').addEventListener('change', e => { state.filters.equipped = e.target.checked; updateFilterCount(); renderAll(); });
+document.getElementById('f-carried').addEventListener('change', e => { state.filters.carried = e.target.checked; updateFilterCount(); renderAll(); });
+document.getElementById('f-favorite').addEventListener('change', e => { state.filters.favorite = e.target.checked; updateFilterCount(); renderAll(); });
+document.getElementById('f-hide-empty').addEventListener('change', e => { state.filters.hideEmpty = e.target.checked; updateFilterCount(); renderAll(); });
+
+function updateFilterCount() {
+  let count = 0;
+  if (state.filters.types.length < 7) count++;
+  if (state.filters.equipped) count++;
+  if (state.filters.carried) count++;
+  if (state.filters.favorite) count++;
+  if (!state.filters.hideEmpty) count++;
+  const el = document.getElementById('filter-count');
+  if (count > 0) {
+    el.textContent = count;
+    el.style.display = 'flex';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+// ============ SORT ============
+const sortModes = ['custom', 'name', 'name-desc', 'type', 'enc-desc', 'enc-asc'];
+const sortLabels = { 'custom': 'Custom', 'name': 'A-Z', 'name-desc': 'Z-A', 'type': 'By type', 'enc-desc': 'ENC ↓', 'enc-asc': 'ENC ↑' };
+
+document.querySelectorAll('[data-sort-section]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const section = btn.dataset.sortSection;
+    const current = state.sortBy[section];
+    const idx = sortModes.indexOf(current);
+    state.sortBy[section] = sortModes[(idx + 1) % sortModes.length];
+    btn.querySelector('span').textContent = sortLabels[state.sortBy[section]];
+    renderAll();
+  });
+});
+
+// ============ SECTION COLLAPSE ============
+document.querySelectorAll('.section-header').forEach(h => {
+  h.addEventListener('click', e => {
+    if (e.target.closest('.sort-pill') || e.target.closest('.iact-btn')) return;
+    h.parentElement.classList.toggle('collapsed');
+  });
+});
+
+// ============ MISC ============
+let chatTimeout;
+function showChat(msg) {
+  const log = document.getElementById('chat-log');
+  document.getElementById('chat-body').textContent = msg;
+  log.classList.add('show');
+  clearTimeout(chatTimeout);
+  chatTimeout = setTimeout(() => log.classList.remove('show'), 3200);
+}
+
+document.querySelectorAll('.rail-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+renderAll();
+</script>
+</body>
+</html>

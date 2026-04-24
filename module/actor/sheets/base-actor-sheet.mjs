@@ -4,16 +4,31 @@ import { BRPSelectLists } from "../../apps/select-lists.mjs";
 import { BRPRollType } from "../../apps/rollType.mjs";
 import { BRPactorItemDrop } from "../actor-itemDrop.mjs";
 import { BRPDamage } from '../../combat/damage.mjs';
+import { BRPHealth } from '../../combat/health.mjs';
 import { BRPUtilities } from '../../apps/utilities.mjs';
 import BRPDialog from '../../setup/brp-dialog.mjs';
 import { BRPActor } from "../actor.mjs";
 import { isCtrlKey } from '../../apps/helper.mjs'
 import { BRPCharDev } from "../../apps/charDev.mjs";
+import { buildSilhouetteMapFromForm, createSilhouetteMappingContext } from './character/prepare/health-silhouette.mjs';
+import { persistUiMapFlag } from './character/character-sheet-utils.mjs';
+
+function hasTransientUiState(value) {
+  if (!value) return false;
+  if (Array.isArray(value)) return value.length > 0;
+  if (value instanceof Set || value instanceof Map) return value.size > 0;
+  if (typeof value !== 'object') return Boolean(value);
+  return Object.values(value).some(hasTransientUiState);
+}
 
 export class BRPActorSheetV2 extends api.HandlebarsApplicationMixin(sheets.ActorSheetV2) {
   constructor(options = {}) {
     super(options);
     this._dragDrop = this._createDragDropHandlers();
+    this._brpUiState = null;
+    this._brpRememberUiState = () => this._rememberUiState();
+    this._brpRememberUiStateSoon = () => globalThis.setTimeout(this._brpRememberUiState, 0);
+    this._brpRememberScroll = () => this._rememberScrollPosition();
   }
 
   static DEFAULT_OPTIONS = {
@@ -56,6 +71,16 @@ export class BRPActorSheetV2 extends api.HandlebarsApplicationMixin(sheets.Actor
       deletePersonality: this._deletePersonality,
       addDamage: this._addDamage,
       healWound: this._healWound,
+      healthAddDamage: this._addDamage,
+      healthHealWound: this._healWound,
+      healthNaturalHeal: this._onHealthNaturalHeal,
+      healthOtherHeal: this._onHealthOtherHeal,
+      healthAllHeal: this._onHealthAllHeal,
+      healthResetDaily: this._onHealthResetDaily,
+      healthReduceArmorEnergy: this._onHealthReduceArmorEnergy,
+      healthAddArmorEnergy: this._onHealthAddArmorEnergy,
+      healthWoundToggle: this._viewWound,
+      healthWoundDelete: this._onHealthWoundDelete,
       attribute: this._onAttribute,
       restoreFatigue: this._onRestoreFatigue,
       restorePower: this._onRestorePower,
@@ -63,6 +88,11 @@ export class BRPActorSheetV2 extends api.HandlebarsApplicationMixin(sheets.Actor
       treatWound: this._treatWound,
       viewWound: this._viewWound,
       healing: this._onHealing,
+      healthVizMode: this._onHealthVizMode,
+      healthLocationRowToggle: this._onHealthLocationRowToggle,
+      healthWoundRowToggle: this._onHealthWoundRowToggle,
+      healthLocationToggle: this._onHealthLocationToggle,
+      healthSilhouetteSettings: this._onHealthSilhouetteSettings,
       armourToggle: this._onArmourToggle,
       armourLocToggle: this._onArmourLocToggle,
       impactRoll: this._onImpactRoll,
@@ -118,6 +148,132 @@ export class BRPActorSheetV2 extends api.HandlebarsApplicationMixin(sheets.Actor
       useBeastiary: game.settings.get('brp', 'beastiary'),
       statOptions: await BRPSelectLists.addStatOptions(""),
     };
+  }
+
+  render(...args) {
+    this._rememberUiState();
+    return super.render(...args);
+  }
+
+  _onRender(context, options) {
+    super._onRender?.(context, options);
+    this._restoreUiState();
+    this._bindUiStateCapture();
+  }
+
+  _rememberScrollPosition() {
+    const positions = this._captureScrollPositions();
+    if (!positions.length) return;
+
+    const transient = this._brpUiState?.transient ?? this._captureTransientUiState();
+    this._setUiState(positions, transient);
+  }
+
+  _restoreScrollPosition() {
+    this._restoreUiState();
+  }
+
+  _rememberUiState() {
+    const positions = this._captureScrollPositions();
+    const transient = this._captureTransientUiState();
+    if (!positions.length && !hasTransientUiState(transient)) return;
+
+    this._setUiState(positions, transient);
+  }
+
+  _setUiState(positions, transient) {
+    this._brpUiState = {
+      created: Date.now(),
+      scroll: positions,
+      transient
+    };
+
+    const refreshWorkspacePosition = positions.find(position => position.key === 'refreshWorkspace');
+    if (refreshWorkspacePosition) this._pendingRefreshWorkspaceScrollTop = refreshWorkspacePosition.top;
+  }
+
+  _captureScrollPositions() {
+    return this._scrollCandidates()
+      .map(([key, element]) => ({ key, top: element.scrollTop, left: element.scrollLeft }))
+      .filter(position => position.top || position.left);
+  }
+
+  _restoreUiState() {
+    const uiState = this._brpUiState;
+    if (!uiState) return;
+    if (Date.now() - uiState.created > 900000) return;
+
+    const restore = () => {
+      this._restoreTransientUiState(uiState.transient);
+      for (const position of uiState.scroll ?? []) {
+        const element = this._scrollElementByKey(position.key);
+        if (!element) continue;
+        element.scrollTop = position.top;
+        element.scrollLeft = position.left;
+      }
+    };
+
+    if (globalThis.requestAnimationFrame) {
+      requestAnimationFrame(() => {
+        restore();
+        requestAnimationFrame(restore);
+      });
+    } else {
+      setTimeout(restore, 0);
+    }
+    setTimeout(restore, 75);
+  }
+
+  _bindUiStateCapture() {
+    this.element?.addEventListener('pointerdown', this._brpRememberUiState, { capture: true });
+    this.element?.addEventListener('click', this._brpRememberUiState, { capture: true });
+    this.element?.addEventListener('click', this._brpRememberUiStateSoon);
+    this.element?.addEventListener('change', this._brpRememberUiState, { capture: true });
+    this.element?.addEventListener('input', this._brpRememberUiState, { capture: true });
+    for (const [, element] of this._scrollCandidates()) {
+      element.addEventListener('scroll', this._brpRememberScroll, { passive: true });
+    }
+  }
+
+  _captureTransientUiState() {
+    return {};
+  }
+
+  _restoreTransientUiState(_state) {}
+
+  _scrollCandidates() {
+    const element = this.element;
+    const owner = element?.closest?.('.application, .app, .window-app') ?? element;
+    const candidates = [
+      ['root', element],
+      ['windowContent', element?.querySelector?.('.window-content') ?? owner?.querySelector?.('.window-content')],
+      ['refreshWorkspace', element?.querySelector?.('.brp-refresh-workspace') ?? owner?.querySelector?.('.brp-refresh-workspace')],
+      ['activeTab', element?.querySelector?.('.tab.active')],
+      ['healthTab', element?.querySelector?.('.tab.health')],
+      ['healthPanel', element?.querySelector?.('.brp-health-tab')],
+      ['sheetBody', element?.querySelector?.('.sheet-body')]
+    ];
+    const seen = new Set();
+    return candidates.filter(([, candidate]) => {
+      if (!candidate || seen.has(candidate)) return false;
+      seen.add(candidate);
+      return true;
+    });
+  }
+
+  _scrollElementByKey(key) {
+    const element = this.element;
+    const owner = element?.closest?.('.application, .app, .window-app') ?? element;
+    const candidates = {
+      root: element,
+      windowContent: element?.querySelector?.('.window-content') ?? owner?.querySelector?.('.window-content'),
+      refreshWorkspace: element?.querySelector?.('.brp-refresh-workspace') ?? owner?.querySelector?.('.brp-refresh-workspace'),
+      activeTab: element?.querySelector?.('.tab.active'),
+      healthTab: element?.querySelector?.('.tab.health'),
+      healthPanel: element?.querySelector?.('.brp-health-tab'),
+      sheetBody: element?.querySelector?.('.sheet-body')
+    };
+    return candidates[key] ?? null;
   }
 
   //---------------ACTIONS-------------
@@ -380,12 +536,88 @@ export class BRPActorSheetV2 extends api.HandlebarsApplicationMixin(sheets.Actor
 
   //Add Damage
   static async _addDamage(event, target) {
-    await BRPDamage.addDamage(target,this.actor, this.token, 0)
+    this._rememberScrollPosition?.();
+    await BRPDamage.addDamage(target, this.actor, this.token, 0, { ballisticArmor: event?.shiftKey })
   }
 
   //Heal a Wound
   static async _healWound(event, target) {
-    await BRPDamage.treatWound(event, this.actor)
+    this._rememberScrollPosition?.();
+    const dataitem = target.dataset.itemId ? "itemId" : undefined;
+    await BRPDamage.treatWound(event, this.actor, dataitem, target.dataset.healing)
+  }
+
+  static async _onHealthNaturalHeal(event, target) {
+    this._rememberScrollPosition?.();
+    await BRPDamage.naturalHeal(event, this.actor);
+  }
+
+  static async _onHealthOtherHeal(event, target) {
+    this._rememberScrollPosition?.();
+    const dataitem = target.dataset.itemId ? "itemId" : undefined;
+    await BRPDamage.treatWound(event, this.actor, dataitem, 'manual');
+  }
+
+  static async _onHealthAllHeal(event, target) {
+    this._rememberScrollPosition?.();
+    await BRPDamage.allHeal(event, this.actor);
+  }
+
+  static async _onHealthResetDaily(event, target) {
+    this._rememberScrollPosition?.();
+    await BRPDamage.resetDaily(event, this.actor);
+  }
+
+  static async _onHealthReduceArmorEnergy(event, target) {
+    return BRPActorSheetV2._onHealthAdjustArmorEnergy.call(this, event, target, -1);
+  }
+
+  static async _onHealthAddArmorEnergy(event, target) {
+    return BRPActorSheetV2._onHealthAdjustArmorEnergy.call(this, event, target, 1);
+  }
+
+  static async _onHealthAdjustArmorEnergy(event, target, direction) {
+    this._rememberScrollPosition?.();
+    const armor = this.actor.items.get(target.dataset.itemId);
+    if (!armor || armor.type !== 'armour') return;
+    const currentEnergy = Math.max(0, Number(armor.system.ppCurr) || 0);
+    const maxEnergy = Math.max(0, Number(armor.system.ppMax) || 0);
+    const isAdding = direction > 0;
+    const inputMax = isAdding ? Math.max(0, maxEnergy - currentEnergy) : currentEnergy;
+    const maxAttr = maxEnergy > 0 && inputMax > 0 ? ` max="${inputMax}"` : '';
+    const label = game.i18n.localize(isAdding ? 'BRP.add' : 'BRP.subtract');
+
+    const html = `
+      <div class="brp brp-health-energy-dialog">
+        <div class="flexcol">
+          <div class="stat-name darkred centre">${game.i18n.localize('BRP.energy')}</div>
+          <div class="brp-health-energy-current">${currentEnergy} / ${maxEnergy}</div>
+        </div>
+        <div class="flexcol">
+          <div class="stat-name darkred centre">${game.i18n.localize('BRP.amount')}</div>
+          <div class="flexrow">
+            <input class="stat-name centre" name="amount" type="number" min="1" step="1"${maxAttr} value="1" autofocus/>
+          </div>
+        </div>
+      </div>
+    `;
+    const usage = await BRPDialog.input({
+      window: { title: `${label} ${game.i18n.localize('BRP.energy')}: ${armor.name}` },
+      content: html,
+      ok: {
+        label: game.i18n.localize('BRP.confirm')
+      }
+    });
+    if (!usage) return;
+
+    this._rememberScrollPosition?.();
+    const amount = Number(usage.amount);
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    if (isAdding) {
+      await BRPHealth.addArmorEnergy(this.actor, armor, amount, { source: 'health-tab' });
+    } else {
+      await BRPHealth.reduceArmorEnergy(this.actor, armor, amount, { source: 'health-tab' });
+    }
   }
 
   //Restore All Fatigue
@@ -513,6 +745,7 @@ export class BRPActorSheetV2 extends api.HandlebarsApplicationMixin(sheets.Actor
 
   //Treat a Wound
   static async _treatWound(event, target) {
+    this._rememberScrollPosition?.();
     let treatType = target.dataset.healing
     await BRPDamage.treatWound(event, this.actor, "itemId", treatType);
   }
@@ -523,23 +756,43 @@ export class BRPActorSheetV2 extends api.HandlebarsApplicationMixin(sheets.Actor
     let wound = this.actor.items.get(target.dataset.woundId)
     let ctrlKey = isCtrlKey(event ?? false);
     if (ctrlKey) {
+      this._rememberScrollPosition?.();
       const confirmation = await BRPDialog.confirm({
         window: { title: game.i18n.localize("BRP.deleteItem") },
         content: game.i18n.localize("BRP.deleteConfirm") + "<br><strong> " + wound.name + "</strong>"
        })
       if (confirmation) {
+        this._rememberScrollPosition?.();
         await wound.delete();
       }
       return
     } else if (event.altKey) {
+      this._rememberScrollPosition?.();
       await BRPDamage.treatWound(event, this.actor, "woundId", "")
       return
     }
     wound.sheet.render(true);
   }
 
+  static async _onHealthWoundDelete(event, target) {
+    if (this.actor.system.lock) return;
+    const wound = this.actor.items.get(target.dataset.woundId || target.dataset.itemId);
+    if (!wound || wound.type !== 'wound') return;
+    this._rememberScrollPosition?.();
+
+    const confirmation = await BRPDialog.confirm({
+      window: { title: game.i18n.localize("BRP.deleteItem") },
+      content: game.i18n.localize("BRP.deleteConfirm") + "<br><strong> " + wound.name + "</strong>"
+    });
+    if (confirmation) {
+      this._rememberScrollPosition?.();
+      await wound.delete();
+    }
+  }
+
   //Healing Options
   static async _onHealing (event, target) {
+    this._rememberScrollPosition?.();
     let prop = target.dataset.prop
     if (!prop) return
     switch (prop) {
@@ -553,6 +806,120 @@ export class BRPActorSheetV2 extends api.HandlebarsApplicationMixin(sheets.Actor
         BRPDamage.resetDaily(event, this.actor)
         break;
     }
+  }
+
+  static async _onHealthVizMode(event, target) {
+    this._rememberScrollPosition?.();
+    const mode = target.dataset.mode;
+    if (!['health', 'armor', 'wounds'].includes(mode)) return;
+    const healthFlags = foundry.utils.deepClone(this.actor.getFlag('brp', 'health') ?? {});
+    healthFlags.vizMode = mode;
+    await this.actor.setFlag('brp', 'health', healthFlags);
+  }
+
+  static async _onHealthLocationRowToggle(event, target) {
+    if (event.target.closest('[data-action]') !== target) return;
+    event.preventDefault();
+
+    const location = target.closest('.brp-health-location');
+    const locationId = location?.dataset?.itemId;
+    if (!location || !locationId) return;
+
+    const wasExpanded = location.classList.contains('is-expanded');
+    const nextExpanded = !wasExpanded;
+    location.classList.toggle('is-expanded', nextExpanded);
+
+    try {
+      await persistUiMapFlag(this.actor, 'flags.brp.sheet.health.expandedLocations', locationId, nextExpanded);
+    } catch (error) {
+      location.classList.toggle('is-expanded', wasExpanded);
+      throw error;
+    }
+  }
+
+  static async _onHealthWoundRowToggle(event, target) {
+    if (event.target.closest('[data-action]') !== target) return;
+    event.preventDefault();
+
+    const wound = target.closest('.brp-health-wound');
+    const woundId = wound?.dataset?.woundId;
+    if (!wound || !woundId) return;
+
+    const wasExpanded = wound.classList.contains('is-expanded');
+    const nextExpanded = !wasExpanded;
+    wound.classList.toggle('is-expanded', nextExpanded);
+
+    try {
+      await persistUiMapFlag(this.actor, 'flags.brp.sheet.health.expandedWounds', woundId, nextExpanded);
+    } catch (error) {
+      wound.classList.toggle('is-expanded', wasExpanded);
+      throw error;
+    }
+  }
+
+  static async _onHealthLocationToggle(event, target) {
+    if (!game.settings.get('brp', 'useHPL')) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    const section = target.closest('.brp-health-location-section');
+    const isCollapsed = section?.classList.contains('is-collapsed') ?? Boolean(this.actor.getFlag('brp', 'sheet')?.healthLocationsCollapsed);
+    const nextCollapsed = !isCollapsed;
+    section?.classList.toggle('is-collapsed', nextCollapsed);
+    target.setAttribute('aria-expanded', String(!nextCollapsed));
+    target.dataset.tooltip = game.i18n.localize(nextCollapsed ? 'BRP.expand' : 'BRP.collapse');
+
+    try {
+      await this.actor.update(
+        { 'flags.brp.sheet.healthLocationsCollapsed': nextCollapsed },
+        { render: false, renderSheet: false }
+      );
+    } catch (error) {
+      section?.classList.toggle('is-collapsed', isCollapsed);
+      target.setAttribute('aria-expanded', String(!isCollapsed));
+      target.dataset.tooltip = game.i18n.localize(isCollapsed ? 'BRP.expand' : 'BRP.collapse');
+      throw error;
+    }
+  }
+
+  static async _onHealthSilhouetteSettings(event, target) {
+    if (!game.settings.get('brp', 'useHPL')) return;
+    if (this.actor.system.lock) return;
+    this._rememberScrollPosition?.();
+
+    const mappingContext = createSilhouetteMappingContext(this.actor);
+    if (!mappingContext.locations.length) {
+      ui.notifications.warn(game.i18n.localize('BRP.healthNoHitLocations'));
+      return;
+    }
+
+    const html = await foundry.applications.handlebars.renderTemplate(
+      'systems/brp/templates/dialog/healthSilhouetteSettings.hbs',
+      mappingContext
+    );
+    const usage = await BRPDialog.input({
+      window: { title: game.i18n.localize('BRP.healthSilhouetteSettings') },
+      content: html,
+      ok: {
+        label: game.i18n.localize('BRP.confirm')
+      }
+    });
+    if (!usage) return;
+
+    const healthFlags = foundry.utils.deepClone(this.actor.getFlag('brp', 'health') ?? {});
+    if (usage.resetMap === true || usage.resetMap === 'true' || usage.resetMap === 'on' || usage.resetMap === '1') {
+      delete healthFlags.silhouetteMap;
+    } else {
+      const silhouetteMap = buildSilhouetteMapFromForm(mappingContext.locations, usage);
+      if (Object.keys(silhouetteMap).length) {
+        healthFlags.silhouetteMap = silhouetteMap;
+      } else {
+        delete healthFlags.silhouetteMap;
+      }
+    }
+
+    this._rememberScrollPosition?.();
+    await this.actor.setFlag('brp', 'health', healthFlags);
   }
 
   //Collapse/Expand Armour on all Hit Locs
@@ -626,8 +993,10 @@ export class BRPActorSheetV2 extends api.HandlebarsApplicationMixin(sheets.Actor
 
 
 
-    //--------------------HANDLER----------------------------------
+  //--------------------HANDLER----------------------------------
   static async _updateObject(event, form, formData) {
+    // Deprecated legacy Story editor path. Keep the old system.stories[] wiring only
+    // until the refreshed Story tab fully replaces the .bio-section-* flow.
     const biographyKeyRegex = /^system.stories\.(\d+)\.(.+)$/
     const biographyKeys = Object.keys(formData.object).map(k => k.match(biographyKeyRegex)).filter(m => m)
     if (biographyKeys.length) {
@@ -695,6 +1064,8 @@ export class BRPActorSheetV2 extends api.HandlebarsApplicationMixin(sheets.Actor
     return;
   }
 
+  // Deprecated legacy Story section helpers. These remain for compatibility until
+  // Story rebase UI/controller work removes the old .bio-section-* actions.
   //Add a New Story Section
   static async createBioSection (title = null) {
     const bio = this.document.system.stories

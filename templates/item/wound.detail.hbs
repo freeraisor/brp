@@ -1,18 +1,64 @@
 <section class="item tab details {{tab.cssClass}}" data-group="primary" data-tab="details">
   <div class="hitloc-scores">
-    <div class="skill-display">{{localize 'BRP.damage'}}</div>
-    <div class="stat-input dam-value"><input name="system.value" type="text" value="{{item.system.value}}"
-        data-dtype="Number" /></div>
-    <br>
+    <div class="skill-display">{{localize 'BRP.woundDamageOriginal'}}</div>
+    <div class="stat-input dam-value">
+      <input name="system.damage" type="number" value="{{woundView.damage}}" data-dtype="Number" />
+    </div>
+
+    <div class="skill-display new-row">{{localize 'BRP.woundDamageRemaining'}}</div>
+    <div class="stat-input dam-value">
+      <input name="system.damageRemaining" type="number" min="0" value="{{woundView.damageRemaining}}" data-dtype="Number" />
+    </div>
+
+    <div class="skill-display new-row">{{localize 'BRP.healthDamageType'}}</div>
+    <div class="stat-input">
+      <select name="system.damageType">
+        {{selectOptions woundView.damageTypes selected=woundView.damageType}}
+      </select>
+    </div>
+
     <div class="skill-display new-row">{{localize 'BRP.status'}}</div>
-    <div class="skill-cat centre" data-action="itemToggle" data-property="treated">
-      {{#if item.system.treated}}
-        {{localize 'BRP.treated'}}
+    <div class="stat-input">
+      <select name="system.status">
+        {{selectOptions woundView.statuses selected=woundView.status}}
+      </select>
+    </div>
+
+    <div class="skill-display new-row">{{localize 'BRP.woundFirstAidUsed'}}</div>
+    <div class="skill-cat centre">
+      {{#if woundView.firstAidUsed}}
+        {{localize 'BRP.yes'}}
       {{else}}
-        {{localize 'BRP.untreated'}}
+        {{localize 'BRP.no'}}
       {{/if}}
     </div>
-  </div>
-  <br>
 
+    <div class="skill-display new-row">{{localize 'BRP.woundArmorApplied'}}</div>
+    <div class="skill-cat centre">
+      {{woundView.armorApplied}}
+      {{#if woundView.armorFormula}}({{woundView.armorFormula}}){{/if}}
+    </div>
+  </div>
+
+  <div class="hitloc-scores">
+    <div class="skill-display">{{localize 'BRP.woundHistory'}}</div>
+    <div class="skill-cat centre">{{woundView.history.length}}</div>
+  </div>
+
+  <ol class="brp-wound-history">
+    {{#each woundView.history as |entry key|}}
+      <li class="brp-wound-history-entry">
+        <div class="brp-wound-history-main">
+          <strong>{{entry.methodLabel}}</strong>
+          <span>{{entry.amountLabel}} ({{entry.before}} -> {{entry.after}})</span>
+        </div>
+        {{#if entry.atLabel}}<div class="brp-wound-history-meta">{{entry.atLabel}}</div>{{/if}}
+        {{#if entry.resultLabel}}<div class="brp-wound-history-meta">{{entry.resultLabel}}</div>{{/if}}
+        {{#if entry.formula}}<div class="brp-wound-history-meta">{{entry.formula}}</div>{{/if}}
+        {{#if entry.note}}<div class="brp-wound-history-note">{{entry.note}}</div>{{/if}}
+      </li>
+    {{else}}
+      <li class="brp-wound-history-empty">{{localize 'BRP.woundNoHistory'}}</li>
+    {{/each}}
+  </ol>
 </section>

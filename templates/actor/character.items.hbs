@@ -1,137 +1,443 @@
 <section class="actor tab items {{tab.cssClass}}" data-group="primary" data-tab="items">
-  <section>
-    <div class="armour-tab-grid">
-      <div class="diff-label" {{#if useHPL}} data-action="armourToggle" data-tooltip="{{localize 'BRP.armExpandHint'}}" {{/if}}>{{ localize 'BRP.armour'}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.ap'}}</div>
-      <div class="diff-label centre" data-tooltip="{{ localize 'BRP.armBalHint' }}">{{ localize 'BRP.bap'}}</div>
-      <div class="diff-label centre" style="grid-column: 4 / span 2;" data-tooltip="{{ localize 'BRP.energyHint' }}">{{ localize 'BRP.energy'}}</div>
-      <div class="diff-label centre" style="grid-column: 6 / span 2;" data-tooltip="{{ localize 'BRP.ppStoreHint' label=system.power.label}}">{{system.power.labelAbbr}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.enc'}}</div>
-      <div class="diff-label centre" data-tooltip="{{ localize 'BRP.skillModHint' }}">{{ localize 'BRP.skillMod'}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.hit-location'}}</div>
-      <div class="diff-label centre" data-tooltip="{{ localize 'BRP.equipStatusHint' }}">{{ localize 'BRP.status'}}</div>
-      <div class="diff-label centre" data-action="createDoc" data-document-class='Item' data-type="armour" data-tooltip="{{ localize 'BRP.addArmour' }}">
-        <a class="largeIcon"><i class="item-control fas fa-plus"></i></a>
+  <section class="brp-items-refresh">
+    <header class="brp-items-refresh-titlebar">
+      <div class="brp-items-refresh-title">
+        <i class="fas fa-cube"></i>
+        <span>{{localize 'BRP.items'}}</span>
       </div>
-    </div>
-    {{#each armours as |armour key|}}
-      <li class="item armour-tab-grid" style="list-style: none;" data-item-id="{{armour._id}}" data-document-class="Item">
-        {{#if (eq armour.system.list 0)}}
-          {{#if (gt armour.system.length 0)}}
-            {{#if armour.system.hide}}
-              <div class="new-row bold rollable {{#if armour.system.hasEffects}}italics bold{{/if}} darkred font14"
-              data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.armour')}}">{{armour.name}}</div>
-              {{#if ../useAVRand}}
-                {{#isOr (ne armour.system.avr1 "") (ne armour.system.avr2 "")}}
-                  <div class="hitloc-name" style="grid-column: 2 / span 2;">{{armour.system.avr1}} / {{armour.system.avr2}} </div>
-                {{/isOr}}
-              {{else}}
-                {{#isOr (ne armour.system.avr1 "") (ne armour.system.avr2 "")}}
-                  <div class="hitloc-name" style="grid-column: 2 / span 2;">{{armour.system.av1}} / {{armour.system.av2}}</div>
-                {{/isOr}}
-              {{/if}}
-              <div class="hitloc-name centre" style="grid-column: 4 / span 2;">{{armour.system.ppCurr}}</div>
-              <div class="hitloc-name centre" style="grid-column: 6 / span 2;">{{armour.system.pSCurr}}</div>
-              <div class="hitloc-name centre">{{armour.system.enc}}</div>
-              <div class="hitloc-name centre">{{armour.system.mnplmod}}/{{armour.system.percmod}}/{{armour.system.physmod}}/{{armour.system.stealthmod}}</div>
-              <div class="centre" data-action="armourLocToggle" data-tooltip="{{localize 'BRP.expand'}}" style="grid-column: 12 / span 1;" data-item-id="{{armour.system.hitlocID}}"
-                data-property="hide"><a class="mediumIcon"><i class="fas fa-solid fa-arrow-down-short-wide"></i></a></div>
-            {{/if}}
-          {{/if}}
+      <div class="brp-items-refresh-lock">
+        {{#if system.lock}}
+          <i class="fas fa-lock"></i>
+          <span>{{localize 'BRP.locked'}}</span>
         {{else}}
-          {{#unless armour.system.hide}}
-            <div class="new-row font14 rollable {{#if armour.system.hasEffects}}italics bold{{/if}}"
-            data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.armour')}}"
-              {{#if armour.system.hasEffects}} data-tooltip="{{localize 'BRP.activeEffect'}}"{{/if}}>{{armour.name}}</div>
-            {{#if ../useAVRand}}
-              <div class="hitloc-name centre">{{armour.system.avr1}} </div>
-              {{#if armour.system.armBal}}
-                <div class="hitloc-name centre">{{armour.system.avr2}}</div>
-              {{else}}
-                <div></div>
-              {{/if}}
-            {{else}}
-              {{#if armour.system.armVar}}
-                <div class="armour-input-small"> <input class="centre inline-edit" data-field="av1" name="armour.system.av1" type="number" value="{{armour.system.av1}}"/></div>
-              {{else}}
-                <div class="hitloc-name centre">{{armour.system.av1}}</div>
-              {{/if}}
-              {{#if armour.system.armBal}}
-                <div class="hitloc-name centre">{{armour.system.av2}}</div>
-              {{else}}
-                <div></div>
-              {{/if}}
-            {{/if}}
-
-            {{#if armour.system.armVar}}
-              <div class="armour-input-small"> <input class="centre inline-edit" data-field="ppCurr" name="armour.system.ppCurr" type="number" value="{{armour.system.ppCurr}}"/></div>
-              <div class="hitloc-name centre">{{armour.system.ppMax}}</div>
-            {{else}}
-              <div>&nbsp</div>
-              <div>&nbsp</div>
-            {{/if}}
-
-            {{#if (gt armour.system.pSMax 0)}}
-              <div class="combat-input-small"> <input class="centre inline-edit" data-field="pSCurr" name="armour.system.pSCurr" type="number" value="{{armour.system.pSCurr}}"/></div>
-              <div class="hitloc-name centre">{{armour.system.pSMax}}</div>
-            {{else}}
-              <div></div>
-              <div></div>
-            {{/if}}
-
-            <div class="hitloc-name centre">{{armour.system.actlEnc}}</div>
-            <div class="hitloc-name centre">{{armour.system.mnplmod}}/{{armour.system.percmod}}/{{armour.system.physmod}}/{{armour.system.stealthmod}}</div>
-            <div class="hitloc-name centre">{{armour.system.hitlocName}}</div>
-            <div class="hitloc-name centre" data-action="itemToggle" data-tooltip="{{armour.system.equippedName}}" data-property="equipStatus"><a class="mediumIcon">
-                {{#if (eq armour.system.equipStatus 'worn')}}<i class="fas fa-shirt"></i>{{/if}}
-                {{#if (eq armour.system.equipStatus 'carried')}}<i class="fas fa-hand-holding"></i>{{/if}}
-                {{#if (eq armour.system.equipStatus 'packed')}}<i class="fas fa-treasure-chest"></i>{{/if}}
-                {{#if (eq armour.system.equipStatus 'stored')}}<i class="fas fa-warehouse"></i>{{/if}}
-              </a>
-            </div>
-            {{#if armour.system.show}}
-              <div class="centre" data-action="armourLocToggle" data-tooltip="{{localize 'BRP.collapse'}}" style="grid-column: 12 / span 1;" data-item-id="{{armour.system.hitlocID}}" data-property="hide">
-                <a class="mediumIcon"><i class="fas fa-solid fa-arrow-up-wide-short"></i></a></div>
-            {{/if}}
-          {{/unless}}
+          <i class="fas fa-lock-open"></i>
+          <span>{{localize 'BRP.unlocked'}}</span>
         {{/if}}
-      </li>
-    {{/each}}
-    <br>
-
-    <div class="gear-tab-grid">
-      <div class="diff-label ">{{ localize 'BRP.equipment'}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.quantity'}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.enc'}}</div>
-      <div class="diff-label centre" style="grid-column: 4 / span 2;" data-tooltip="{{ localize 'BRP.ppStoreHint' label=system.power.label}}">{{system.power.labelAbbr}}</div>
-      <div class="diff-label centre" data-tooltip="{{ localize 'BRP.equipStatusHint' }}">{{ localize 'BRP.status'}}</div>
-      <div class="diff-label centre" data-action="createDoc" data-tooltip="{{ localize 'BRP.addGear' }}" data-document-class="Item" data-type="gear">
-        <a class="largeIcon"><i class="item-control fas fa-plus"></i></a>
       </div>
-    </div>
-    <ol class="gr-list">
-    {{#each gears as |gear key|}}
-      <li class="item gear-tab-grid" style="list-style: none;" data-item-id="{{gear._id}}" data-document-class="Item">
-        <div class="font14 rollable {{#if gear.system.hasEffects}}italics bold{{/if}}"
-          data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.gear')}}">{{gear.name}}</div>
-        <div class="combat-input-small"> <input class="centre inline-edit" data-field="quantity" name="gear.system.quantity" type="number" value="{{gear.system.quantity}}"/></div>
-        <div class="hitloc-name centre">{{gear.system.actlEnc}}</div>
-        {{#if (gt gear.system.pSMax 0)}}
-          <div class="combat-input-small"> <input class="centre inline-edit" data-field="pSCurr" name="gear.system.pSCurr" type="number" value="{{gear.system.pSCurr}}"/></div>
-          <div class="hitloc-name centre">{{gear.system.pSMax}}</div>
-        {{else}}
-          <div></div>
-          <div></div>
-        {{/if}}
-        <div class="hitloc-name centre" data-action="itemToggle" data-tooltip="{{gear.system.equippedName}}" data-property="equipStatus">
-          <a class="mediumIcon">
-            {{#if (eq gear.system.equipStatus 'carried')}}<i class="fas fa-hand-holding"></i>{{/if}}
-            {{#if (eq gear.system.equipStatus 'packed')}}<i class="fas fa-treasure-chest"></i>{{/if}}
-            {{#if (eq gear.system.equipStatus 'stored')}}<i class="fas fa-warehouse"></i>{{/if}}
-          </a>
+    </header>
+
+    <section class="brp-items-refresh-header">
+      <div class="brp-items-refresh-enc">
+        <div class="brp-items-refresh-enc-head">
+          <span>{{localize 'BRP.enc'}}</span>
+          <strong>{{inventoryView.encumbrance.current}}</strong>
+          <em>{{localize 'BRP.actualENC'}} {{inventoryView.encumbrance.preview}}</em>
         </div>
-      </li>
-    {{/each}}
-    </ol>
+        <div class="brp-items-refresh-enc-bar">
+          <span style="width: 50%"></span>
+          <i style="left: 50%" data-label="Medium"></i>
+          <i style="left: 75%" data-label="Heavy"></i>
+        </div>
+        <div class="brp-items-refresh-enc-zones">
+          <span>Light</span>
+          <span>Medium</span>
+          <span>Heavy</span>
+        </div>
+      </div>
+
+      <div class="brp-items-refresh-currencies">
+        <span class="brp-items-refresh-currency-label">{{localize 'BRP.price'}}</span>
+        {{#each inventoryView.currencies as |currency|}}
+          <button type="button" class="brp-items-refresh-currency brp-items-refresh-currency-{{currency.icon}}" data-action="inventoryCurrencyEdit" data-currency-id="{{currency.id}}" data-tooltip="{{localize 'BRP.inventoryCurrencyEdit'}}">
+            {{#if (eq currency.icon 'bill')}}<i class="fas fa-money-bill"></i>{{/if}}
+            {{#if (eq currency.icon 'card')}}<i class="fas fa-credit-card"></i>{{/if}}
+            {{#if (eq currency.icon 'coin')}}<i class="fas fa-coins"></i>{{/if}}
+            {{#if (eq currency.icon 'crypto')}}<i class="fas fa-bitcoin-sign"></i>{{/if}}
+            {{#if (eq currency.icon 'gem')}}<i class="fas fa-gem"></i>{{/if}}
+            {{#if (eq currency.icon 'token')}}<i class="fas fa-circle-dot"></i>{{/if}}
+            <span>{{currency.name}}</span>
+            <strong>{{currency.amount}}</strong>
+          </button>
+        {{/each}}
+        <button type="button" class="brp-items-refresh-currency-add" data-action="inventoryCurrencyAdd" data-tooltip="{{localize 'BRP.inventoryCurrencyAdd'}}">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </section>
+
+    <section class="brp-items-refresh-toolbar">
+      <label class="brp-items-refresh-search">
+        <i class="fas fa-search"></i>
+        <input type="search" class="brp-items-refresh-search-input" placeholder="{{localize 'BRP.search'}}" autocomplete="off" />
+      </label>
+      <button type="button" class="brp-items-refresh-tool {{#if inventoryView.filters.activeCount}}is-active{{/if}}" data-action="inventoryFilterToggle">
+        <i class="fas fa-filter"></i>
+        <span>{{localize 'BRP.filters'}}</span>
+        {{#if inventoryView.filters.activeCount}}<b>{{inventoryView.filters.activeCount}}</b>{{/if}}
+      </button>
+      <a class="brp-items-refresh-tool"
+        data-action="{{inventoryView.sections.other.createAction.action}}"
+        data-document-class="{{inventoryView.sections.other.createAction.documentClass}}"
+        data-type="{{inventoryView.sections.other.createAction.type}}"
+        data-tooltip="{{localize 'BRP.addGear'}}">
+        <i class="fas fa-plus"></i>
+      </a>
+    </section>
+
+    <section class="brp-items-refresh-filter-panel" hidden>
+      <div>
+        <span>{{localize 'BRP.inventoryFilterByType'}}</span>
+        {{#each inventoryView.filters.typeOptions as |filter|}}
+          <label>
+            <input type="checkbox" class="brp-items-refresh-filter-input" data-inventory-filter-type="{{filter.id}}" {{#if filter.checked}}checked{{/if}} />
+            {{localize filter.label}}
+          </label>
+        {{/each}}
+      </div>
+      <div>
+        <span>{{localize 'BRP.inventoryFilterByState'}}</span>
+        <label><input type="checkbox" class="brp-items-refresh-filter-input" data-inventory-filter="equipped" {{#if inventoryView.filters.equipped}}checked{{/if}} /> {{localize 'BRP.equipped'}}</label>
+        <label><input type="checkbox" class="brp-items-refresh-filter-input" data-inventory-filter="carried" {{#if inventoryView.filters.carried}}checked{{/if}} /> {{localize 'BRP.carried'}}</label>
+        <label><input type="checkbox" class="brp-items-refresh-filter-input" data-inventory-filter="favorite" {{#if inventoryView.filters.favorite}}checked{{/if}} /> {{localize 'BRP.favorites'}}</label>
+        <label><input type="checkbox" class="brp-items-refresh-filter-input" data-inventory-filter="hideEmpty" {{#if inventoryView.filters.hideEmpty}}checked{{/if}} /> {{localize 'BRP.inventoryHideEmpty'}}</label>
+      </div>
+    </section>
+
+    <section class="brp-items-refresh-section {{#if inventoryView.sections.weapons.collapsed}}is-collapsed{{/if}}" data-inventory-section="weapons">
+      <header class="brp-items-refresh-section-header">
+        <button type="button" class="brp-items-refresh-section-toggle" data-action="inventorySectionToggle" data-section-id="weapons" data-tooltip="{{#if inventoryView.sections.weapons.collapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <h3>{{localize inventoryView.sections.weapons.label}}</h3>
+        <span>{{inventoryView.sections.weapons.rows.length}}</span>
+        <button type="button" class="brp-items-refresh-sort" data-action="inventorySortToggle" data-section-id="weapons" data-sort-mode="{{inventoryView.sections.weapons.sort.mode}}">
+          <i class="{{inventoryView.sections.weapons.sort.icon}}"></i>
+          <span>{{localize inventoryView.sections.weapons.sort.label}}</span>
+        </button>
+        <b></b>
+        <a class="brp-items-refresh-icon-action"
+          data-action="{{inventoryView.sections.weapons.createAction.action}}"
+          data-document-class="{{inventoryView.sections.weapons.createAction.documentClass}}"
+          data-type="{{inventoryView.sections.weapons.createAction.type}}"
+          data-tooltip="{{localize 'BRP.addWeapon'}}">
+          <i class="fas fa-plus"></i>
+        </a>
+      </header>
+      <div class="brp-items-refresh-sort-menu" hidden>
+        {{#each inventoryView.sections.weapons.sort.options as |option|}}
+          <button type="button" class="brp-items-refresh-sort-option {{#if option.active}}is-active{{/if}}" data-action="inventorySortSelect" data-section-id="weapons" data-sort-mode="{{option.mode}}">
+            <i class="{{option.icon}}"></i>
+            <span>{{localize option.label}}</span>
+          </button>
+        {{/each}}
+      </div>
+      <ol class="brp-items-refresh-list">
+        {{#each inventoryView.sections.weapons.rows as |row|}}
+          <li class="item brp-items-refresh-row brp-items-refresh-row-{{row.mockType}} {{#if row.flags.equipped}}is-equipped{{/if}} {{#unless row.flags.carried}}is-not-carried{{/unless}} {{#if row.flags.empty}}is-empty{{/if}} {{#if row.flags.favorite}}is-favorite{{/if}} {{#if row.flags.overCapacity}}is-over-capacity{{/if}} {{#if row.flags.detailsOpen}}is-details-open{{/if}}" data-item-id="{{row.id}}" data-document-class="{{row.documentType}}" data-search-text="{{row.searchText}}">
+            <span class="brp-items-refresh-handle" draggable="true" data-inventory-row-drag="{{row.id}}">::</span>
+            <span class="brp-items-refresh-item-icon">
+              {{#if row.icon.path}}
+                <svg viewBox="{{row.icon.viewBox}}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="{{row.icon.path}}"></path>
+                </svg>
+              {{else}}
+                <i class="{{row.icon}}"></i>
+              {{/if}}
+            </span>
+            <span class="brp-items-refresh-main" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=row.typeLabel}}">
+              <strong>{{row.name}}</strong>
+              <em>{{row.typeLabel}}{{#if row.subtitle}} - {{row.subtitle}}{{/if}}</em>
+              {{#if row.hasBonuses}}
+                <span class="brp-items-refresh-bonus-strip">
+                  {{#each row.bonusPreviewRows as |bonus|}}
+                    <span class="brp-items-refresh-bonus brp-items-refresh-bonus-{{bonus.mode}} {{#if bonus.inactive}}is-inactive{{/if}}" data-tooltip="{{bonus.tooltip}}">{{bonus.compactLabel}}</span>
+                  {{/each}}
+                  {{#if row.bonusOverflow}}<span class="brp-items-refresh-bonus brp-items-refresh-bonus-more">+{{row.bonusOverflow}}</span>{{/if}}
+                </span>
+              {{/if}}
+            </span>
+            <span class="brp-items-refresh-stats">
+              {{#each row.stats as |stat|}}
+                <span class="brp-items-refresh-stat brp-items-refresh-stat-{{stat.id}}" data-tooltip="{{stat.tooltip}}">
+                  <small>{{localize stat.label}}</small>
+                  <strong>{{stat.value}}</strong>
+                </span>
+              {{/each}}
+            </span>
+            <span class="brp-items-refresh-actions">
+              <a class="brp-items-refresh-action brp-items-refresh-favorite {{#if row.flags.favorite}}is-active{{/if}}" data-action="inventoryFavoriteToggle" data-tooltip="{{#if row.flags.favorite}}{{localize 'BRP.skillContextUnfavorite'}}{{else}}{{localize 'BRP.skillContextFavorite'}}{{/if}}"><i class="{{#if row.flags.favorite}}fas{{else}}far{{/if}} fa-star"></i></a>
+              <a class="brp-items-refresh-action {{#if row.flags.carried}}is-active is-carry{{/if}}" data-action="inventoryStatusToggle" data-tooltip="{{row.equippedName}}"><i class="fas fa-hand-holding"></i></a>
+              <a class="brp-items-refresh-action {{#if row.flags.equipped}}is-active{{/if}}" data-action="inventoryStatusToggle" data-tooltip="{{row.equippedName}}"><i class="fas fa-bolt"></i></a>
+              <a class="brp-items-refresh-action" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=row.typeLabel}}"><i class="fas fa-eye"></i></a>
+              <a class="brp-items-refresh-action" data-action="inventoryDuplicate" data-tooltip="{{localize 'BRP.duplicate'}}"><i class="fas fa-copy"></i></a>
+              <a class="brp-items-refresh-action" data-action="inventoryDelete" data-tooltip="{{localize 'BRP.deleteItem'}}"><i class="fas fa-trash"></i></a>
+            </span>
+            <button type="button" class="brp-items-refresh-chevron" data-action="inventoryDetailsToggle" aria-label="{{localize 'BRP.details'}}">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="brp-items-refresh-details" {{#unless row.flags.detailsOpen}}hidden{{/unless}}>
+              {{#each row.details as |detail|}}
+                <span><small>{{localize detail.label}}</small> {{detail.value}}</span>
+              {{/each}}
+              {{#each row.bonusRows as |bonus|}}
+                <span class="brp-items-refresh-bonus-detail brp-items-refresh-bonus-{{bonus.mode}} {{#if bonus.inactive}}is-inactive{{/if}}" data-tooltip="{{bonus.tooltip}}"><small>{{localize 'BRP.bonus'}}</small> {{bonus.detailLabel}}</span>
+              {{/each}}
+            </div>
+          </li>
+        {{else}}
+          <li class="brp-items-refresh-empty">{{localize 'BRP.none'}}</li>
+        {{/each}}
+      </ol>
+      <div class="brp-items-refresh-drop-zone" data-inventory-top-drop="weapons">{{localize 'BRP.inventoryDropTopLevel'}}</div>
+    </section>
+
+    <section class="brp-items-refresh-section {{#if inventoryView.sections.armour.collapsed}}is-collapsed{{/if}}" data-inventory-section="armour">
+      <header class="brp-items-refresh-section-header">
+        <button type="button" class="brp-items-refresh-section-toggle" data-action="inventorySectionToggle" data-section-id="armour" data-tooltip="{{#if inventoryView.sections.armour.collapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <h3>{{localize inventoryView.sections.armour.label}}</h3>
+        <span>{{inventoryView.sections.armour.rows.length}}</span>
+        <button type="button" class="brp-items-refresh-sort" data-action="inventorySortToggle" data-section-id="armour" data-sort-mode="{{inventoryView.sections.armour.sort.mode}}">
+          <i class="{{inventoryView.sections.armour.sort.icon}}"></i>
+          <span>{{localize inventoryView.sections.armour.sort.label}}</span>
+        </button>
+        <b></b>
+        <a class="brp-items-refresh-icon-action"
+          data-action="{{inventoryView.sections.armour.createAction.action}}"
+          data-document-class="{{inventoryView.sections.armour.createAction.documentClass}}"
+          data-type="{{inventoryView.sections.armour.createAction.type}}"
+          data-tooltip="{{localize 'BRP.addArmour'}}">
+          <i class="fas fa-plus"></i>
+        </a>
+      </header>
+      <div class="brp-items-refresh-sort-menu" hidden>
+        {{#each inventoryView.sections.armour.sort.options as |option|}}
+          <button type="button" class="brp-items-refresh-sort-option {{#if option.active}}is-active{{/if}}" data-action="inventorySortSelect" data-section-id="armour" data-sort-mode="{{option.mode}}">
+            <i class="{{option.icon}}"></i>
+            <span>{{localize option.label}}</span>
+          </button>
+        {{/each}}
+      </div>
+      <ol class="brp-items-refresh-list">
+        {{#each inventoryView.sections.armour.rows as |row|}}
+          <li class="item brp-items-refresh-row brp-items-refresh-row-{{row.mockType}} {{#if row.flags.equipped}}is-equipped{{/if}} {{#unless row.flags.carried}}is-not-carried{{/unless}} {{#if row.flags.empty}}is-empty{{/if}} {{#if row.flags.favorite}}is-favorite{{/if}} {{#if row.flags.overCapacity}}is-over-capacity{{/if}} {{#if row.flags.detailsOpen}}is-details-open{{/if}}" data-item-id="{{row.id}}" data-document-class="{{row.documentType}}" data-search-text="{{row.searchText}}">
+            <span class="brp-items-refresh-handle" draggable="true" data-inventory-row-drag="{{row.id}}">::</span>
+            <span class="brp-items-refresh-item-icon">
+              {{#if row.icon.path}}
+                <svg viewBox="{{row.icon.viewBox}}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="{{row.icon.path}}"></path>
+                </svg>
+              {{else}}
+                <i class="{{row.icon}}"></i>
+              {{/if}}
+            </span>
+            <span class="brp-items-refresh-main" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=row.typeLabel}}">
+              <strong>{{row.name}}</strong>
+              <em>{{row.typeLabel}}{{#if row.subtitle}} - {{row.subtitle}}{{/if}}</em>
+              {{#if row.hasBonuses}}
+                <span class="brp-items-refresh-bonus-strip">
+                  {{#each row.bonusPreviewRows as |bonus|}}
+                    <span class="brp-items-refresh-bonus brp-items-refresh-bonus-{{bonus.mode}} {{#if bonus.inactive}}is-inactive{{/if}}" data-tooltip="{{bonus.tooltip}}">{{bonus.compactLabel}}</span>
+                  {{/each}}
+                  {{#if row.bonusOverflow}}<span class="brp-items-refresh-bonus brp-items-refresh-bonus-more">+{{row.bonusOverflow}}</span>{{/if}}
+                </span>
+              {{/if}}
+            </span>
+            <span class="brp-items-refresh-stats">
+              {{#each row.stats as |stat|}}
+                <span class="brp-items-refresh-stat brp-items-refresh-stat-{{stat.id}}" data-tooltip="{{stat.tooltip}}">
+                  <small>{{localize stat.label}}</small>
+                  <strong>{{stat.value}}</strong>
+                </span>
+              {{/each}}
+            </span>
+            <span class="brp-items-refresh-actions">
+              <a class="brp-items-refresh-action brp-items-refresh-favorite {{#if row.flags.favorite}}is-active{{/if}}" data-action="inventoryFavoriteToggle" data-tooltip="{{#if row.flags.favorite}}{{localize 'BRP.skillContextUnfavorite'}}{{else}}{{localize 'BRP.skillContextFavorite'}}{{/if}}"><i class="{{#if row.flags.favorite}}fas{{else}}far{{/if}} fa-star"></i></a>
+              <a class="brp-items-refresh-action {{#if row.flags.carried}}is-active is-carry{{/if}}" data-action="inventoryStatusToggle" data-tooltip="{{row.equippedName}}"><i class="fas fa-hand-holding"></i></a>
+              <a class="brp-items-refresh-action {{#if row.flags.equipped}}is-active{{/if}}" data-action="inventoryArmourWornToggle" data-tooltip="{{row.equippedName}}"><i class="fas fa-shirt"></i></a>
+              <a class="brp-items-refresh-action" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=row.typeLabel}}"><i class="fas fa-eye"></i></a>
+              <a class="brp-items-refresh-action" data-action="inventoryDuplicate" data-tooltip="{{localize 'BRP.duplicate'}}"><i class="fas fa-copy"></i></a>
+              <a class="brp-items-refresh-action" data-action="inventoryDelete" data-tooltip="{{localize 'BRP.deleteItem'}}"><i class="fas fa-trash"></i></a>
+            </span>
+            <button type="button" class="brp-items-refresh-chevron" data-action="inventoryDetailsToggle" aria-label="{{localize 'BRP.details'}}">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="brp-items-refresh-details" {{#unless row.flags.detailsOpen}}hidden{{/unless}}>
+              {{#if row.armour.hitLocationName}}<span><small>{{localize 'BRP.hit-location'}}</small> {{row.armour.hitLocationName}}</span>{{/if}}
+              <span><small>{{localize 'BRP.skillMod'}}</small> {{row.armour.skillModifierLabel}}</span>
+              {{#each row.bonusRows as |bonus|}}
+                <span class="brp-items-refresh-bonus-detail brp-items-refresh-bonus-{{bonus.mode}} {{#if bonus.inactive}}is-inactive{{/if}}" data-tooltip="{{bonus.tooltip}}"><small>{{localize 'BRP.bonus'}}</small> {{bonus.detailLabel}}</span>
+              {{/each}}
+            </div>
+          </li>
+        {{else}}
+          <li class="brp-items-refresh-empty">{{localize 'BRP.none'}}</li>
+        {{/each}}
+      </ol>
+      <div class="brp-items-refresh-drop-zone" data-inventory-top-drop="armour">{{localize 'BRP.inventoryDropTopLevel'}}</div>
+    </section>
+
+    <section class="brp-items-refresh-section {{#if inventoryView.sections.other.collapsed}}is-collapsed{{/if}}" data-inventory-section="other">
+      <header class="brp-items-refresh-section-header">
+        <button type="button" class="brp-items-refresh-section-toggle" data-action="inventorySectionToggle" data-section-id="other" data-tooltip="{{#if inventoryView.sections.other.collapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <h3>{{localize inventoryView.sections.other.label}}</h3>
+        <span>{{inventoryView.sections.other.rows.length}}</span>
+        <button type="button" class="brp-items-refresh-sort" data-action="inventorySortToggle" data-section-id="other" data-sort-mode="{{inventoryView.sections.other.sort.mode}}">
+          <i class="{{inventoryView.sections.other.sort.icon}}"></i>
+          <span>{{localize inventoryView.sections.other.sort.label}}</span>
+        </button>
+        <b></b>
+        <a class="brp-items-refresh-icon-action"
+          data-action="{{inventoryView.sections.other.createAction.action}}"
+          data-document-class="{{inventoryView.sections.other.createAction.documentClass}}"
+          data-type="{{inventoryView.sections.other.createAction.type}}"
+          data-tooltip="{{localize 'BRP.addGear'}}">
+          <i class="fas fa-plus"></i>
+        </a>
+      </header>
+      <div class="brp-items-refresh-sort-menu" hidden>
+        {{#each inventoryView.sections.other.sort.options as |option|}}
+          <button type="button" class="brp-items-refresh-sort-option {{#if option.active}}is-active{{/if}}" data-action="inventorySortSelect" data-section-id="other" data-sort-mode="{{option.mode}}">
+            <i class="{{option.icon}}"></i>
+            <span>{{localize option.label}}</span>
+          </button>
+        {{/each}}
+      </div>
+      <ol class="brp-items-refresh-list">
+        {{#each inventoryView.sections.other.rows as |row|}}
+          <li class="item brp-items-refresh-row brp-items-refresh-row-{{row.mockType}} {{#if row.flags.equipped}}is-equipped{{/if}} {{#unless row.flags.carried}}is-not-carried{{/unless}} {{#if row.flags.empty}}is-empty{{/if}} {{#if row.flags.favorite}}is-favorite{{/if}} {{#if row.flags.overCapacity}}is-over-capacity{{/if}} {{#if row.flags.detailsOpen}}is-details-open{{/if}} {{#if row.container}}is-container-row{{/if}}" data-item-id="{{row.id}}" data-document-class="{{row.documentType}}" data-search-text="{{row.searchText}}" {{#if row.container}}data-inventory-container-row-drop="{{row.id}}"{{/if}}>
+            <span class="brp-items-refresh-handle" draggable="true" data-inventory-row-drag="{{row.id}}">::</span>
+            <span class="brp-items-refresh-item-icon">
+              {{#if row.icon.path}}
+                <svg viewBox="{{row.icon.viewBox}}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="{{row.icon.path}}"></path>
+                </svg>
+              {{else}}
+                <i class="{{row.icon}}"></i>
+              {{/if}}
+            </span>
+            <span class="brp-items-refresh-main" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=row.typeLabel}}">
+              <strong>{{row.name}}</strong>
+              <em>{{row.typeLabel}}{{#if row.subtitle}} - {{row.subtitle}}{{/if}}</em>
+              {{#if row.hasBonuses}}
+                <span class="brp-items-refresh-bonus-strip">
+                  {{#each row.bonusPreviewRows as |bonus|}}
+                    <span class="brp-items-refresh-bonus brp-items-refresh-bonus-{{bonus.mode}} {{#if bonus.inactive}}is-inactive{{/if}}" data-tooltip="{{bonus.tooltip}}">{{bonus.compactLabel}}</span>
+                  {{/each}}
+                  {{#if row.bonusOverflow}}<span class="brp-items-refresh-bonus brp-items-refresh-bonus-more">+{{row.bonusOverflow}}</span>{{/if}}
+                </span>
+              {{/if}}
+            </span>
+            <span class="brp-items-refresh-stats">
+              {{#each row.stats as |stat|}}
+                <span class="brp-items-refresh-stat brp-items-refresh-stat-{{stat.id}}" data-tooltip="{{stat.tooltip}}">
+                  <small>{{localize stat.label}}</small>
+                  <strong>{{stat.value}}</strong>
+                </span>
+              {{/each}}
+            </span>
+            <span class="brp-items-refresh-actions">
+              <a class="brp-items-refresh-action brp-items-refresh-favorite {{#if row.flags.favorite}}is-active{{/if}}" data-action="inventoryFavoriteToggle" data-tooltip="{{#if row.flags.favorite}}{{localize 'BRP.skillContextUnfavorite'}}{{else}}{{localize 'BRP.skillContextFavorite'}}{{/if}}"><i class="{{#if row.flags.favorite}}fas{{else}}far{{/if}} fa-star"></i></a>
+              <a class="brp-items-refresh-action {{#if row.flags.carried}}is-active is-carry{{/if}}" data-action="inventoryStatusToggle" data-tooltip="{{row.equippedName}}"><i class="fas fa-hand-holding"></i></a>
+              {{#if row.consumable}}
+                <a class="brp-items-refresh-action {{#unless row.consumable.canUse}}is-disabled{{/unless}}" data-action="inventoryUseConsumable" data-tooltip="{{localize 'BRP.inventoryUse'}}"><i class="fas fa-flask"></i></a>
+                {{#if row.consumable.canSplit}}<a class="brp-items-refresh-action" data-action="inventorySplitStack" data-tooltip="{{localize 'BRP.inventorySplitStack'}}"><i class="fas fa-code-branch"></i></a>{{/if}}
+              {{/if}}
+              <a class="brp-items-refresh-action" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=row.typeLabel}}"><i class="fas fa-eye"></i></a>
+              <a class="brp-items-refresh-action" data-action="inventoryDuplicate" data-tooltip="{{localize 'BRP.duplicate'}}"><i class="fas fa-copy"></i></a>
+              <a class="brp-items-refresh-action" data-action="inventoryDelete" data-tooltip="{{localize 'BRP.deleteItem'}}"><i class="fas fa-trash"></i></a>
+            </span>
+            <button type="button" class="brp-items-refresh-chevron" data-action="inventoryDetailsToggle" aria-label="{{localize 'BRP.details'}}">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="brp-items-refresh-details" {{#unless row.flags.detailsOpen}}hidden{{/unless}}>
+              {{#if row.consumable}}<span><small>{{localize 'BRP.useEffect'}}</small> {{row.consumable.useEffectLabel}}</span>{{/if}}
+              {{#each row.bonusRows as |bonus|}}
+                <span class="brp-items-refresh-bonus-detail brp-items-refresh-bonus-{{bonus.mode}} {{#if bonus.inactive}}is-inactive{{/if}}" data-tooltip="{{bonus.tooltip}}"><small>{{localize 'BRP.bonus'}}</small> {{bonus.detailLabel}}</span>
+              {{/each}}
+              {{#if row.loot}}<span><small>{{localize 'BRP.value'}}</small> {{row.loot.value}}</span>{{/if}}
+            </div>
+
+            {{#if row.container}}
+              <div class="brp-items-refresh-container-body" {{#unless row.flags.detailsOpen}}hidden{{/unless}}>
+                <div class="brp-items-refresh-container-info">
+                  <span>{{localize 'BRP.enc'}} <strong>{{row.container.effectiveEnc}}</strong></span>
+                  <span class="{{#if row.container.overCapacity}}is-over-capacity{{/if}}">{{localize 'BRP.capacityEnc'}} <strong>{{row.container.capacityLabel}}</strong></span>
+                  <span>{{localize 'BRP.encReductionPct'}} <strong>{{row.container.encReductionPct}}%</strong></span>
+                </div>
+                <ol class="brp-items-refresh-nested-list">
+                  {{#each row.children as |child|}}
+                    <li class="item brp-items-refresh-row brp-items-refresh-row-nested brp-items-refresh-row-depth-{{child.depth}} brp-items-refresh-row-{{child.mockType}} {{#unless child.flags.carried}}is-not-carried{{/unless}} {{#if child.flags.favorite}}is-favorite{{/if}} {{#if child.flags.overCapacity}}is-over-capacity{{/if}} {{#if child.flags.detailsOpen}}is-details-open{{/if}} {{#if child.container}}is-container-row{{/if}}" data-item-id="{{child.id}}" data-document-class="{{child.documentType}}" data-search-text="{{child.searchText}}" {{#if child.container}}data-inventory-container-row-drop="{{child.id}}"{{/if}}>
+                      <span class="brp-items-refresh-handle" draggable="true" data-inventory-row-drag="{{child.id}}">::</span>
+                      <span class="brp-items-refresh-item-icon">
+                        {{#if child.icon.path}}
+                          <svg viewBox="{{child.icon.viewBox}}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="{{child.icon.path}}"></path>
+                          </svg>
+                        {{else}}
+                          <i class="{{child.icon}}"></i>
+                        {{/if}}
+                      </span>
+                      <span class="brp-items-refresh-main" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=child.typeLabel}}">
+                        <strong>{{child.name}}</strong>
+                        <em>{{child.typeLabel}}{{#if child.subtitle}} - {{child.subtitle}}{{/if}}</em>
+                        {{#if child.hasBonuses}}
+                          <span class="brp-items-refresh-bonus-strip">
+                            {{#each child.bonusPreviewRows as |bonus|}}
+                              <span class="brp-items-refresh-bonus brp-items-refresh-bonus-{{bonus.mode}} {{#if bonus.inactive}}is-inactive{{/if}}" data-tooltip="{{bonus.tooltip}}">{{bonus.compactLabel}}</span>
+                            {{/each}}
+                            {{#if child.bonusOverflow}}<span class="brp-items-refresh-bonus brp-items-refresh-bonus-more">+{{child.bonusOverflow}}</span>{{/if}}
+                          </span>
+                        {{/if}}
+                      </span>
+                      <span class="brp-items-refresh-stats">
+                        {{#each child.stats as |stat|}}
+                          <span class="brp-items-refresh-stat brp-items-refresh-stat-{{stat.id}}">
+                            <small>{{localize stat.label}}</small>
+                            <strong>{{stat.value}}</strong>
+                          </span>
+                        {{/each}}
+                      </span>
+                      <span class="brp-items-refresh-actions">
+                        <a class="brp-items-refresh-action brp-items-refresh-favorite {{#if child.flags.favorite}}is-active{{/if}}" data-action="inventoryFavoriteToggle" data-tooltip="{{#if child.flags.favorite}}{{localize 'BRP.skillContextUnfavorite'}}{{else}}{{localize 'BRP.skillContextFavorite'}}{{/if}}"><i class="{{#if child.flags.favorite}}fas{{else}}far{{/if}} fa-star"></i></a>
+                        <a class="brp-items-refresh-action {{#if child.flags.carried}}is-active is-carry{{/if}}" data-action="inventoryStatusToggle" data-tooltip="{{child.equippedName}}"><i class="fas fa-hand-holding"></i></a>
+                        {{#if child.consumable}}
+                          <a class="brp-items-refresh-action {{#unless child.consumable.canUse}}is-disabled{{/unless}}" data-action="inventoryUseConsumable" data-tooltip="{{localize 'BRP.inventoryUse'}}"><i class="fas fa-flask"></i></a>
+                          {{#if child.consumable.canSplit}}<a class="brp-items-refresh-action" data-action="inventorySplitStack" data-tooltip="{{localize 'BRP.inventorySplitStack'}}"><i class="fas fa-code-branch"></i></a>{{/if}}
+                        {{/if}}
+                        <a class="brp-items-refresh-action" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=child.typeLabel}}"><i class="fas fa-eye"></i></a>
+                        <a class="brp-items-refresh-action" data-action="inventoryDuplicate" data-tooltip="{{localize 'BRP.duplicate'}}"><i class="fas fa-copy"></i></a>
+                        <a class="brp-items-refresh-action" data-action="inventoryDelete" data-tooltip="{{localize 'BRP.deleteItem'}}"><i class="fas fa-trash"></i></a>
+                      </span>
+                      <button type="button" class="brp-items-refresh-chevron" data-action="inventoryDetailsToggle" aria-label="{{localize 'BRP.details'}}">
+                        <i class="fas fa-chevron-down"></i>
+                      </button>
+                      <div class="brp-items-refresh-details" {{#unless child.flags.detailsOpen}}hidden{{/unless}}>
+                        {{#each child.details as |detail|}}
+                          <span><small>{{localize detail.label}}</small> {{detail.value}}</span>
+                        {{/each}}
+                        {{#if child.consumable}}<span><small>{{localize 'BRP.useEffect'}}</small> {{child.consumable.useEffectLabel}}</span>{{/if}}
+                        {{#each child.bonusRows as |bonus|}}
+                          <span class="brp-items-refresh-bonus-detail brp-items-refresh-bonus-{{bonus.mode}} {{#if bonus.inactive}}is-inactive{{/if}}" data-tooltip="{{bonus.tooltip}}"><small>{{localize 'BRP.bonus'}}</small> {{bonus.detailLabel}}</span>
+                        {{/each}}
+                      </div>
+                      {{#if child.container}}
+                        <div class="brp-items-refresh-container-body" {{#unless child.flags.detailsOpen}}hidden{{/unless}}>
+                          <div class="brp-items-refresh-container-info">
+                            <span>{{localize 'BRP.enc'}} <strong>{{child.container.effectiveEnc}}</strong></span>
+                            <span class="{{#if child.container.overCapacity}}is-over-capacity{{/if}}">{{localize 'BRP.capacityEnc'}} <strong>{{child.container.capacityLabel}}</strong></span>
+                            <span>{{localize 'BRP.encReductionPct'}} <strong>{{child.container.encReductionPct}}%</strong></span>
+                          </div>
+                          <div class="brp-items-refresh-drop-zone" data-inventory-container-drop="{{child.id}}">{{localize 'BRP.inventoryDropContainer'}}</div>
+                        </div>
+                      {{/if}}
+                    </li>
+                  {{else}}
+                    <li class="brp-items-refresh-container-empty">{{localize 'BRP.none'}}</li>
+                  {{/each}}
+                </ol>
+                <div class="brp-items-refresh-drop-zone" data-inventory-container-drop="{{row.id}}">{{localize 'BRP.inventoryDropContainer'}}</div>
+              </div>
+            {{/if}}
+          </li>
+        {{else}}
+          <li class="brp-items-refresh-empty">{{localize 'BRP.none'}}</li>
+        {{/each}}
+      </ol>
+      <div class="brp-items-refresh-drop-zone" data-inventory-top-drop="other">{{localize 'BRP.inventoryDropTopLevel'}}</div>
+    </section>
   </section>
 </section>

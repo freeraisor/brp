@@ -1,7 +1,13 @@
 <section class='item tab details {{tab.cssClass}}' data-group='primary' data-tab='details'>
-  <div class="armour-scores">
-    <div class="skill-display">{{localize 'BRP.opposedTrait'}}</div>
-    <div class="stat-input"><input name="system.oppName" type="text" value="{{item.system.oppName}}" /></div>
+  <div class="brp-item-detail-grid">
+    <div class="brp-item-detail-label">{{localize 'BRP.opposedTrait'}}</div>
+    <div class="brp-item-detail-field"><input name="system.oppName" type="text" value="{{item.system.oppName}}" /></div>
+    {{> brpItemDetailTextareaField
+      label='BRP.notes'
+      name='system.notes'
+      rows=4
+      value=item.system.notes
+    }}
   </div>
   <br>
   <div class="item-title"> {{localize 'BRP.options'}}:</div>
@@ -21,21 +27,15 @@
       <div class="weapon-input centre"><input name="system.xp" type="text" value="{{item.system.xp}}"
           data-dtype="Number" /></div>
       <div class="skill-display indent">{{localize 'BRP.total'}}</div>
-      <div class="weapon-input centre bold tertiary">{{item.system.total}}</div>
+      <div class="weapon-input centre bold tertiary">{{persTraitView.total}}</div>
       <div class="new-row skill-display indent">{{localize 'BRP.opposedTotal'}}</div>
-      <div class="weapon-input centre bold tertiary">{{item.system.opptotal}}</div>
+      <div class="weapon-input centre bold tertiary">{{persTraitView.opposedTotal}}</div>
       <br>
       <div class="new-row"></div>
 
-      <div class="new-row skill-display new-row">{{localize 'BRP.improve'}}</div>
-      <div class="centre itemIcon"><a class="nopad" data-action="itemToggle" data-property="improve"><i
-            class="{{#if item.system.improve}}fa-regular fa-square-check{{else}}fa-regular fa-square{{/if}}"></i></a>
-      </div>
-      <br>
-      <div class="new-row skill-display new-row">{{localize 'BRP.oppImprove'}}</div>
-      <div class="centre itemIcon"><a class="nopad"  data-action="itemToggle" data-property="oppimprove"><i
-            class="{{#if item.system.oppimprove}}fa-regular fa-square-check{{else}}fa-regular fa-square{{/if}}"></i></a>
-      </div>
+      <div class="new-row skill-display new-row">{{localize 'BRP.persPairImpCheck'}}</div>
+      <div class="weapon-input centre"><input name="system.improve" type="checkbox" {{checked persTraitView.impCheck}} /></div>
     </div>
+    <div class="itemSummary">{{localize 'BRP.persPairImpCheckHint'}}</div>
   {{/if}}
 </section>

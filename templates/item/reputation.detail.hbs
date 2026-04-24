@@ -6,6 +6,16 @@
     <div class="skill-display new-row indent">{{localize 'BRP.base'}}</div>
     <div class="weapon-input centre"><input name="system.base" type="text" value="{{item.system.base}}"
         data-dtype="Number" /></div>
+    <div class="skill-display indent">{{localize 'BRP.category'}}</div>
+    <div class="weapon-input centre">
+      <select name="system.category">
+        {{selectOptions categoryOptions selected=reputationCategory}}
+      </select>
+    </div>
+    <div class="skill-display new-row indent">{{localize 'BRP.scope'}}</div>
+    <div class="weapon-input centre"><input name="system.scope" type="text" value="{{item.system.scope}}" /></div>
+    <div class="skill-display indent">{{localize 'BRP.total'}}</div>
+    <div class="weapon-input centre bold tertiary">{{item.system.total}}</div>
   </div>
   {{/if}}
 </section>

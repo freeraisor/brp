@@ -1,26 +1,42 @@
 <section class="actor tab sorcery {{tab.cssClass}}" data-group="primary" data-tab="sorcery">
-    <div class="sorcery-listitem">
-      <div class="diff-label">{{sorceryLabel}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.range'}}</div>
-      <div class="diff-label centre" data-tooltip="{{localize 'BRP.spellLvlHint'}}">{{ localize 'BRP.level'}}</div>
-      <div class="diff-label centre" data-tooltip="{{localize 'BRP.ppCostHint' label=system.power.labelAbbr}}">{{system.power.labelAbbr}}</div>
-      <div class="diff-label centre" data-tooltip="{{ localize 'BRP.spellCost' }}">{{ localize 'BRP.powCost'}}</div>
-      <div class="diff-label centre" data-tooltip="{{ localize 'BRP.memHint' }}">{{ localize 'BRP.mem'}}</div>
-      <div class="diff-label centre" data-action="createDoc" data-tooltip="{{ localize 'BRP.addItem' type=sorceryLabel }}" data-type="sorcery" data-document-class="Item">
-        <a class="largeIcon"><i class="item-control fas fa-plus"></i></a>
+  <section class="brp-powers brp-powers-sorcery">
+    <section class="brp-power-section">
+      <div class="brp-power-section-header">
+        <div class="brp-power-section-title">{{powersView.sorcery.label}}</div>
+        <a class="brp-icon-button largeIcon" data-action="{{powersView.sorcery.createAction.action}}" data-document-class="{{powersView.sorcery.createAction.documentClass}}" data-type="{{powersView.sorcery.createAction.type}}" data-tooltip="{{localize powersView.sorcery.addTooltip type=powersView.sorcery.label}}">
+          <i class="item-control fas fa-plus"></i>
+        </a>
       </div>
-    </div>
-    <ol class="gr-list">
-      {{#each sorceries as |sorcery id|}}
-        <li class="item sorcery-listitem" data-item-id="{{sorcery._id}}" data-document-class="Item">
-          <div class="rollable" data-action="viewDoc"
-              data-tooltip="{{localize 'BRP.viewSpell' type=../sorceryLabel }}">{{sorcery.name}}</div>
-          <div class="centre">{{sorcery.system.range}}</div>
-          <div class="centre">{{sorcery.system.currLvl}}{{#if sorcery.system.var}}({{sorcery.system.memLvl}}){{/if}}</div>
-          <div class="centre">{{sorcery.system.ppCost}}</div>
-          <div class="centre">{{sorcery.system.powCost}}</div>
-          <div class="centre"><a class="mediumIcon" data-action="itemToggle" data-property="mem"><i class="{{#if sorcery.system.mem}}fa-solid fa-book-open-cover{{else}}fa-light fa-book-open-cover{{/if}}"></i></a></div>
-        </li>
-      {{/each}}
-    </ol>
+
+      <ol class="brp-power-list brp-power-list-sorcery">
+        {{#each powersView.sorcery.rows as |sorcery id|}}
+          <li class="item brp-power-row brp-power-row-sorcery {{#if sorcery.hasEffects}}has-effects{{/if}}" data-item-id="{{sorcery.id}}" data-document-class="{{sorcery.documentType}}" data-drag="true">
+            <div class="brp-power-main">
+              <div class="brp-power-name rollable truncate {{#if sorcery.flags.hasEffects}}italics bold{{/if}}" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewSpell' type=../powersView.sorcery.label }}">
+                {{sorcery.displayTitle}}
+              </div>
+              {{#if sorcery.shortDescription}}<div class="brp-power-subtitle truncate">{{sorcery.shortDescription}}</div>{{/if}}
+            </div>
+
+            <div class="brp-power-actions">
+              {{#each sorcery.actions as |action key|}}
+                <a class="brp-power-action {{#if action.active}}is-active{{/if}}" data-action="{{action.action}}" data-property="{{action.property}}" data-tooltip="{{localize action.tooltipKey}}">
+                  <i class="{{#if action.active}}{{action.activeIcon}}{{else}}{{action.inactiveIcon}}{{/if}}"></i>
+                </a>
+              {{/each}}
+            </div>
+
+            <div class="brp-power-cells">
+              {{#each sorcery.summaryCells as |cell key|}}
+                <div class="brp-power-cell {{#if cell.rollable}}rollable{{/if}}" {{#if cell.action}}data-action="{{cell.action}}"{{/if}} {{#if cell.tooltipKey}}data-tooltip="{{localize cell.tooltipKey}}"{{/if}}>
+                  <span>{{#if cell.labelKey}}{{localize cell.labelKey}}{{else}}{{cell.label}}{{/if}}</span>
+                  <strong>{{#if cell.valueKey}}{{localize cell.valueKey}}{{else}}{{cell.value}}{{/if}}</strong>
+                </div>
+              {{/each}}
+            </div>
+          </li>
+        {{/each}}
+      </ol>
+    </section>
+  </section>
 </section>

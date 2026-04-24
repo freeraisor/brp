@@ -1,0 +1,28 @@
+<section class="item tab details {{tab.cssClass}}" data-group="primary" data-tab="details">
+  <div class="item-title">{{localize 'BRP.details'}}:</div>
+  <div class="armour-scores">
+    <div class="skill-display new-row">{{localize 'BRP.status'}}</div>
+    <div class="weapon-input centre">
+      <select name="system.status">
+        {{selectOptions questStatusOptions selected=questStatus}}
+      </select>
+    </div>
+
+    <div class="skill-display">{{localize 'BRP.storyQuestSessionGiven'}}</div>
+    <div class="weapon-input centre">
+      <input name="system.sessionGiven" type="text" value="{{item.system.sessionGiven}}" />
+    </div>
+  </div>
+
+  <div class="brp-item-detail-grid brp-item-detail-grid--spaced">
+    {{> brpItemDetailTextareaField
+      label='BRP.storyQuestObjective'
+      name='system.objective'
+      rows=5
+      value=item.system.objective
+    }}
+  </div>
+
+  <p>{{localize 'BRP.storyQuestUpdatesManagedHint' count=updatesCount}}</p>
+  <p>{{localize 'BRP.storyQuestLinksManagedHint' count=linkedCount}}</p>
+</section>

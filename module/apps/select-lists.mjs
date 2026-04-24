@@ -85,6 +85,52 @@ export class BRPSelectLists {
     return options;
   }
 
+  //Ammo Mode List
+  static async getAmmoModeOptions() {
+    let options = {
+      "none": game.i18n.localize("BRP.ammoModeNone"),
+      "count": game.i18n.localize("BRP.ammoModeCount"),
+      "single": game.i18n.localize("BRP.ammoModeSingle"),
+      "magazine": game.i18n.localize("BRP.ammoModeMagazine"),
+    };
+    return options;
+  }
+
+  //Inventory kind list
+  static async getInventoryKindOptions() {
+    let options = {
+      "container": game.i18n.localize("BRP.inventoryKindContainer"),
+      "consumable": game.i18n.localize("BRP.inventoryKindConsumable"),
+      "tool": game.i18n.localize("BRP.inventoryKindTool"),
+      "equipment": game.i18n.localize("BRP.inventoryKindEquipment"),
+      "loot": game.i18n.localize("BRP.inventoryKindLoot"),
+    };
+    return options;
+  }
+
+  //Inventory use effect list
+  static async getInventoryUseEffectOptions() {
+    let options = {
+      "": game.i18n.localize("BRP.none"),
+      "consume": game.i18n.localize("BRP.inventoryUseEffectConsume"),
+      "message": game.i18n.localize("BRP.inventoryUseEffectMessage"),
+    };
+    return options;
+  }
+
+  //Currency icon list
+  static async getCurrencyIconOptions() {
+    let options = {
+      "coin": game.i18n.localize("BRP.currencyIconCoin"),
+      "bill": game.i18n.localize("BRP.currencyIconBill"),
+      "card": game.i18n.localize("BRP.currencyIconCard"),
+      "crypto": game.i18n.localize("BRP.currencyIconCrypto"),
+      "gem": game.i18n.localize("BRP.currencyIconGem"),
+      "token": game.i18n.localize("BRP.currencyIconToken"),
+    };
+    return options;
+  }
+
   //Special Success  Category List
   static async getSpecialOptions() {
     let options = {

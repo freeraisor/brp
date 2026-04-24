@@ -1,55 +1,190 @@
 <section class="actor tab pers {{tab.cssClass}}" data-group="primary" data-tab="pers">
-
-    {{#if usePersTrait}}
-      <div class="trait-listitem">
-        <div class="diff-label">{{ localize 'BRP.persTrait'}}</div>
-        <div></div>
-        <div class="diff-label centre">{{ localize 'BRP.total'}}</div>
-        <div></div>
-        <div class="diff-label centre">{{ localize 'BRP.total'}}</div>
-        <div></div>
-        <div class="right diff-label">{{ localize 'BRP.opposedTrait'}}</div>
-        <div class="diff-label centre" data-tooltip="{{ localize 'BRP.addItem' type=(localize 'TYPES.Item.persTrait') }}"
-          data-action="createDoc" data-document-class="Item" data-type="persTrait">
-          <a class="largeIcon"><i class="item-control fas fa-plus"></i></a>
+  {{#with persRefresh as |pers|}}
+    <section class="brp-pers-refresh">
+      <header class="brp-pers-refresh-titlebar">
+        <div class="brp-pers-refresh-heading">
+          <i class="fas fa-heart"></i>
+          <span>{{localize 'BRP.personality'}}</span>
         </div>
-      </div>
-    <ol class="gr-list">
-      {{#each persTraits as |persTrait id|}}
-        <li class="item trait-listitem" data-item-id="{{persTrait._id}}" data-document-class="Item" data-drag='true'>
-          <div class="new-row persTrait-name rollable" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.persTrait') }}">{{persTrait.name}}</div>
-          <div data-tooltip="{{ localize 'BRP.improve' }}"><a class="" data-action="itemToggle" data-property="improve"><i class="{{#if persTrait.system.improve}}fa-regular fa-square-check{{else}}fa-regular fa-square{{/if}}"></i></a></div>
-          <div class="centre rollable" data-action="personalityRoll"  data-opp="false">{{persTrait.system.total}}%</div>
-          <div><a class="centre"><i class="plainIcon fa-regular fa-scale-balanced"></i></a></div>
-          <div class="centre rollable" data-action="personalityRoll" data-opp="true">{{persTrait.system.opptotal}}%</div>
-          <div class="right" data-tooltip="{{ localize 'BRP.oppImprove' }}"><a class="" data-action="itemToggle" data-property="oppimprove"><i class="{{#if persTrait.system.oppimprove}}fa-regular fa-square-check{{else}}fa-regular fa-square{{/if}}"></i></a></div>
-          <div class="right rollable" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.persTrait') }}">{{persTrait.system.oppName}}</div>
-        </li>
-      {{/each}}
-      </ol>
-      <br>
-    {{/if}}
 
-    {{#if usePassion}}
-      <div class="magic-listitem">
-        <div class="diff-label">{{ localize 'BRP.passion'}}</div>
-        <div></div>
-        <div class="diff-label centre">{{ localize 'BRP.total'}}</div>
-        <div></div>
-        <div class="diff-label right" data-tooltip="{{ localize 'BRP.addItem' type=(localize 'TYPES.Item.passion') }}"
-          data-action="createDoc" data-document-class="Item" data-type="passion">
-          <a class="largeIcon"><i class="item-control fas fa-plus"></i></a>
+        <div class="brp-pers-refresh-lock">
+          <i class="fas {{#if system.lock}}fa-lock{{else}}fa-lock-open{{/if}}"></i>
+          <span>{{#if system.lock}}{{localize 'BRP.locked'}}{{else}}{{localize 'BRP.unlocked'}}{{/if}}</span>
         </div>
-      </div>
-      <ol class="gr-list">
-      {{#each passions as |passion id|}}
-        <li class="item magic-listitem" data-item-id="{{passion._id}}" data-document-class="Item" data-drag='true'>
-          <div class="new-row passion-name rollable" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.passion') }}">{{passion.name}}</div>
-          <div data-tooltip="{{ localize 'BRP.improve' }}"><a class="" data-action="itemToggle" data-property="improve"><i class="{{#if passion.system.improve}}fa-regular fa-square-check{{else}}fa-regular fa-square{{/if}}"></i></a></div>
-          <div class="centre rollable" data-action="passionRoll">{{passion.system.total}}%</div>
-        </li>
-      {{/each}}
-      </ol>
-    {{/if}}
+      </header>
 
-  </section>
+      {{#with pers.sections.traits as |section|}}
+        {{#if section.visible}}
+          <section class="brp-pers-refresh-section {{#if section.collapsed}}is-collapsed{{/if}}" data-pers-section="traits">
+            <header class="brp-pers-refresh-section-header">
+              <button type="button" class="brp-pers-refresh-section-toggle" data-action="persSectionToggle" data-section-id="traits" aria-expanded="{{#if section.collapsed}}false{{else}}true{{/if}}" data-tooltip="{{#if section.collapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <h3 class="brp-pers-refresh-section-title">{{section.label}}</h3>
+              <span class="brp-pers-refresh-section-count">{{section.count}}</span>
+              <span class="brp-pers-refresh-section-line"></span>
+              <button type="button" class="brp-pers-refresh-sort-pill" data-action="persSortCycle" data-section-id="traits" data-tooltip="{{section.sortLabel}}">
+                <i class="fas fa-arrow-down-a-z"></i>
+                <span>{{section.sortLabel}}</span>
+              </button>
+              <div class="brp-pers-refresh-section-actions">
+                <button type="button" class="brp-icon-button {{#if @root.system.lock}}is-disabled{{/if}}" {{#if @root.system.lock}}disabled{{else}}data-action="{{section.createAction.action}}" data-document-class="{{section.createAction.documentClass}}" data-type="{{section.createAction.type}}"{{/if}} data-tooltip="{{#if @root.system.lock}}{{localize 'BRP.locked'}}{{else}}{{localize 'BRP.addItem' type=(localize 'TYPES.Item.persTrait')}}{{/if}}">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </header>
+
+            <div class="brp-pers-refresh-section-body" {{#if section.collapsed}}hidden{{/if}}>
+              {{#if section.hasRows}}
+                <ol class="brp-pers-refresh-trait-list">
+                  {{#each section.rows as |row|}}
+                    <li class="item brp-pers-refresh-trait-card {{#if (eq row.fixatedSide 'left')}}is-fixated-left{{/if}} {{#if (eq row.fixatedSide 'right')}}is-fixated-right{{/if}}" data-item-id="{{row.itemId}}" data-document-class="Item" data-drag="true">
+                      <div class="brp-pers-refresh-trait-header">
+                        <div class="brp-pers-refresh-trait-main">
+                          <button type="button" class="brp-pers-refresh-check {{#if row.impCheck}}is-checked{{/if}} {{#if @root.system.lock}}is-disabled{{/if}}" {{#if @root.system.lock}}disabled{{else}}data-action="{{row.actions.impCheck.action}}" data-item-id="{{row.itemId}}"{{/if}} aria-pressed="{{#if row.impCheck}}true{{else}}false{{/if}}" data-tooltip="{{#if @root.system.lock}}{{localize 'BRP.locked'}}{{else}}{{#if row.impCheck}}{{localize 'BRP.persRemoveImpCheck'}}{{else}}{{localize 'BRP.persAddImpCheck'}}{{/if}}{{/if}}">
+                            <i class="fas fa-check"></i>
+                          </button>
+
+                          <div class="brp-pers-refresh-trait-names">
+                            <span class="brp-pers-refresh-trait-name is-left">{{row.leftName}}</span>
+                            <span class="brp-pers-refresh-trait-arrow">&harr;</span>
+                            <span class="brp-pers-refresh-trait-name is-right">{{row.rightName}}</span>
+                          </div>
+                        </div>
+
+                        <div class="brp-pers-refresh-trait-values">
+                          <a class="brp-pers-refresh-trait-value is-left {{#if (eq row.dominantSide 'left')}}is-dominant{{/if}} {{#if (eq row.dominantSide 'right')}}is-muted{{/if}} rollable" data-action="personalityRoll" data-opp="false" data-tooltip="{{localize 'BRP.persTrait'}}">{{row.leftValueDisplay}}</a>
+                          <span class="brp-pers-refresh-trait-slash">/</span>
+                          <a class="brp-pers-refresh-trait-value is-right {{#if (eq row.dominantSide 'right')}}is-dominant{{/if}} {{#if (eq row.dominantSide 'left')}}is-muted{{/if}} rollable" data-action="personalityRoll" data-opp="true" data-tooltip="{{localize 'BRP.opposedTrait'}}">{{row.rightValueDisplay}}</a>
+                          {{#if row.fixated}}
+                            <span class="brp-pers-refresh-fixated-badge">{{localize 'BRP.fixated'}}</span>
+                          {{/if}}
+                        </div>
+
+                        <div class="brp-pers-refresh-card-actions">
+                          <button type="button" class="brp-pers-refresh-card-action" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.persTrait')}}">
+                            <i class="fas fa-eye"></i>
+                          </button>
+                          <button type="button" class="brp-pers-refresh-card-action" data-action="{{row.actions.menu.action}}" data-section-id="{{row.actions.menu.sectionId}}" data-item-id="{{row.actions.menu.itemId}}" data-tooltip="{{localize 'BRP.options'}}">
+                            <i class="fas fa-ellipsis-h"></i>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="brp-pers-refresh-trait-bar-wrap">
+                        <div class="brp-pers-refresh-trait-bar">
+                          <span class="brp-pers-refresh-trait-bar-fill is-left" style="width: {{row.leftValue}}%"></span>
+                          <span class="brp-pers-refresh-trait-bar-fill is-right" style="width: {{row.rightValue}}%"></span>
+                          <span class="brp-pers-refresh-trait-bar-mid"></span>
+                        </div>
+                      </div>
+
+                      {{#if row.hasNotes}}
+                        <div class="brp-pers-refresh-trait-notes">
+                          <span class="brp-pers-refresh-trait-notes-label">{{localize 'BRP.notes'}}</span>
+                          <span class="brp-pers-refresh-trait-notes-text">{{row.displayNotes}}</span>
+                        </div>
+                      {{/if}}
+                    </li>
+                  {{/each}}
+                </ol>
+              {{else}}
+                <div class="brp-pers-refresh-empty">{{section.emptyText}}</div>
+              {{/if}}
+            </div>
+          </section>
+        {{/if}}
+      {{/with}}
+
+      {{#with pers.sections.passions as |section|}}
+        {{#if section.visible}}
+          <section class="brp-pers-refresh-section {{#if section.collapsed}}is-collapsed{{/if}}" data-pers-section="passions">
+            <header class="brp-pers-refresh-section-header">
+              <button type="button" class="brp-pers-refresh-section-toggle" data-action="persSectionToggle" data-section-id="passions" aria-expanded="{{#if section.collapsed}}false{{else}}true{{/if}}" data-tooltip="{{#if section.collapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <h3 class="brp-pers-refresh-section-title">{{section.label}}</h3>
+              <span class="brp-pers-refresh-section-count">{{section.count}}</span>
+              <span class="brp-pers-refresh-section-line"></span>
+              <button type="button" class="brp-pers-refresh-sort-pill" data-action="persSortCycle" data-section-id="passions" data-tooltip="{{section.sortLabel}}">
+                <i class="fas fa-arrow-down-wide-short"></i>
+                <span>{{section.sortLabel}}</span>
+              </button>
+              <div class="brp-pers-refresh-section-actions">
+                <button type="button" class="brp-icon-button {{#if @root.system.lock}}is-disabled{{/if}}" {{#if @root.system.lock}}disabled{{else}}data-action="{{section.createAction.action}}" data-document-class="{{section.createAction.documentClass}}" data-type="{{section.createAction.type}}"{{/if}} data-tooltip="{{#if @root.system.lock}}{{localize 'BRP.locked'}}{{else}}{{localize 'BRP.addItem' type=(localize 'TYPES.Item.passion')}}{{/if}}">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </header>
+
+            <div class="brp-pers-refresh-section-body" {{#if section.collapsed}}hidden{{/if}}>
+              {{#if section.hasRows}}
+                <ol class="brp-pers-refresh-passion-list">
+                  {{#each section.rows as |row|}}
+                    <li class="item brp-pers-refresh-passion-card {{#if row.fixated}}is-fixated{{/if}}" data-item-id="{{row.itemId}}" data-document-class="Item" data-drag="true" data-passion-type="{{row.type}}" data-focus-type="{{row.focusLink.type}}" data-focus-label="{{row.focusText}}" data-focus-resolved="{{#if row.focusResolved}}true{{else}}false{{/if}}">
+                      <div class="brp-pers-refresh-passion-icon">
+                        <i class="{{row.typeIcon}}"></i>
+                      </div>
+
+                      <div class="brp-pers-refresh-passion-main">
+                        <div class="brp-pers-refresh-passion-name">
+                          <button type="button" class="brp-pers-refresh-check {{#if row.impCheck}}is-checked{{/if}} {{#if @root.system.lock}}is-disabled{{/if}}" {{#if @root.system.lock}}disabled{{else}}data-action="{{row.actions.impCheck.action}}" data-item-id="{{row.itemId}}"{{/if}} aria-pressed="{{#if row.impCheck}}true{{else}}false{{/if}}" data-tooltip="{{#if @root.system.lock}}{{localize 'BRP.locked'}}{{else}}{{#if row.impCheck}}{{localize 'BRP.persRemoveImpCheck'}}{{else}}{{localize 'BRP.persAddImpCheck'}}{{/if}}{{/if}}">
+                            <i class="fas fa-check"></i>
+                          </button>
+                          <span class="brp-pers-refresh-passion-name-text">{{row.name}}</span>
+                          <span class="brp-pers-refresh-type-badge is-{{row.type}}">{{row.typeLabel}}</span>
+                          {{#if row.fixated}}
+                            <span class="brp-pers-refresh-fixated-badge">{{localize 'BRP.fixated'}}</span>
+                          {{/if}}
+                        </div>
+
+                        {{#if row.hasFocus}}
+                          <div class="brp-pers-refresh-passion-focus {{#if row.focusResolved}}is-linked{{/if}}">
+                            {{#if row.focusResolved}}
+                              <button type="button" class="brp-pers-refresh-passion-focus-link" data-action="{{row.actions.openFocus.action}}" data-item-id="{{row.itemId}}" data-tooltip="{{localize 'BRP.persOpenLinkedFocus'}}">
+                                <span>{{row.focusText}}</span>
+                              </button>
+                            {{else}}
+                              <span class="brp-pers-refresh-passion-focus-text">
+                                <span>{{row.focusText}}</span>
+                              </span>
+                            {{/if}}
+                          </div>
+                        {{else}}
+                          <div class="brp-pers-refresh-passion-focus is-empty">{{localize 'BRP.persNoFocus'}}</div>
+                        {{/if}}
+                      </div>
+
+                      <a class="brp-pers-refresh-passion-roll rollable" data-action="passionRoll" data-tooltip="{{localize 'BRP.passion'}}">
+                        <span class="brp-pers-refresh-passion-bar">
+                          <span class="brp-pers-refresh-passion-bar-fill" style="width: {{row.valueBarPercent}}%"></span>
+                        </span>
+                      </a>
+
+                      <a class="brp-pers-refresh-passion-value rollable" data-action="passionRoll" data-tooltip="{{localize 'BRP.passion'}}">{{row.valueDisplay}}</a>
+
+                      <div class="brp-pers-refresh-card-actions">
+                        <button type="button" class="brp-pers-refresh-card-action" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.passion')}}">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button type="button" class="brp-pers-refresh-card-action" data-action="{{row.actions.menu.action}}" data-section-id="{{row.actions.menu.sectionId}}" data-item-id="{{row.actions.menu.itemId}}" data-tooltip="{{localize 'BRP.options'}}">
+                          <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                      </div>
+                    </li>
+                  {{/each}}
+                </ol>
+              {{else}}
+                <div class="brp-pers-refresh-empty">{{section.emptyText}}</div>
+              {{/if}}
+            </div>
+          </section>
+        {{/if}}
+      {{/with}}
+    </section>
+  {{else}}
+    <section class="brp-pers-refresh">
+      <div class="brp-pers-refresh-empty">Personality view unavailable.</div>
+    </section>
+  {{/with}}
+</section>

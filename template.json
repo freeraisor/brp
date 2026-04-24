@@ -92,6 +92,7 @@
         "health": {
           "value": 10,
           "mod": 0,
+          "effects": 0,
           "max": 10,
           "mjrwnd": 5,
           "daily": 0
@@ -99,6 +100,7 @@
         "power": {
           "value": 5,
           "mod": 0,
+          "effects": 0,
           "max": 5,
           "battVal": 0,
           "battMax": 0
@@ -106,6 +108,7 @@
         "fatigue": {
           "value": 5,
           "max": 5,
+          "effects": 0,
           "mod": 0
         },
         "sanity": {
@@ -123,10 +126,31 @@
       "templates": [
         "base"
       ],
-      "biography": "",
+      "biography": {
+        "pronouns": "",
+        "dateOfBirth": "",
+        "placeOfBirth": "",
+        "nativeLanguage": "",
+        "build": "",
+        "eyeColor": "",
+        "hairColor": "",
+        "skinTone": "",
+        "distinctiveMarks": "",
+        "employer": "",
+        "rankTitle": "",
+        "maritalStatus": "",
+        "socialClass": "",
+        "knownLanguages": "",
+        "about": ""
+      },
       "background": "",
       "backstory": "",
       "stories":[],
+      "story": {
+        "entries": [],
+        "questLinks": []
+      },
+      "customFields": [],
       "gender": "",
       "culture": "",
       "religion": "",
@@ -144,7 +168,19 @@
       "hand": "Right",
       "lock": false,
       "skillOrder": true,
-      "skillcategory": {}
+      "skillcategory": {},
+      "social": {
+        "factionMemberships": []
+      },
+      "currencies": [
+        {
+          "id": "credits",
+          "name": "Credits",
+          "icon": "coin",
+          "amount": 0,
+          "sortOrder": 0
+        }
+      ]
     },
     "npc": {
       "templates": [
@@ -234,6 +270,9 @@
       "passion",
       "persTrait",
       "reputation",
+      "contact",
+      "faction",
+      "quest",
       "skillcat",
       "culture"
     ],
@@ -253,7 +292,16 @@
       "cost": 0,
       "equipStatus": "carried",
       "pSCurr": 0,
-      "pSMax": 0
+      "pSMax": 0,
+      "inventoryKind": "equipment",
+      "stackable": false,
+      "containerId": "",
+      "capacityEnc": 0,
+      "encReductionPct": 0,
+      "useEffect": "",
+      "usesRemaining": 0,
+      "value": "",
+      "bonuses": []
     },
     "skill": {
       "templates": [
@@ -465,7 +513,9 @@
       "HPL": false,
       "coverage": "",
       "pSCurr": 0,
-      "pSMax": 0
+      "pSMax": 0,
+      "containerId": "",
+      "bonuses": []
     },
     "weapon": {
       "templates": [
@@ -506,6 +556,8 @@
       "ammoType": "",
       "ammo": 0,
       "ammoCurr": 0,
+      "ammoMode": "none",
+      "magazineCount": 0,
       "mal": 0,
       "rof": 0,
       "radius": 0,
@@ -516,17 +568,37 @@
       "price": "",
       "cost": 0,
       "equipStatus": "carried",
+      "sortOrder": 0,
       "coverage": "",
       "quantity": 1,
       "npcVal": 0,
       "pSCurr": 0,
-      "pSMax": 0
+      "pSMax": 0,
+      "containerId": "",
+      "bonuses": []
     },
     "wound": {
+      "templates": [
+        "base"
+      ],
       "value": 1,
+      "damage": 1,
+      "damageRemaining": 1,
+      "damageType": "other",
+      "status": "fresh",
       "treated": false,
       "created": false,
-      "locId": ""
+      "locId": "",
+      "isMajor": false,
+      "firstAidUsed": false,
+      "medicineLastDay": "",
+      "source": "manual",
+      "armorApplied": 0,
+      "armorFormula": "",
+      "armorRolls": [],
+      "createdAt": 0,
+      "createdLabel": "",
+      "history": []
     },
     "allegiance": {
       "templates": [
@@ -535,6 +607,8 @@
       "allegPoints": 0,
       "opposeAlleg": "",
       "allegTitle": "",
+      "enemyId": "",
+      "rankText": "",
       "improve": false,
       "allegEnemy": false,
       "allegAllied": false,
@@ -548,7 +622,12 @@
       ],
       "base": 0,
       "improve": false,
-      "xp": 0
+      "xp": 0,
+      "type": "other",
+      "focus": "",
+      "focusLinkType": "",
+      "focusLinkUuid": "",
+      "notes": ""
     },
     "persTrait": {
       "templates": [
@@ -559,13 +638,40 @@
       "improve": false,
       "oppimprove": false,
       "xp": 0,
-      "basic": false
+      "basic": false,
+      "notes": ""
     },
     "reputation": {
       "templates": [
         "base"
       ],
-      "base": 0
+      "base": 0,
+      "category": "reputation",
+      "scope": ""
+    },
+    "contact": {
+      "templates": [
+        "base"
+      ],
+      "role": "",
+      "location": "",
+      "relation": "neutral",
+      "linkedActorUuid": ""
+    },
+    "faction": {
+      "templates": [
+        "base"
+      ]
+    },
+    "quest": {
+      "templates": [
+        "base"
+      ],
+      "status": "active",
+      "objective": "",
+      "sessionGiven": "",
+      "updates": [],
+      "linked": []
     },
     "skillcat": {
       "templates": [

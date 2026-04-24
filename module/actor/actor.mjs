@@ -1,5 +1,9 @@
 import { BRPactorItemDrop } from './actor-itemDrop.mjs'
 import { BRPID } from '../brpid/brpid.mjs';
+import { BRPHealth } from '../combat/health.mjs';
+import { computeInventoryTotalEnc } from './sheets/character/prepare/inventory-helpers.mjs';
+import { hasNativeEffectCompatibility } from './effects/effect-compatibility.mjs';
+import { finalizeActorEffectProjection, projectActorEffects } from './effects/effect-projector.mjs';
 
 export class BRPActor extends Actor {
 
@@ -29,6 +33,7 @@ export class BRPActor extends Actor {
     const actorData = this;
     const systemData = actorData.system;
     const flags = actorData.flags.boilerplate || {};
+    this._brpEffectProjection = null;
 
     //Prepare data for different actor types
     this._prepareCharacterData(actorData);
@@ -39,6 +44,7 @@ export class BRPActor extends Actor {
   async _prepareCharacterData(actorData) {
     if (actorData.type !== 'character') return;
     const systemData = actorData.system;
+    const effectProjection = projectActorEffects(actorData);
     this._prepStats(actorData)
     this._prepDerivedStats(actorData)
 
@@ -118,29 +124,10 @@ export class BRPActor extends Actor {
         systemData.skillcategory[key] = itm.system.total;
       }
     }
-    let effects = actorData.effects.map(i=> {return {origin: i.origin} })
+    const effectOrigins = new Set(actorData.effects.map(effect => effect.origin).filter(Boolean));
     //Calcualte/adjust scores for items (itm)
     for (let itm of actorData.items) {
-
-      /*Replaced with code below as not correctly applying to weapons
-      //Does the item have transferrable effects
-      if (['gear', 'armour', 'weapon','wound'].includes(itm.type)) {
-        if (itm.transferredEffects.length > 0) {
-          itm.system.hasEffects = true;
-        } else {
-          itm.system.hasEffects = false;
-        }
-      }*/
-
-      //Does the item have transferrable effects
-      if (['gear', 'armour', 'weapon','wound'].includes(itm.type)) {
-          itm.system.hasEffects = false;
-        for (let effect of effects) {
-          if (effect.origin === itm.uuid) {
-            itm.system.hasEffects = true;
-          }
-        }
-      }
+      itm.system.hasEffects = effectOrigins.has(itm.uuid) || hasNativeEffectCompatibility(itm);
 
       //If skill, magic or psychic calculate the total score and record the category bonus
       if (itm.type === 'skill' || itm.type === 'magic' || itm.type === 'psychic') {
@@ -169,7 +156,6 @@ export class BRPActor extends Actor {
       } else if (['gear', 'weapon'].includes(itm.type)) {
         if (itm.system.equipStatus === 'carried') {
           itm.system.actlEnc = itm.system.quantity * itm.system.enc
-          systemData.enc = Number(systemData.enc + itm.system.actlEnc)
         } else { itm.system.actlEnc = 0 }
 
         if (itm.system.equipStatus != 'stored') {
@@ -191,7 +177,6 @@ export class BRPActor extends Actor {
           }
           //If not carried then zero ENC
         }
-        systemData.enc = systemData.enc + itm.system.actlEnc
         if (itm.system.equipStatus != 'stored') {
           if (itm.system.pSCurr > 0) { systemData.psCurr = systemData.psCurr + itm.system.pSCurr }
           if (itm.system.pSMax > 0) { systemData.psMax = systemData.psMax + itm.system.pSMax }
@@ -250,7 +235,7 @@ export class BRPActor extends Actor {
         //Loop through items (wnd) to find wounds
         for (let wnd of actorData.items) {
           if (wnd.type === 'wound' && wnd.system.locId === itm._id) {
-            itm.system.currHP = itm.system.currHP - wnd.system.value
+            itm.system.currHP = itm.system.currHP - BRPHealth.getWoundDamageRemaining(wnd)
           }
         }
         if (itm.system.currHP < 1 && itm.system.locType === 'limb') {
@@ -272,10 +257,12 @@ export class BRPActor extends Actor {
         if (itm.system.dead) { systemData.dead = true }
         //If wound calculate total HPL
       } else if (itm.type === 'wound') {
-        systemData.health.value = systemData.health.value - itm.system.value
+        systemData.health.value = systemData.health.value - BRPHealth.getWoundDamageRemaining(itm)
       }
 
     }
+
+    systemData.enc = computeInventoryTotalEnc(actorData.items);
 
     //Calculate allegiance target
     let allegiances = actorData.items.filter(itm => itm.type === 'allegiance')
@@ -299,6 +286,10 @@ export class BRPActor extends Actor {
     systemData.enc = (systemData.enc).toFixed(2)
     systemData.fatigue.max = Math.ceil(systemData.stats.str.total + systemData.stats.con.total - systemData.enc + systemData.fatigue.mod + (systemData.fatigue.effects ?? 0));
 
+    finalizeActorEffectProjection(actorData, effectProjection, {
+      useHPL: game.settings.get('brp', 'useHPL')
+    });
+
     //Derive Health Statuses from total HP
     if (systemData.health.value < 1) {
       systemData.dead = true;
@@ -314,6 +305,7 @@ export class BRPActor extends Actor {
   async _prepareNpcData(actorData) {
     if (actorData.type !== 'npc') return;
     const systemData = actorData.system;
+    const effectProjection = projectActorEffects(actorData);
     this._prepStats(actorData)
     this._prepDerivedStats(actorData)
 
@@ -349,6 +341,10 @@ export class BRPActor extends Actor {
     if (game.settings.get('brp', 'useHPL') || game.settings.get('brp', 'beastiary')) {
       systemData.health.value = systemData.health.max - damage
     }
+
+    finalizeActorEffectProjection(actorData, effectProjection, {
+      useHPL: game.settings.get('brp', 'useHPL') || game.settings.get('brp', 'beastiary')
+    });
   }
 
 

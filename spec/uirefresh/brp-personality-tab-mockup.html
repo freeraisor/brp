@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>BRP Character Sheet — Personality Tab Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-base: #1a1210;
+  --bg-card: #241a18;
+  --bg-elevated: #2d211f;
+  --bg-hover: #3a2a26;
+  --border: #4a1f1f;
+  --border-soft: #33211f;
+  --red: #c8302e;
+  --red-bright: #e24b4a;
+  --red-muted: #8a2a28;
+  --mint: #9ad8c4;
+  --mint-dim: #6fa894;
+  --blue: #5b8fd8;
+  --blue-dim: #3d6a9c;
+  --amber: #d4a04a;
+  --amber-dim: #8c6a2e;
+  --green: #7fb355;
+  --purple: #a77bc4;
+  --pink: #d47ba8;
+  --text: #e8e2dc;
+  --text-dim: #a89d94;
+  --text-muted: #6e6560;
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.sheet {
+  max-width: 1280px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  min-height: 820px;
+  overflow: hidden;
+}
+
+.sidebar { width: 260px; background: var(--bg-base); border-right: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+.workspace { flex: 1; min-width: 0; padding: 20px 24px; overflow-y: auto; max-height: calc(100vh - 40px); }
+.rail { width: 52px; background: var(--bg-base); border-left: 1px solid var(--border); padding: 8px 0; display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+
+.avatar { aspect-ratio: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+.identity { text-align: center; }
+.identity .name { font-family: var(--font-display); font-size: 18px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--red-bright); }
+.identity .sub { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+.mov-line { display: flex; justify-content: center; gap: 10px; font-size: 10px; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; padding: 4px 0; border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+.mov-line .mov-val { color: var(--mint); font-weight: 600; }
+.status-row { display: flex; justify-content: space-between; gap: 4px; padding: 8px 4px; border-bottom: 1px solid var(--border-soft); }
+.status-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 3px; color: var(--text-muted); }
+.status-icon.active { color: var(--red-bright); background: rgba(226, 75, 74, 0.12); }
+
+.resource { display: flex; flex-direction: column; gap: 6px; }
+.resource-head { display: flex; justify-content: space-between; align-items: baseline; }
+.resource-head .label { font-family: var(--font-display); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); font-weight: 600; }
+.resource-head .value { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.bar { height: 8px; background: var(--bg-card); border-radius: 1px; overflow: hidden; border: 1px solid var(--border-soft); }
+.bar.big { height: 12px; }
+.bar-fill { height: 100%; transition: width 0.3s; }
+.resource.compact .resource-head .label { font-size: 10px; letter-spacing: 1.5px; color: var(--text-dim); }
+.resource.compact .resource-head .value { font-size: 11px; color: var(--text-dim); }
+.resource.compact .bar { height: 4px; }
+.divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+.rail-btn { width: 52px; height: 48px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; position: relative; border-left: 3px solid transparent; transition: all 0.15s; }
+.rail-btn:hover { color: var(--text-dim); background: var(--bg-card); }
+.rail-btn.active { color: var(--mint); background: var(--bg-card); border-left-color: var(--mint); }
+.rail-btn .tooltip { position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); background: var(--bg-elevated); border: 1px solid var(--border); padding: 4px 10px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text); white-space: nowrap; border-radius: 2px; opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 10; }
+.rail-btn:hover .tooltip { opacity: 1; }
+
+.tab-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--mint); padding-bottom: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 12px; }
+.tab-title .lock { margin-left: auto; font-size: 10px; letter-spacing: 2px; color: var(--text-muted); font-family: var(--font-body); font-weight: 400; display: flex; align-items: center; gap: 6px; }
+
+.section { margin-bottom: 20px; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding-top: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-header .chevron { width: 12px; height: 12px; color: var(--text-muted); transition: transform 0.15s; }
+.section.collapsed .chevron { transform: rotate(-90deg); }
+.section.collapsed .section-body { display: none; }
+
+.section-header .title { font-family: var(--font-display); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); font-weight: 600; }
+.section-header .count { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); background: var(--bg-card); padding: 1px 8px; border-radius: 10px; border: 1px solid var(--border-soft); }
+.section-header .line { flex: 1; height: 1px; background: var(--border-soft); }
+.section-header .actions { display: flex; gap: 6px; align-items: center; }
+
+.sort-pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sort-pill:hover { border-color: var(--mint-dim); color: var(--mint); }
+.sort-pill svg { width: 10px; height: 10px; }
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.icon-btn:hover { border-color: var(--red-muted); color: var(--red-bright); }
+.icon-btn svg { width: 14px; height: 14px; }
+.icon-btn.small { width: 22px; height: 22px; }
+.icon-btn.small svg { width: 11px; height: 11px; }
+
+.section-body { display: flex; flex-direction: column; gap: 8px; }
+
+/* ============ PERSONALITY TRAIT ============ */
+
+.trait-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 12px 16px;
+  transition: border-color 0.15s;
+  position: relative;
+}
+
+.trait-card:hover { border-color: var(--border); }
+.trait-card.fixated-left { border-left: 2px solid var(--amber); }
+.trait-card.fixated-right { border-right: 2px solid var(--amber); }
+
+.trait-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.trait-names {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.trait-names .trait-name-left { color: var(--text); }
+.trait-names .trait-arrow { color: var(--text-muted); font-weight: 400; font-size: 14px; margin: 0 2px; }
+.trait-names .trait-name-right { color: var(--text-dim); }
+
+.trait-names .exp-check {
+  width: 13px;
+  height: 13px;
+  border: 1px solid var(--border);
+  border-radius: 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: var(--bg-card);
+  transition: all 0.12s;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.trait-names .exp-check:hover { border-color: var(--mint-dim); }
+.trait-names .exp-check.checked { background: var(--mint); border-color: var(--mint); }
+.trait-names .exp-check.checked::after {
+  content: '';
+  width: 7px;
+  height: 4px;
+  border-left: 2px solid var(--bg-base);
+  border-bottom: 2px solid var(--bg-base);
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+
+.trait-values {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.trait-values .tv-left { color: var(--mint); font-weight: 600; font-size: 14px; }
+.trait-values .tv-slash { color: var(--text-muted); }
+.trait-values .tv-right { color: var(--text-dim); }
+.trait-values .tv-left.dominated { color: var(--text-muted); }
+.trait-values .tv-right.dominated { color: var(--mint); font-weight: 600; font-size: 14px; }
+
+.trait-values .fixated-badge {
+  font-size: 9px;
+  padding: 1px 6px;
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  color: var(--amber);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: rgba(212, 160, 74, 0.08);
+  margin-left: 6px;
+}
+
+.trait-actions { display: flex; gap: 4px; margin-left: auto; }
+
+/* dual-sided bar */
+.trait-bar-wrap {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.trait-bar {
+  height: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.trait-bar-fill-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--mint);
+  transition: width 0.3s;
+}
+
+.trait-bar-fill-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--red-muted);
+  transition: width 0.3s;
+  opacity: 0.5;
+}
+
+.trait-bar-mid {
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--text-muted);
+  opacity: 0.4;
+}
+
+.trait-bar-mid::after {
+  content: '50';
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.trait-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  font-size: 11px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-soft);
+  margin-top: 10px;
+}
+
+.trait-meta .tm-label { font-size: 9px; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; padding-top: 2px; }
+.trait-meta .tm-val { color: var(--text-dim); }
+.trait-meta .tm-val.empty { color: var(--text-muted); font-style: italic; }
+
+/* ============ PASSION ============ */
+
+.passion-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 14px;
+  transition: border-color 0.15s;
+  display: grid;
+  grid-template-columns: 28px 1fr 140px auto auto auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.passion-card:hover { border-color: var(--border); }
+.passion-card.fixated { border-left: 2px solid var(--amber); }
+
+.passion-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+}
+
+.passion-card[data-type="love"] .passion-icon { color: var(--pink); }
+.passion-card[data-type="hate"] .passion-icon { color: var(--red-bright); }
+.passion-card[data-type="loyalty"] .passion-icon { color: var(--blue); }
+.passion-card[data-type="fear"] .passion-icon { color: var(--purple); }
+.passion-card[data-type="devotion"] .passion-icon { color: var(--amber); }
+.passion-card[data-type="other"] .passion-icon { color: var(--mint-dim); }
+
+.passion-name-block { min-width: 0; }
+
+.passion-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.passion-name .exp-check {
+  width: 13px;
+  height: 13px;
+  border: 1px solid var(--border);
+  border-radius: 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: var(--bg-card);
+  transition: all 0.12s;
+}
+
+.passion-name .exp-check:hover { border-color: var(--mint-dim); }
+.passion-name .exp-check.checked { background: var(--mint); border-color: var(--mint); }
+.passion-name .exp-check.checked::after { content: ''; width: 7px; height: 4px; border-left: 2px solid var(--bg-base); border-bottom: 2px solid var(--bg-base); transform: rotate(-45deg) translate(1px, -1px); }
+
+.passion-type-badge {
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.passion-type-badge.love { color: var(--pink); border-color: var(--pink); background: rgba(212, 123, 168, 0.08); }
+.passion-type-badge.hate { color: var(--red-bright); border-color: var(--red-muted); background: rgba(226, 75, 74, 0.08); }
+.passion-type-badge.loyalty { color: var(--blue); border-color: var(--blue-dim); background: rgba(91, 143, 216, 0.08); }
+.passion-type-badge.fear { color: var(--purple); border-color: var(--purple); background: rgba(167, 123, 196, 0.08); }
+.passion-type-badge.devotion { color: var(--amber); border-color: var(--amber-dim); background: rgba(212, 160, 74, 0.08); }
+.passion-type-badge.other { color: var(--mint-dim); border-color: var(--mint-dim); background: rgba(154, 216, 196, 0.08); }
+
+.passion-focus {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.passion-focus .linked {
+  color: var(--mint);
+  font-weight: 500;
+}
+
+.passion-focus .linked::before { content: '→ '; }
+
+.passion-bar {
+  height: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.passion-bar-fill { height: 100%; transition: width 0.3s; }
+
+.passion-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  min-width: 40px;
+  text-align: right;
+}
+
+.passion-fixated-badge {
+  font-size: 9px;
+  padding: 1px 6px;
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  color: var(--amber);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: rgba(212, 160, 74, 0.08);
+}
+
+.passion-actions { display: flex; gap: 4px; }
+
+/* ============ CTX MENU ============ */
+
+.ctx { position: fixed; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 2px; min-width: 180px; padding: 4px; z-index: 120; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); display: none; }
+.ctx.show { display: block; }
+.ctx-item { padding: 7px 12px; font-size: 12px; color: var(--text); cursor: pointer; border-radius: 1px; display: flex; align-items: center; gap: 10px; letter-spacing: 0.3px; }
+.ctx-item svg { width: 13px; height: 13px; color: var(--text-muted); }
+.ctx-item:hover { background: var(--red-muted); }
+.ctx-item:hover svg { color: var(--text); }
+.ctx-item.danger { color: var(--red-bright); }
+.ctx-divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+/* ============ EMPTY ============ */
+
+.empty-state {
+  background: var(--bg-base);
+  border: 1px dashed var(--border-soft);
+  border-radius: 2px;
+  padding: 20px 14px;
+  text-align: center;
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.chat-log { position: fixed; bottom: 20px; right: 20px; max-width: 380px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 3px; padding: 12px 14px; font-size: 12px; color: var(--text-dim); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; z-index: 150; }
+.chat-log.show { opacity: 1; transform: translateY(0); }
+.chat-log .chat-head { font-family: var(--font-display); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mint); margin-bottom: 4px; }
+
+.workspace::-webkit-scrollbar { width: 6px; }
+.workspace::-webkit-scrollbar-track { background: transparent; }
+.workspace::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.workspace::-webkit-scrollbar-thumb:hover { background: var(--red-muted); }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <aside class="sidebar">
+    <div class="avatar">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+    </div>
+    <div class="identity"><div class="name">Арсэн</div><div class="sub">Pilot · 27</div></div>
+    <div class="mov-line"><span>MOV <span class="mov-val">10</span></span><span>Run <span class="mov-val">30m/rd</span></span></div>
+    <div class="status-row">
+      <div class="status-icon active"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1 3-6 9-6 13a6 6 0 0 0 12 0c0-4-5-10-6-13z"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 9l2 2m0-2l-2 2M14 9l2 2m0-2l-2 2"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18"/><circle cx="7" cy="14" r="2"/><path d="M9 14h10"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6a3 3 0 0 0 6 0V5"/><path d="M18 3v6a3 3 0 0 1-6 0"/><path d="M6 15a6 6 0 0 0 12 0"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h5l-4 4h4"/><path d="M14 14h5l-4 4h4"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/><path d="M4 15c-1 5 2 7 8 7s9-2 8-7c-1-4-3-11-8-11s-7 7-8 11z"/></svg></div>
+    </div>
+    <div class="resource">
+      <div class="resource-head"><span class="label">Hit points</span><span class="value" style="color: var(--red-bright)">18 / 20</span></div>
+      <div class="bar big"><div class="bar-fill" style="width:90%; background: var(--red-bright)"></div></div>
+    </div>
+    <div class="resource">
+      <div class="resource-head"><span class="label">Power points</span><span class="value" style="color: var(--blue)">10 / 10</span></div>
+      <div class="bar big"><div class="bar-fill" style="width:100%; background: var(--blue)"></div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Fatigue</span><span class="value">16 / 16</span></div><div class="bar"><div class="bar-fill" style="width:100%; background: var(--amber)"></div></div></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Sanity</span><span class="value">5 / 5</span></div><div class="bar"><div class="bar-fill" style="width:100%; background: var(--green)"></div></div></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Resource</span><span class="value" style="color: var(--text-muted)">0 / 0</span></div><div class="bar"></div></div>
+  </aside>
+
+  <main class="workspace">
+    <div class="tab-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c1.5 0 3 1 3 3 0 1 0 2-1 3 2 0 4 1 4 3 0 2-2 3-3 3 1 1 1 3 0 4-1 2-3 2-4 1-1 1-3 1-4 0-2-1-2-3-1-4-1 0-3-1-3-3 0-2 2-3 4-3-1-1-1-2-1-3 0-2 2-3 3-3"/><circle cx="12" cy="12" r="2"/></svg>
+      Personality
+      <span class="lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Locked</span>
+    </div>
+
+    <!-- ======= PERSONALITY TRAITS ======= -->
+    <div class="section" data-section="traits">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Personality Traits</span>
+        <span class="count" id="traits-count">4</span>
+        <span class="line"></span>
+        <div class="actions">
+          <button class="sort-pill" id="traits-sort" data-mode="name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M9 18h6"/></svg><span>A-Z</span></button>
+          <button class="icon-btn" data-add="trait" title="Add trait"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+      <div class="section-body" id="traits-body">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- ======= PASSIONS ======= -->
+    <div class="section" data-section="passions">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Passions</span>
+        <span class="count" id="passions-count">4</span>
+        <span class="line"></span>
+        <div class="actions">
+          <button class="sort-pill" id="passions-sort" data-mode="value-desc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M9 18h6"/></svg><span>Value ↓</span></button>
+          <button class="icon-btn" data-add="passion" title="Add passion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+      <div class="section-body" id="passions-body">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <nav class="rail">
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg><span class="tooltip">Skills</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14.5 17.5L3 6V3h3l11.5 11.5z"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M21 3v3L9.5 17.5"/><path d="M8 14l-4 4"/></svg><span class="tooltip">Combat</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg><span class="tooltip">Health</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg><span class="tooltip">Items</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span class="tooltip">Character</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="7" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/><circle cx="17" cy="8" r="3"/><path d="M22 20c0-2.76-2.24-5-5-5"/></svg><span class="tooltip">Social</span></div>
+    <div class="rail-btn active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-7-4.5-7-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-7 10-7 10h-4z"/></svg><span class="tooltip">Personality</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="tooltip">Story</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg><span class="tooltip">Effects</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg><span class="tooltip">Dev</span></div>
+  </nav>
+</div>
+
+<div class="ctx" id="ctx"></div>
+
+<div class="chat-log" id="chat-log">
+  <div class="chat-head">Foundry chat</div>
+  <div class="chat-body" id="chat-body"></div>
+</div>
+
+<script>
+// ============ DATA ============
+const traits = [
+  { id: 't1', left: 'Brave', right: 'Cowardly', value: 70, notes: 'Выковано на службе в разведке. Прошёл через атаку на Тарсис-7.', exp: false },
+  { id: 't2', left: 'Honest', right: 'Deceitful', value: 35, notes: '', exp: true },
+  { id: 't3', left: 'Just', right: 'Arbitrary', value: 50, notes: 'Не верит в абстрактную справедливость, но держит слово.', exp: false },
+  { id: 't4', left: 'Generous', right: 'Greedy', value: 5, notes: 'Денег не хватало никогда.', exp: false }
+];
+
+const passions = [
+  { id: 'p1', name: 'Revenge', focus: 'Captain Koss', focus_link: null, type: 'hate', value: 88, notes: 'Винит капитана в гибели отряда.', exp: true },
+  { id: 'p2', name: 'Love', focus: 'Младшая сестра Лена', focus_link: 'contact:lena', type: 'love', value: 72, notes: '', exp: false },
+  { id: 'p3', name: 'Loyalty', focus: 'Free Stars Alliance', focus_link: 'faction:f2', type: 'loyalty', value: 45, notes: '', exp: false },
+  { id: 'p4', name: 'Fear', focus: 'Confined spaces', focus_link: null, type: 'fear', value: 60, notes: 'После шахтного инцидента.', exp: false }
+];
+
+// sort state
+const sortState = { traits: 'name', passions: 'value-desc' };
+const sortModes = ['name', 'name-desc', 'value-desc', 'value-asc'];
+const sortLabels = { name: 'A-Z', 'name-desc': 'Z-A', 'value-desc': 'Value ↓', 'value-asc': 'Value ↑' };
+
+// ============ PASSION ICONS ============
+const PASSION_ICONS = {
+  love: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-7-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-7 10-7 10h-4z"/></svg>`,
+  hate: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h5l-2 8 6 1-4 9 3-10-5-1 2-7z"/></svg>`,
+  loyalty: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 3v7c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5l8-3z"/></svg>`,
+  fear: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12a10 10 0 1 0 20 0 10 10 0 0 0-20 0z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>`,
+  devotion: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>`,
+  other: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`
+};
+
+// ============ RENDER TRAITS ============
+function sortTraits(list, mode) {
+  const copy = [...list];
+  if (mode === 'name') copy.sort((a, b) => a.left.localeCompare(b.left));
+  else if (mode === 'name-desc') copy.sort((a, b) => b.left.localeCompare(a.left));
+  else if (mode === 'value-desc') copy.sort((a, b) => b.value - a.value);
+  else if (mode === 'value-asc') copy.sort((a, b) => a.value - b.value);
+  return copy;
+}
+
+function renderTraits() {
+  const body = document.getElementById('traits-body');
+  const sorted = sortTraits(traits, sortState.traits);
+
+  if (sorted.length === 0) {
+    body.innerHTML = `<div class="empty-state">No personality traits. Click + to add a pair.</div>`;
+    return;
+  }
+
+  body.innerHTML = sorted.map(t => {
+    const leftVal = t.value;
+    const rightVal = 100 - t.value;
+    const dominated = leftVal > rightVal ? 'left' : (rightVal > leftVal ? 'right' : 'equal');
+    const fixated = leftVal === 0 || leftVal === 100;
+    const fixatedSide = leftVal === 0 ? 'right' : (leftVal === 100 ? 'left' : null);
+    const fixatedClass = fixatedSide ? `fixated-${fixatedSide}` : '';
+
+    return `
+      <div class="trait-card ${fixatedClass}" data-id="${t.id}">
+        <div class="trait-header">
+          <div class="trait-names">
+            <span class="exp-check ${t.exp ? 'checked' : ''}" data-exp="${t.id}" title="Experience check"></span>
+            <span class="trait-name-left">${t.left}</span>
+            <span class="trait-arrow">↔</span>
+            <span class="trait-name-right">${t.right}</span>
+          </div>
+          <div class="trait-values">
+            <span class="tv-left ${dominated === 'right' ? 'dominated' : ''}">${leftVal}</span>
+            <span class="tv-slash">/</span>
+            <span class="tv-right ${dominated === 'left' ? 'dominated' : ''}">${rightVal}</span>
+            ${fixated ? `<span class="fixated-badge">Fixated</span>` : ''}
+          </div>
+          <div class="trait-actions">
+            <button class="icon-btn small" data-action="open" data-id="${t.id}" title="Open object"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg></button>
+            <button class="icon-btn small" data-action="menu" data-id="${t.id}" title="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+          </div>
+        </div>
+        <div class="trait-bar-wrap">
+          <div class="trait-bar">
+            <div class="trait-bar-fill-left" style="width: ${leftVal}%"></div>
+            <div class="trait-bar-fill-right" style="width: ${rightVal}%"></div>
+            <div class="trait-bar-mid"></div>
+          </div>
+        </div>
+        ${t.notes ? `
+          <div class="trait-meta">
+            <span class="tm-label">Notes</span>
+            <span class="tm-val">${t.notes}</span>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+
+  attachTraitHandlers();
+}
+
+function attachTraitHandlers() {
+  document.querySelectorAll('.trait-card').forEach(card => {
+    card.addEventListener('dblclick', e => {
+      if (e.target.closest('.icon-btn') || e.target.closest('.exp-check')) return;
+      const t = traits.find(x => x.id === card.dataset.id);
+      showChat(`[SHEET] Open personality trait: ${t.left} ↔ ${t.right}`);
+    });
+
+    card.addEventListener('contextmenu', e => {
+      if (e.target.closest('.icon-btn')) return;
+      e.preventDefault();
+      showTraitCtx(e.clientX, e.clientY, card.dataset.id);
+    });
+  });
+
+  document.querySelectorAll('[data-exp]').forEach(cb => {
+    cb.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = cb.dataset.exp;
+      const t = traits.find(x => x.id === id) || passions.find(x => x.id === id);
+      if (t) t.exp = !t.exp;
+      cb.classList.toggle('checked');
+    });
+  });
+
+  document.querySelectorAll('[data-action="open"]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const t = traits.find(x => x.id === btn.dataset.id) || passions.find(x => x.id === btn.dataset.id);
+      if (t) showChat(`[SHEET] Open: ${t.left || t.name}`);
+    });
+  });
+
+  document.querySelectorAll('[data-action="menu"]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const rect = btn.getBoundingClientRect();
+      const id = btn.dataset.id;
+      if (traits.find(x => x.id === id)) showTraitCtx(rect.right, rect.bottom, id);
+      else if (passions.find(x => x.id === id)) showPassionCtx(rect.right, rect.bottom, id);
+    });
+  });
+}
+
+function showTraitCtx(x, y, id) {
+  const t = traits.find(x => x.id === id);
+  const ctx = document.getElementById('ctx');
+  ctx.innerHTML = `
+    <div class="ctx-item" data-ctx="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg>Open trait object</div>
+    <div class="ctx-item" data-ctx="reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M4 10a9 9 0 0 1 15-4M20 14a9 9 0 0 1-15 4"/></svg>Reset exp check</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item danger" data-ctx="remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Remove from character</div>
+  `;
+  ctx.classList.add('show');
+  ctx.style.left = Math.min(x, window.innerWidth - 220) + 'px';
+  ctx.style.top = Math.min(y, window.innerHeight - 150) + 'px';
+
+  ctx.querySelectorAll('[data-ctx]').forEach(item => {
+    item.addEventListener('click', () => {
+      const a = item.dataset.ctx;
+      if (a === 'open') showChat(`[SHEET] Open: ${t.left} ↔ ${t.right}`);
+      if (a === 'reset') { t.exp = false; renderTraits(); }
+      if (a === 'remove') {
+        const idx = traits.indexOf(t);
+        traits.splice(idx, 1);
+        renderTraits();
+        document.getElementById('traits-count').textContent = traits.length;
+        showChat(`Removed: ${t.left} ↔ ${t.right}`);
+      }
+      ctx.classList.remove('show');
+    });
+  });
+}
+
+// ============ RENDER PASSIONS ============
+function sortPassions(list, mode) {
+  const copy = [...list];
+  if (mode === 'name') copy.sort((a, b) => a.name.localeCompare(b.name));
+  else if (mode === 'name-desc') copy.sort((a, b) => b.name.localeCompare(a.name));
+  else if (mode === 'value-desc') copy.sort((a, b) => b.value - a.value);
+  else if (mode === 'value-asc') copy.sort((a, b) => a.value - b.value);
+  return copy;
+}
+
+function renderPassions() {
+  const body = document.getElementById('passions-body');
+  const sorted = sortPassions(passions, sortState.passions);
+
+  if (sorted.length === 0) {
+    body.innerHTML = `<div class="empty-state">No passions yet. Click + to add one.</div>`;
+    return;
+  }
+
+  body.innerHTML = sorted.map(p => {
+    const fixated = p.value === 100;
+    const fixatedClass = fixated ? 'fixated' : '';
+
+    const focusHtml = p.focus_link
+      ? `<span class="linked">${p.focus}</span>`
+      : (p.focus ? p.focus : '');
+
+    return `
+      <div class="passion-card ${fixatedClass}" data-id="${p.id}" data-type="${p.type}">
+        <div class="passion-icon">${PASSION_ICONS[p.type] || PASSION_ICONS.other}</div>
+        <div class="passion-name-block">
+          <div class="passion-name">
+            <span class="exp-check ${p.exp ? 'checked' : ''}" data-exp="${p.id}" title="Experience check"></span>
+            ${p.name}
+            <span class="passion-type-badge ${p.type}">${p.type}</span>
+            ${fixated ? `<span class="passion-fixated-badge">Fixated</span>` : ''}
+          </div>
+          ${focusHtml ? `<div class="passion-focus">${focusHtml}</div>` : ''}
+        </div>
+        <div class="passion-bar"><div class="passion-bar-fill" style="width: ${p.value}%; background: var(--${typeColor(p.type)})"></div></div>
+        <div class="passion-value">${p.value}%</div>
+        <div class="passion-actions">
+          <button class="icon-btn small" data-action="open" data-id="${p.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg></button>
+          <button class="icon-btn small" data-action="menu" data-id="${p.id}"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  attachPassionHandlers();
+}
+
+function typeColor(t) {
+  return { love: 'pink', hate: 'red-bright', loyalty: 'blue', fear: 'purple', devotion: 'amber', other: 'mint-dim' }[t] || 'mint-dim';
+}
+
+function attachPassionHandlers() {
+  document.querySelectorAll('.passion-card').forEach(card => {
+    card.addEventListener('dblclick', e => {
+      if (e.target.closest('.icon-btn') || e.target.closest('.exp-check')) return;
+      const p = passions.find(x => x.id === card.dataset.id);
+      showChat(`[SHEET] Open passion: ${p.name}${p.focus ? ' (' + p.focus + ')' : ''}`);
+    });
+
+    card.addEventListener('contextmenu', e => {
+      if (e.target.closest('.icon-btn')) return;
+      e.preventDefault();
+      showPassionCtx(e.clientX, e.clientY, card.dataset.id);
+    });
+  });
+
+  document.querySelectorAll('[data-exp]').forEach(cb => {
+    cb.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = cb.dataset.exp;
+      const t = traits.find(x => x.id === id) || passions.find(x => x.id === id);
+      if (t) t.exp = !t.exp;
+      cb.classList.toggle('checked');
+    });
+  });
+
+  document.querySelectorAll('[data-action="open"]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const p = passions.find(x => x.id === btn.dataset.id) || traits.find(x => x.id === btn.dataset.id);
+      if (p) showChat(`[SHEET] Open: ${p.name || p.left}`);
+    });
+  });
+
+  document.querySelectorAll('[data-action="menu"]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const rect = btn.getBoundingClientRect();
+      const id = btn.dataset.id;
+      if (passions.find(x => x.id === id)) showPassionCtx(rect.right, rect.bottom, id);
+      else if (traits.find(x => x.id === id)) showTraitCtx(rect.right, rect.bottom, id);
+    });
+  });
+}
+
+function showPassionCtx(x, y, id) {
+  const p = passions.find(x => x.id === id);
+  const ctx = document.getElementById('ctx');
+  ctx.innerHTML = `
+    <div class="ctx-item" data-ctx="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg>Open passion object</div>
+    ${p.focus_link ? `<div class="ctx-item" data-ctx="open-focus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>Open ${p.focus_link.split(':')[0]}: ${p.focus}</div>` : ''}
+    <div class="ctx-item" data-ctx="reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M4 10a9 9 0 0 1 15-4M20 14a9 9 0 0 1-15 4"/></svg>Reset exp check</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item danger" data-ctx="remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Remove from character</div>
+  `;
+  ctx.classList.add('show');
+  ctx.style.left = Math.min(x, window.innerWidth - 240) + 'px';
+  ctx.style.top = Math.min(y, window.innerHeight - 180) + 'px';
+
+  ctx.querySelectorAll('[data-ctx]').forEach(item => {
+    item.addEventListener('click', () => {
+      const a = item.dataset.ctx;
+      if (a === 'open') showChat(`[SHEET] Open: ${p.name}`);
+      if (a === 'open-focus') showChat(`[SHEET] Open linked object: ${p.focus_link}`);
+      if (a === 'reset') { p.exp = false; renderPassions(); }
+      if (a === 'remove') {
+        const idx = passions.indexOf(p);
+        passions.splice(idx, 1);
+        renderPassions();
+        document.getElementById('passions-count').textContent = passions.length;
+        showChat(`Removed: ${p.name}`);
+      }
+      ctx.classList.remove('show');
+    });
+  });
+}
+
+// ============ SORT BUTTONS ============
+document.getElementById('traits-sort').addEventListener('click', () => {
+  const idx = sortModes.indexOf(sortState.traits);
+  sortState.traits = sortModes[(idx + 1) % sortModes.length];
+  document.querySelector('#traits-sort span').textContent = sortLabels[sortState.traits];
+  renderTraits();
+});
+
+document.getElementById('passions-sort').addEventListener('click', () => {
+  const idx = sortModes.indexOf(sortState.passions);
+  sortState.passions = sortModes[(idx + 1) % sortModes.length];
+  document.querySelector('#passions-sort span').textContent = sortLabels[sortState.passions];
+  renderPassions();
+});
+
+// ============ SECTION COLLAPSE ============
+document.querySelectorAll('.section-header').forEach(h => {
+  h.addEventListener('click', e => {
+    if (e.target.closest('.icon-btn') || e.target.closest('.sort-pill')) return;
+    h.parentElement.classList.toggle('collapsed');
+  });
+});
+
+// ============ ADD ============
+document.querySelectorAll('[data-add]').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const t = btn.dataset.add;
+    showChat(`[ADD] Open creation flow for: ${t}`);
+  });
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ctx')) document.getElementById('ctx').classList.remove('show');
+});
+
+document.querySelectorAll('.rail-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+let chatTimeout;
+function showChat(msg) {
+  const log = document.getElementById('chat-log');
+  document.getElementById('chat-body').textContent = msg;
+  log.classList.add('show');
+  clearTimeout(chatTimeout);
+  chatTimeout = setTimeout(() => log.classList.remove('show'), 3200);
+}
+
+renderTraits();
+renderPassions();
+</script>
+</body>
+</html>

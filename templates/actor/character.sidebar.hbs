@@ -1,0 +1,103 @@
+<section class="brp-refresh-sidebar-content">
+  <div class="brp-refresh-sidebar-topbar">
+    <div class="brp-refresh-brand">
+      <img class="logo-img" src="systems/brp/assets/brp-logo-powered_by-02.png" height="34" width="34" />
+      {{#unless (eq sidebar.logo "")}}
+        <img class="long-logo" src={{sidebar.logo}} height="34" />
+      {{/unless}}
+    </div>
+    <a class="brp-refresh-lock" data-action="{{sidebar.lock.action}}" data-property="{{sidebar.lock.property}}" data-tooltip="{{localize sidebar.lock.tooltip}}">
+      <i class="{{#if sidebar.lock.active}}fas fa-lock{{else}}fas fa-lock-open{{/if}}"></i>
+    </a>
+  </div>
+
+  <div class="brp-refresh-portrait">
+    <img class="profile-img" data-action="onEditImage" src="{{sidebar.identity.avatar}}" data-edit="img" data-tooltip="{{sidebar.identity.avatarTooltip}}" height="180" width="180" />
+  </div>
+
+  <div class="brp-refresh-nameplate">
+    <label>{{ localize sidebar.identity.name.label }}</label>
+    <input class="brp-refresh-character-name" name="{{sidebar.identity.name.path}}" type="text" value="{{sidebar.identity.name.value}}" />
+    <div class="brp-refresh-subtitle">
+      {{sidebar.identity.subtitle.primary}}{{#if sidebar.identity.subtitle.secondary}} &middot; {{sidebar.identity.subtitle.secondary}}{{/if}}
+    </div>
+  </div>
+
+  <div class="brp-refresh-movement-line" {{#if sidebar.movement.isPlaceholder}}data-tooltip="{{sidebar.movement.tooltip}}"{{/if}}>
+    <span class="brp-refresh-movement-item">
+      <span class="brp-refresh-movement-label">{{sidebar.movement.shortLabel}}</span>
+      <span class="brp-refresh-movement-value">{{sidebar.movement.displayValue}}</span>
+    </span>
+    <span class="brp-refresh-movement-separator">&middot;</span>
+    <span class="brp-refresh-movement-item">
+      <span class="brp-refresh-movement-label">{{localize 'BRP.run'}}</span>
+      <span class="brp-refresh-movement-value">{{sidebar.movement.runDisplay}}{{sidebar.movement.runUnit}}</span>
+    </span>
+  </div>
+
+  <div class="centre statusIcon brp-refresh-status-strip">
+    {{#each sidebar.statuses as |status key|}}
+      <a class="{{#if status.active}}active-status{{/if}} {{#if status.auto}}is-auto{{/if}} {{#if status.todo}}is-disabled{{/if}}"
+        {{#if status.toggleable}}data-action="{{status.action}}" data-property="{{status.property}}"{{/if}}
+        {{#unless status.toggleable}}{{#if status.detailTab}}data-action="tab" data-group="primary" data-tab="{{status.detailTab}}"{{/if}}{{/unless}}
+        data-tooltip="{{#if status.tooltipText}}{{status.tooltipText}}{{else}}{{ localize status.tooltip }}{{/if}}">
+        <i class="{{status.icon}}"></i>
+      </a>
+    {{/each}}
+  </div>
+
+  <section class="brp-refresh-resource-stack">
+    {{#each sidebar.resources as |resource key|}}
+      <div class="brp-refresh-meter {{resource.className}}">
+        <div class="brp-refresh-meter-header">
+          {{#if resource.actions.restore}}
+            {{#if resource.store}}
+              <label class="resource-label rollable" data-action="{{resource.actions.restore.action}}" data-tooltip="{{localize resource.store.tooltip label=resource.label}}{{resource.store.value}}/{{resource.store.max}}">{{resource.label}}</label>
+            {{else}}
+              <label class="resource-label rollable" data-action="{{resource.actions.restore.action}}" data-tooltip="{{localize resource.actions.restore.tooltip}}">{{resource.label}}</label>
+            {{/if}}
+          {{else}}
+            <label class="resource-label">{{resource.label}}</label>
+          {{/if}}
+          <span>{{resource.value}} / {{resource.max}}</span>
+        </div>
+        <div class="brp-refresh-meter-bar">
+          <span style="width: {{resource.meter.percentage}}%"></span>
+        </div>
+        <div class="brp-refresh-meter-controls">
+          {{#if resource.actions.decrease}}
+            <a class="smallIcon" data-action="{{resource.actions.decrease.action}}" data-tooltip="{{localize resource.actions.decrease.tooltip}}"><i class="{{resource.actions.decrease.icon}}"></i></a>
+          {{else}}
+            {{#if resource.actions.spend}}
+              <a class="smallIcon" data-action="{{resource.actions.spend.action}}" data-att="{{resource.actions.spend.att}}" data-adj="{{resource.actions.spend.adj}}" data-tooltip="{{localize resource.actions.spend.tooltip}}"><i class="{{resource.actions.spend.icon}}"></i></a>
+            {{else}}
+              <span></span>
+            {{/if}}
+          {{/if}}
+
+          {{#if resource.editable.value}}
+            <input class="attrib-inp centre" type="text" name="{{resource.fields.value}}" value="{{resource.value}}" data-dtype="Number" />
+          {{else}}
+            <div class="attrib-disp tertiary bold">{{resource.value}}</div>
+          {{/if}}
+          <span class="divider">/</span>
+          {{#if resource.editable.max}}
+            <input class="attrib-inp centre" type="text" name="{{resource.fields.max}}" value="{{resource.max}}" data-dtype="Number" />
+          {{else}}
+            <div class="attrib-disp tertiary bold" {{#if resource.hint}}data-tooltip="{{localize resource.hint value=resource.hintValue}}"{{/if}}>{{resource.max}}</div>
+          {{/if}}
+
+          {{#if resource.actions.increase}}
+            <a class="smallIcon" data-action="{{resource.actions.increase.action}}" data-tooltip="{{localize resource.actions.increase.tooltip}}"><i class="{{resource.actions.increase.icon}}"></i></a>
+          {{else}}
+            {{#if resource.actions.recover}}
+              <a class="smallIcon" data-action="{{resource.actions.recover.action}}" data-att="{{resource.actions.recover.att}}" data-adj="{{resource.actions.recover.adj}}" data-tooltip="{{localize resource.actions.recover.tooltip}}"><i class="{{resource.actions.recover.icon}}"></i></a>
+            {{else}}
+              <span></span>
+            {{/if}}
+          {{/if}}
+        </div>
+      </div>
+    {{/each}}
+  </section>
+</section>

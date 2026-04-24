@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>BRP Character Sheet — Character Tab Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-base: #1a1210;
+  --bg-card: #241a18;
+  --bg-elevated: #2d211f;
+  --bg-hover: #3a2a26;
+  --border: #4a1f1f;
+  --border-soft: #33211f;
+  --red: #c8302e;
+  --red-bright: #e24b4a;
+  --red-muted: #8a2a28;
+  --mint: #9ad8c4;
+  --mint-dim: #6fa894;
+  --blue: #5b8fd8;
+  --blue-dim: #3d6a9c;
+  --amber: #d4a04a;
+  --amber-dim: #8c6a2e;
+  --green: #7fb355;
+  --purple: #a77bc4;
+  --text: #e8e2dc;
+  --text-dim: #a89d94;
+  --text-muted: #6e6560;
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.sheet {
+  max-width: 1280px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  min-height: 820px;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--bg-base);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.workspace {
+  flex: 1;
+  min-width: 0;
+  padding: 20px 24px;
+  overflow-y: auto;
+  max-height: calc(100vh - 40px);
+}
+
+.rail {
+  width: 52px;
+  background: var(--bg-base);
+  border-left: 1px solid var(--border);
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.avatar { aspect-ratio: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+.identity { text-align: center; }
+.identity .name { font-family: var(--font-display); font-size: 18px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--red-bright); }
+.identity .sub { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+
+.mov-line {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  padding: 4px 0;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.mov-line .mov-val { color: var(--mint); font-weight: 600; }
+
+.status-row { display: flex; justify-content: space-between; gap: 4px; padding: 8px 4px; border-bottom: 1px solid var(--border-soft); }
+.status-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 3px; color: var(--text-muted); }
+.status-icon.active { color: var(--red-bright); background: rgba(226, 75, 74, 0.12); }
+
+.resource { display: flex; flex-direction: column; gap: 6px; }
+.resource-head { display: flex; justify-content: space-between; align-items: baseline; }
+.resource-head .label { font-family: var(--font-display); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); font-weight: 600; }
+.resource-head .value { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.bar { height: 8px; background: var(--bg-card); border-radius: 1px; overflow: hidden; border: 1px solid var(--border-soft); }
+.bar.big { height: 12px; }
+.bar-fill { height: 100%; transition: width 0.3s; }
+.resource.compact .resource-head .label { font-size: 10px; letter-spacing: 1.5px; color: var(--text-dim); }
+.resource.compact .resource-head .value { font-size: 11px; color: var(--text-dim); }
+.resource.compact .bar { height: 4px; }
+.divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+.rail-btn { width: 52px; height: 48px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; position: relative; border-left: 3px solid transparent; transition: all 0.15s; }
+.rail-btn:hover { color: var(--text-dim); background: var(--bg-card); }
+.rail-btn.active { color: var(--mint); background: var(--bg-card); border-left-color: var(--mint); }
+.rail-btn .tooltip { position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); background: var(--bg-elevated); border: 1px solid var(--border); padding: 4px 10px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text); white-space: nowrap; border-radius: 2px; opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 10; }
+.rail-btn:hover .tooltip { opacity: 1; }
+
+.tab-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--mint); padding-bottom: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 12px; }
+.tab-title .lock { margin-left: auto; font-size: 10px; letter-spacing: 2px; color: var(--text-muted); font-family: var(--font-body); font-weight: 400; display: flex; align-items: center; gap: 6px; }
+
+.section { margin-bottom: 20px; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding-top: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-header .chevron { width: 12px; height: 12px; color: var(--text-muted); transition: transform 0.15s; }
+.section.collapsed .chevron { transform: rotate(-90deg); }
+
+.section-header .title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+}
+
+.section-header .line { flex: 1; height: 1px; background: var(--border-soft); }
+.section-header .actions { display: flex; gap: 6px; }
+
+.section-body { display: flex; flex-direction: column; gap: 8px; }
+.section.collapsed .section-body { display: none; }
+
+.icon-btn {
+  width: 24px;
+  height: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.icon-btn:hover { border-color: var(--red-muted); color: var(--red-bright); }
+.icon-btn svg { width: 12px; height: 12px; }
+
+/* ============== BIOGRAPHY ============== */
+
+.bio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px 12px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 14px;
+}
+
+.bio-grid.wide {
+  grid-template-columns: 1fr 1fr;
+}
+
+.bio-group-title {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 8px 14px 4px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-bottom: 0;
+  border-radius: 2px 2px 0 0;
+  margin-top: 6px;
+}
+
+.bio-group-title + .bio-grid {
+  border-radius: 0 0 2px 2px;
+  border-top: 0;
+  margin-top: 0;
+}
+
+.bio-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0;
+}
+
+.bio-field .bf-label {
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.bio-field .bf-val {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.bio-field .bf-val.empty {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.bio-field .bf-val.wide {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bio-notes {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 14px;
+  margin-top: 6px;
+}
+
+.bio-notes .bn-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.bio-notes .bn-text {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* ============== CLASS / BACKGROUND ============== */
+
+.class-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.class-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 12px 14px;
+  position: relative;
+  transition: border-color 0.15s;
+}
+
+.class-card:hover { border-color: var(--border); }
+
+.class-card.empty {
+  border-style: dashed;
+  color: var(--text-muted);
+  text-align: center;
+  font-style: italic;
+  font-size: 12px;
+  padding: 20px 14px;
+  cursor: pointer;
+}
+
+.class-card.empty:hover { border-color: var(--amber-dim); color: var(--amber); }
+
+.class-card .cc-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.class-card .cc-name {
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--mint);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.class-card .cc-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.class-card .cc-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+}
+
+/* ============== CHARACTERISTICS ============== */
+
+.char-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.char-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.char-card:hover {
+  border-color: var(--red-muted);
+  background: var(--bg-card);
+}
+
+.char-card.expanded {
+  border-color: var(--mint-dim);
+  background: rgba(154, 216, 196, 0.04);
+}
+
+.char-card .cc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.char-card .cc-code {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+}
+
+.char-card .cc-total {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.char-card .cc-chevron {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: all 0.15s;
+}
+
+.char-card:hover .cc-chevron { opacity: 0.5; }
+.char-card.expanded .cc-chevron { opacity: 1; transform: rotate(180deg); }
+.char-card .cc-chevron svg { width: 10px; height: 10px; }
+
+.char-breakdown {
+  grid-column: 1 / -1;
+  background: var(--bg-base);
+  border: 1px solid var(--mint-dim);
+  border-radius: 2px;
+  padding: 12px 14px;
+  display: none;
+  margin-top: 4px;
+}
+
+.char-breakdown.show { display: block; }
+
+.char-breakdown .cb-title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--mint);
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.cb-rows {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 20px;
+}
+
+.cb-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+}
+
+.cb-row .cb-label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.cb-row .cb-value {
+  color: var(--text);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.cb-row.total { grid-column: 1 / -1; padding-top: 6px; border-top: 1px solid var(--border-soft); margin-top: 2px; }
+.cb-row.total .cb-label { color: var(--mint); font-weight: 600; }
+.cb-row.total .cb-value { color: var(--mint); font-size: 14px; font-weight: 600; }
+
+.cb-dice {
+  grid-column: 1 / -1;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-soft);
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.cb-dice code { color: var(--text-dim); background: var(--bg-card); padding: 1px 6px; border-radius: 2px; font-family: var(--font-body); }
+
+/* ============== DERIVED STATS ============== */
+
+.derived-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.derived-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 12px;
+}
+
+.derived-card .dc-label {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.derived-card .dc-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.derived-card .dc-value.mint { color: var(--mint); }
+.derived-card .dc-value.red { color: var(--red-bright); }
+.derived-card .dc-value.blue { color: var(--blue); }
+
+.derived-card .dc-formula {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+.skill-points-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.sp-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 12px 14px;
+}
+
+.sp-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.sp-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+}
+
+.sp-percent {
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.sp-percent.ok { color: var(--mint); }
+.sp-percent.over { color: var(--red-bright); }
+
+.sp-detail {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.sp-detail .sp-formula { color: var(--text-dim); }
+.sp-detail .sp-used { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* ============== POWERS ============== */
+
+.powers-empty {
+  background: var(--bg-base);
+  border: 1px dashed var(--border-soft);
+  border-radius: 2px;
+  padding: 20px 14px;
+  text-align: center;
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.powers-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.power-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-width: 160px;
+}
+
+.power-card:hover { border-color: var(--purple); color: var(--purple); }
+
+.power-card .pc-icon { color: var(--purple); display: flex; }
+.power-card .pc-icon svg { width: 18px; height: 18px; }
+
+.power-card .pc-name {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.power-card:hover .pc-name { color: var(--purple); }
+
+.power-card .pc-count {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-left: auto;
+  letter-spacing: 0.5px;
+}
+
+/* ============== CUSTOM BLOCKS ============== */
+
+.custom-block {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.custom-block .handle {
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: transparent;
+  font-size: 14px;
+  cursor: grab;
+  letter-spacing: -2px;
+}
+
+.custom-block:hover .handle { color: var(--text-muted); }
+
+.custom-block .cb-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.custom-block .cb-title {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.custom-block .cb-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.custom-block:hover .cb-actions { opacity: 1; }
+
+.custom-block .cb-text {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.add-block-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px dashed var(--border-soft);
+  color: var(--text-muted);
+  padding: 10px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.add-block-btn:hover { border-color: var(--amber-dim); color: var(--amber); border-style: solid; }
+
+/* ============== CONTEXT MENU ============== */
+
+.ctx { position: fixed; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 2px; min-width: 180px; padding: 4px; z-index: 120; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); display: none; }
+.ctx.show { display: block; }
+.ctx-item { padding: 7px 12px; font-size: 12px; color: var(--text); cursor: pointer; border-radius: 1px; display: flex; align-items: center; gap: 10px; letter-spacing: 0.3px; }
+.ctx-item svg { width: 13px; height: 13px; color: var(--text-muted); }
+.ctx-item:hover { background: var(--red-muted); }
+.ctx-item.danger { color: var(--red-bright); }
+.ctx-divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+/* ============== MODAL ============== */
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center; z-index: 100; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 3px; padding: 20px 22px; width: 420px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8); }
+.modal h3 { font-family: var(--font-display); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--red-bright); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-soft); }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 10px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
+.field input, .field textarea { width: 100%; background: var(--bg-base); border: 1px solid var(--border-soft); color: var(--text); padding: 7px 10px; font-family: inherit; font-size: 12px; border-radius: 2px; outline: none; }
+.field textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.field input:focus, .field textarea:focus { border-color: var(--mint-dim); }
+
+.modal-buttons { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-soft); }
+.modal-buttons button { background: var(--bg-base); border: 1px solid var(--border-soft); color: var(--text); padding: 8px 18px; font-family: inherit; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 2px; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+.modal-buttons button:hover { border-color: var(--red-muted); }
+.modal-buttons button.primary { background: var(--mint); color: var(--bg-base); border-color: var(--mint); font-weight: 600; }
+
+.chat-log { position: fixed; bottom: 20px; right: 20px; max-width: 380px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 3px; padding: 12px 14px; font-size: 12px; color: var(--text-dim); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; z-index: 150; }
+.chat-log.show { opacity: 1; transform: translateY(0); }
+.chat-log .chat-head { font-family: var(--font-display); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mint); margin-bottom: 4px; }
+
+.workspace::-webkit-scrollbar { width: 6px; }
+.workspace::-webkit-scrollbar-track { background: transparent; }
+.workspace::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.workspace::-webkit-scrollbar-thumb:hover { background: var(--red-muted); }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <aside class="sidebar">
+    <div class="avatar">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+    </div>
+    <div class="identity">
+      <div class="name">Арсэн</div>
+      <div class="sub">Pilot · 27</div>
+    </div>
+    <div class="mov-line">
+      <span>MOV <span class="mov-val">10</span></span>
+      <span>Run <span class="mov-val">30m/rd</span></span>
+    </div>
+    <div class="status-row">
+      <div class="status-icon active" title="Bleeding"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1 3-6 9-6 13a6 6 0 0 0 12 0c0-4-5-10-6-13z"/></svg></div>
+      <div class="status-icon" title="Stunned"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 9l2 2m0-2l-2 2M14 9l2 2m0-2l-2 2"/></svg></div>
+      <div class="status-icon" title="Prone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18"/><circle cx="7" cy="14" r="2"/><path d="M9 14h10"/></svg></div>
+      <div class="status-icon" title="Grappled"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6a3 3 0 0 0 6 0V5"/><path d="M18 3v6a3 3 0 0 1-6 0"/><path d="M6 15a6 6 0 0 0 12 0"/></svg></div>
+      <div class="status-icon" title="Unconscious"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h5l-4 4h4"/><path d="M14 14h5l-4 4h4"/></svg></div>
+      <div class="status-icon" title="Dying"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/><path d="M4 15c-1 5 2 7 8 7s9-2 8-7c-1-4-3-11-8-11s-7 7-8 11z"/></svg></div>
+    </div>
+    <div class="resource">
+      <div class="resource-head"><span class="label">Hit points</span><span class="value" style="color: var(--red-bright)">18 / 20</span></div>
+      <div class="bar big"><div class="bar-fill" style="width:90%; background: var(--red-bright)"></div></div>
+    </div>
+    <div class="resource">
+      <div class="resource-head"><span class="label">Power points</span><span class="value" style="color: var(--blue)">10 / 10</span></div>
+      <div class="bar big"><div class="bar-fill" style="width:100%; background: var(--blue)"></div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Fatigue</span><span class="value">16 / 16</span></div><div class="bar"><div class="bar-fill" style="width:100%; background: var(--amber)"></div></div></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Sanity</span><span class="value">5 / 5</span></div><div class="bar"><div class="bar-fill" style="width:100%; background: var(--green)"></div></div></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Resource</span><span class="value" style="color: var(--text-muted)">0 / 0</span></div><div class="bar"></div></div>
+  </aside>
+
+  <main class="workspace">
+    <div class="tab-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+      Character
+      <span class="lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Locked</span>
+    </div>
+
+    <!-- BIOGRAPHY -->
+    <div class="section" data-section="biography">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Biography</span>
+        <span class="line"></span>
+      </div>
+      <div class="section-body">
+
+        <div class="bio-group-title">Demographics</div>
+        <div class="bio-grid">
+          <div class="bio-field"><span class="bf-label">Name</span><span class="bf-val">Арсэн Кримс</span></div>
+          <div class="bio-field"><span class="bf-label">Age</span><span class="bf-val">27</span></div>
+          <div class="bio-field"><span class="bf-label">Gender</span><span class="bf-val">Male</span></div>
+          <div class="bio-field"><span class="bf-label">Pronouns</span><span class="bf-val">he / him</span></div>
+          <div class="bio-field"><span class="bf-label">Date of birth</span><span class="bf-val">2269-03-14</span></div>
+          <div class="bio-field"><span class="bf-label">Place of birth</span><span class="bf-val">Тарсис-4</span></div>
+          <div class="bio-field"><span class="bf-label">Nationality / Culture</span><span class="bf-val wide">Colony-born</span></div>
+          <div class="bio-field"><span class="bf-label">Religion</span><span class="bf-val empty">Not specified</span></div>
+          <div class="bio-field"><span class="bf-label">Native language</span><span class="bf-val">Russian</span></div>
+        </div>
+
+        <div class="bio-group-title">Physical</div>
+        <div class="bio-grid">
+          <div class="bio-field"><span class="bf-label">Height</span><span class="bf-val">182 cm</span></div>
+          <div class="bio-field"><span class="bf-label">Weight</span><span class="bf-val">78 kg</span></div>
+          <div class="bio-field"><span class="bf-label">Build</span><span class="bf-val">Lean</span></div>
+          <div class="bio-field"><span class="bf-label">Eye color</span><span class="bf-val">Dark grey</span></div>
+          <div class="bio-field"><span class="bf-label">Hair color</span><span class="bf-val">Black</span></div>
+          <div class="bio-field"><span class="bf-label">Skin tone</span><span class="bf-val">Pale</span></div>
+          <div class="bio-field"><span class="bf-label">Handed</span><span class="bf-val">Right</span></div>
+          <div class="bio-field" style="grid-column: span 2"><span class="bf-label">Distinctive marks</span><span class="bf-val wide">Шрам через левую бровь, татуировка разведки на шее</span></div>
+        </div>
+
+        <div class="bio-group-title">Social</div>
+        <div class="bio-grid">
+          <div class="bio-field"><span class="bf-label">Profession</span><span class="bf-val">Pilot</span></div>
+          <div class="bio-field"><span class="bf-label">Employer</span><span class="bf-val">Free agent</span></div>
+          <div class="bio-field"><span class="bf-label">Rank / Title</span><span class="bf-val empty">—</span></div>
+          <div class="bio-field"><span class="bf-label">Marital status</span><span class="bf-val">Single</span></div>
+          <div class="bio-field"><span class="bf-label">Social class</span><span class="bf-val">Working</span></div>
+          <div class="bio-field"><span class="bf-label">Known languages</span><span class="bf-val wide">Russian, English, Trade</span></div>
+        </div>
+
+        <div class="bio-notes">
+          <div class="bn-label">About</div>
+          <div class="bn-text">Бывший разведчик-пилот, ушёл после инцидента на Тарсис-7. Сейчас работает перевозчиком на свой страх и риск. Слишком умный для грязной работы, слишком подозрительный для чистой.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLASS / BACKGROUND -->
+    <div class="section" data-section="class">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Class & Background</span>
+        <span class="line"></span>
+      </div>
+      <div class="section-body">
+        <div class="class-row">
+          <div class="class-card" data-object-type="class" data-object-id="pilot-class">
+            <div class="cc-label">Class</div>
+            <div class="cc-name">Pilot</div>
+            <div class="cc-desc">Elite operative trained for zero-g combat and stellar navigation. Bonus to Pilot, Navigate, Drive.</div>
+            <div class="cc-actions">
+              <button class="icon-btn" title="Open class object" data-ctxaction="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg></button>
+              <button class="icon-btn" title="More" data-ctxaction="menu"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+            </div>
+          </div>
+          <div class="class-card" data-object-type="background" data-object-id="skilled-bg">
+            <div class="cc-label">Background</div>
+            <div class="cc-name">Skilled</div>
+            <div class="cc-desc">+5% к трём выбранным скиллам на выбор игрока. Дополнительные 20 пунктов Personal Points.</div>
+            <div class="cc-actions">
+              <button class="icon-btn" title="Open background object" data-ctxaction="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg></button>
+              <button class="icon-btn" title="More" data-ctxaction="menu"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARACTERISTICS -->
+    <div class="section" data-section="characteristics">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Characteristics</span>
+        <span class="line"></span>
+      </div>
+      <div class="section-body">
+        <div class="char-grid" id="char-grid">
+
+          <div class="char-card" data-char="str">
+            <div class="cc-top"><span class="cc-code">STR</span><span class="cc-total">11</span></div>
+            <div class="cc-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+          </div>
+          <div class="char-card" data-char="con">
+            <div class="cc-top"><span class="cc-code">CON</span><span class="cc-total">10</span></div>
+            <div class="cc-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+          </div>
+          <div class="char-card" data-char="int">
+            <div class="cc-top"><span class="cc-code">INT</span><span class="cc-total">13</span></div>
+            <div class="cc-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+          </div>
+          <div class="char-card" data-char="siz">
+            <div class="cc-top"><span class="cc-code">SIZ</span><span class="cc-total">10</span></div>
+            <div class="cc-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+          </div>
+          <div class="char-card" data-char="pow">
+            <div class="cc-top"><span class="cc-code">POW</span><span class="cc-total">10</span></div>
+            <div class="cc-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+          </div>
+          <div class="char-card" data-char="dex">
+            <div class="cc-top"><span class="cc-code">DEX</span><span class="cc-total">11</span></div>
+            <div class="cc-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+          </div>
+          <div class="char-card" data-char="cha">
+            <div class="cc-top"><span class="cc-code">CHA</span><span class="cc-total">11</span></div>
+            <div class="cc-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+          </div>
+          <div class="char-card" data-char="edu">
+            <div class="cc-top"><span class="cc-code">EDU</span><span class="cc-total">12</span></div>
+            <div class="cc-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+          </div>
+
+          <div class="char-breakdown" id="char-breakdown">
+            <div class="cb-title" id="cb-title">STR — Strength breakdown</div>
+            <div class="cb-rows" id="cb-rows">
+              <!-- populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DERIVED STATS -->
+    <div class="section" data-section="derived">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Derived stats</span>
+        <span class="line"></span>
+      </div>
+      <div class="section-body">
+
+        <div class="derived-grid">
+          <div class="derived-card"><div class="dc-label">XP Bonus</div><div class="dc-value mint">+7</div><div class="dc-formula">½ INT · для skill improvement</div></div>
+          <div class="derived-card"><div class="dc-label">HP Bonus</div><div class="dc-value">0</div><div class="dc-formula">опционально</div></div>
+          <div class="derived-card"><div class="dc-label">PP Bonus</div><div class="dc-value">0</div><div class="dc-formula">опционально</div></div>
+          <div class="derived-card"><div class="dc-label">FP Bonus</div><div class="dc-value">0</div><div class="dc-formula">опционально</div></div>
+          <div class="derived-card"><div class="dc-label">Damage Mod</div><div class="dc-value red">+0</div><div class="dc-formula">STR+SIZ = 21</div></div>
+          <div class="derived-card"><div class="dc-label">Total ENC</div><div class="dc-value">22</div><div class="dc-formula">STR × 2 max carry</div></div>
+          <div class="derived-card"><div class="dc-label">MOV</div><div class="dc-value mint">10</div><div class="dc-formula">humanoid base</div></div>
+          <div class="derived-card"><div class="dc-label">Total XP</div><div class="dc-value">12</div><div class="dc-formula">накоплено очков опыта</div></div>
+        </div>
+
+        <div class="skill-points-row">
+          <div class="sp-card">
+            <div class="sp-head">
+              <span class="sp-label">Personal Skill Points</span>
+              <span class="sp-percent ok">68%</span>
+            </div>
+            <div class="sp-detail">
+              <span class="sp-formula">INT × 10 = 130</span>
+              <span class="sp-used">Used 88 / 130</span>
+            </div>
+          </div>
+          <div class="sp-card">
+            <div class="sp-head">
+              <span class="sp-label">Professional Skill Points</span>
+              <span class="sp-percent over">108%</span>
+            </div>
+            <div class="sp-detail">
+              <span class="sp-formula">EDU × 20 = 240</span>
+              <span class="sp-used">Used 260 / 240</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POWERS -->
+    <div class="section" data-section="powers">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Powers</span>
+        <span class="line"></span>
+        <div class="actions">
+          <button class="icon-btn" title="Add power system"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="powers-list">
+          <div class="power-card" data-power="sorcery">
+            <span class="pc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg></span>
+            <span class="pc-name">Sorcery</span>
+            <span class="pc-count">3 spells</span>
+          </div>
+          <div class="power-card" data-power="magic">
+            <span class="pc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L3 12l9 10 9-10z"/><circle cx="12" cy="12" r="3"/></svg></span>
+            <span class="pc-name">Magic</span>
+            <span class="pc-count">7 spells</span>
+          </div>
+          <div class="power-card" data-power="superpower">
+            <span class="pc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg></span>
+            <span class="pc-name">Superpower</span>
+            <span class="pc-count">empty</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOM BLOCKS -->
+    <div class="section" data-section="custom">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Custom fields</span>
+        <span class="line"></span>
+      </div>
+      <div class="section-body" id="custom-body">
+        <div class="custom-block">
+          <span class="handle">⁝⁝</span>
+          <div class="cb-head">
+            <span class="cb-title">Phobias & Quirks</span>
+            <div class="cb-actions">
+              <button class="icon-btn" data-cb-action="edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+              <button class="icon-btn" data-cb-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+            </div>
+          </div>
+          <div class="cb-text">Клаустрофобия после инцидента в шахте. Затруднённо дышит в маленьких помещениях, избегает лифтов.
+
+Лёгкий тик правого глаза при стрессе. Никогда не смотрит в зеркало дольше необходимого.</div>
+        </div>
+
+        <div class="custom-block">
+          <span class="handle">⁝⁝</span>
+          <div class="cb-head">
+            <span class="cb-title">Связи и контакты</span>
+            <div class="cb-actions">
+              <button class="icon-btn" data-cb-action="edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+              <button class="icon-btn" data-cb-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+            </div>
+          </div>
+          <div class="cb-text">• Дорн Келлер — бывший командир, теперь работает в службе безопасности порта Кассия. Должен услугу.
+• Мила — бармен в «Железной звезде», знает слухи первой.
+• Тарн — брат, не общаемся с Тарсис-7.</div>
+        </div>
+
+        <button class="add-block-btn" id="add-block">+ Add custom field</button>
+      </div>
+    </div>
+
+  </main>
+
+  <nav class="rail">
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg><span class="tooltip">Skills</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14.5 17.5L3 6V3h3l11.5 11.5z"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M21 3v3L9.5 17.5"/><path d="M8 14l-4 4"/></svg><span class="tooltip">Combat</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg><span class="tooltip">Health</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg><span class="tooltip">Items</span></div>
+    <div class="rail-btn active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span class="tooltip">Character</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="7" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/><circle cx="17" cy="8" r="3"/><path d="M22 20c0-2.76-2.24-5-5-5"/></svg><span class="tooltip">Social</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="tooltip">Story</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg><span class="tooltip">Effects</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg><span class="tooltip">Dev</span></div>
+  </nav>
+</div>
+
+<!-- Context menu -->
+<div class="ctx" id="ctx"></div>
+
+<!-- Custom block modal -->
+<div class="modal-overlay" id="cb-modal">
+  <div class="modal">
+    <h3 id="cb-modal-title">Add custom field</h3>
+    <div class="field">
+      <label>Title</label>
+      <input type="text" id="cb-title-input" placeholder="e.g. Phobias, Notes, Relationships">
+    </div>
+    <div class="field">
+      <label>Content</label>
+      <textarea id="cb-text-input" placeholder="Any text content..."></textarea>
+    </div>
+    <div class="modal-buttons">
+      <button id="cb-cancel">Cancel</button>
+      <button class="primary" id="cb-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="chat-log" id="chat-log">
+  <div class="chat-head">Foundry chat</div>
+  <div class="chat-body" id="chat-body"></div>
+</div>
+
+<script>
+// ============ STATE ============
+const chars = {
+  str: { code: 'STR', name: 'Strength', initial: 13, redistribute: -2, cultural: 0, age: 0, experience: 0, effects: 0, dice: '3D6', category: 'basic' },
+  con: { code: 'CON', name: 'Constitution', initial: 10, redistribute: 0, cultural: 0, age: 0, experience: 0, effects: 0, dice: '3D6', category: 'basic' },
+  int: { code: 'INT', name: 'Intelligence', initial: 10, redistribute: 3, cultural: 0, age: 0, experience: 0, effects: 0, dice: '6 + 2D6', category: 'basic' },
+  siz: { code: 'SIZ', name: 'Size', initial: 10, redistribute: 0, cultural: 0, age: 0, experience: 0, effects: 0, dice: '6 + 2D6', category: 'basic' },
+  pow: { code: 'POW', name: 'Power', initial: 11, redistribute: -1, cultural: 0, age: 0, experience: 0, effects: 0, dice: '3D6', category: 'basic' },
+  dex: { code: 'DEX', name: 'Dexterity', initial: 11, redistribute: 0, cultural: 0, age: 0, experience: 0, effects: 0, dice: '3D6', category: 'basic' },
+  cha: { code: 'CHA', name: 'Charisma', initial: 11, redistribute: 0, cultural: 0, age: 0, experience: 0, effects: 0, dice: '3D6', category: 'basic' },
+  edu: { code: 'EDU', name: 'Education', initial: 12, redistribute: 0, cultural: 0, age: 0, experience: 0, effects: 0, dice: '6 + 2D6', category: 'basic' }
+};
+
+function charTotal(c) { return c.initial + c.redistribute + c.cultural + c.age + c.experience + c.effects; }
+
+// ============ CHARACTERISTIC BREAKDOWN ============
+let expandedChar = null;
+
+function renderBreakdown(code) {
+  const c = chars[code];
+  const t = charTotal(c);
+  document.getElementById('cb-title').textContent = `${c.code} — ${c.name} breakdown`;
+  document.getElementById('cb-rows').innerHTML = `
+    <div class="cb-row"><span class="cb-label">Initial</span><span class="cb-value">${c.initial}</span></div>
+    <div class="cb-row"><span class="cb-label">Redistribute</span><span class="cb-value">${c.redistribute >= 0 ? '+' : ''}${c.redistribute}</span></div>
+    <div class="cb-row"><span class="cb-label">Cultural</span><span class="cb-value">${c.cultural >= 0 ? '+' : ''}${c.cultural}</span></div>
+    <div class="cb-row"><span class="cb-label">Age</span><span class="cb-value">${c.age >= 0 ? '+' : ''}${c.age}</span></div>
+    <div class="cb-row"><span class="cb-label">Experience</span><span class="cb-value">${c.experience >= 0 ? '+' : ''}${c.experience}</span></div>
+    <div class="cb-row"><span class="cb-label">Effects</span><span class="cb-value">${c.effects >= 0 ? '+' : ''}${c.effects}</span></div>
+    <div class="cb-row total"><span class="cb-label">Total</span><span class="cb-value">${t}</span></div>
+    <div class="cb-dice">Dice formula for generation: <code>${c.dice}</code></div>
+  `;
+}
+
+document.querySelectorAll('.char-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const code = card.dataset.char;
+
+    if (expandedChar === code) {
+      card.classList.remove('expanded');
+      document.getElementById('char-breakdown').classList.remove('show');
+      expandedChar = null;
+      return;
+    }
+
+    document.querySelectorAll('.char-card').forEach(c => c.classList.remove('expanded'));
+    card.classList.add('expanded');
+    renderBreakdown(code);
+    const breakdown = document.getElementById('char-breakdown');
+    breakdown.classList.add('show');
+
+    // Position breakdown after current card row
+    const grid = document.getElementById('char-grid');
+    const cards = Array.from(grid.querySelectorAll('.char-card'));
+    const idx = cards.indexOf(card);
+    // move breakdown to appear at the end of the row (every 4 cards)
+    const rowEnd = Math.min(cards.length - 1, Math.floor(idx / 4) * 4 + 3);
+    grid.insertBefore(breakdown, cards[rowEnd].nextSibling);
+
+    expandedChar = code;
+  });
+});
+
+// ============ SECTION COLLAPSE ============
+document.querySelectorAll('.section-header').forEach(h => {
+  h.addEventListener('click', e => {
+    if (e.target.closest('.icon-btn')) return;
+    h.parentElement.classList.toggle('collapsed');
+  });
+});
+
+// ============ CLASS / BACKGROUND CONTEXT MENU ============
+document.querySelectorAll('.class-card[data-object-id]').forEach(card => {
+  card.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    showClassContextMenu(e.clientX, e.clientY, card);
+  });
+
+  card.querySelectorAll('[data-ctxaction]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const action = btn.dataset.ctxaction;
+      if (action === 'open') {
+        showChat(`[OPEN] ${card.dataset.objectType} object: ${card.querySelector('.cc-name').textContent}`);
+      } else if (action === 'menu') {
+        const rect = btn.getBoundingClientRect();
+        showClassContextMenu(rect.right, rect.bottom, card);
+      }
+    });
+  });
+
+  card.addEventListener('dblclick', () => {
+    showChat(`[SHEET] Open ${card.dataset.objectType}: ${card.querySelector('.cc-name').textContent}`);
+  });
+});
+
+function showClassContextMenu(x, y, card) {
+  const ctx = document.getElementById('ctx');
+  const type = card.dataset.objectType;
+  const name = card.querySelector('.cc-name').textContent;
+  ctx.innerHTML = `
+    <div class="ctx-item" data-action="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg>Open ${type} object</div>
+    <div class="ctx-item" data-action="replace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M4 10a9 9 0 0 1 15-4M20 14a9 9 0 0 1-15 4"/></svg>Replace ${type}</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item danger" data-action="remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Remove ${type}</div>
+  `;
+  ctx.classList.add('show');
+  ctx.style.left = Math.min(x, window.innerWidth - 200) + 'px';
+  ctx.style.top = Math.min(y, window.innerHeight - 150) + 'px';
+
+  ctx.querySelectorAll('[data-action]').forEach(item => {
+    item.addEventListener('click', () => {
+      const a = item.dataset.action;
+      if (a === 'open') showChat(`[OPEN] ${type}: ${name}`);
+      else if (a === 'replace') showChat(`[REPLACE] ${type}: ${name} — drag new object to replace`);
+      else if (a === 'remove') {
+        card.classList.add('empty');
+        card.innerHTML = `<div class="cc-label">${type}</div><div>[Assign ${type}]</div>`;
+        showChat(`[REMOVE] ${type}: ${name}`);
+      }
+      ctx.classList.remove('show');
+    });
+  });
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ctx')) document.getElementById('ctx').classList.remove('show');
+});
+
+// ============ POWERS ============
+document.querySelectorAll('.power-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const power = card.dataset.power;
+    showChat(`[OPEN] Power system: ${power} — opens dedicated window with spells/abilities list`);
+  });
+});
+
+// ============ CUSTOM BLOCKS ============
+let editingBlock = null;
+
+document.getElementById('add-block').addEventListener('click', () => {
+  editingBlock = null;
+  document.getElementById('cb-modal-title').textContent = 'Add custom field';
+  document.getElementById('cb-title-input').value = '';
+  document.getElementById('cb-text-input').value = '';
+  document.getElementById('cb-modal').classList.add('show');
+});
+
+document.querySelectorAll('.custom-block').forEach(attachCustomBlockHandlers);
+
+function attachCustomBlockHandlers(block) {
+  block.querySelectorAll('[data-cb-action]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const action = btn.dataset.cbAction;
+      if (action === 'delete') {
+        block.remove();
+        showChat('Custom block removed');
+      } else if (action === 'edit') {
+        editingBlock = block;
+        document.getElementById('cb-modal-title').textContent = 'Edit custom field';
+        document.getElementById('cb-title-input').value = block.querySelector('.cb-title').textContent;
+        document.getElementById('cb-text-input').value = block.querySelector('.cb-text').textContent;
+        document.getElementById('cb-modal').classList.add('show');
+      }
+    });
+  });
+}
+
+document.getElementById('cb-cancel').addEventListener('click', () => {
+  document.getElementById('cb-modal').classList.remove('show');
+});
+
+document.getElementById('cb-save').addEventListener('click', () => {
+  const title = document.getElementById('cb-title-input').value.trim();
+  const text = document.getElementById('cb-text-input').value;
+  if (!title) return;
+
+  if (editingBlock) {
+    editingBlock.querySelector('.cb-title').textContent = title;
+    editingBlock.querySelector('.cb-text').textContent = text;
+    showChat(`Custom block "${title}" updated`);
+  } else {
+    const block = document.createElement('div');
+    block.className = 'custom-block';
+    block.innerHTML = `
+      <span class="handle">⁝⁝</span>
+      <div class="cb-head">
+        <span class="cb-title">${title}</span>
+        <div class="cb-actions">
+          <button class="icon-btn" data-cb-action="edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+          <button class="icon-btn" data-cb-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div>
+      </div>
+      <div class="cb-text">${text}</div>
+    `;
+    const addBtn = document.getElementById('add-block');
+    addBtn.parentElement.insertBefore(block, addBtn);
+    attachCustomBlockHandlers(block);
+    showChat(`Custom block "${title}" added`);
+  }
+  document.getElementById('cb-modal').classList.remove('show');
+});
+
+// ============ RAIL NAV ============
+document.querySelectorAll('.rail-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// ============ CHAT ============
+let chatTimeout;
+function showChat(msg) {
+  const log = document.getElementById('chat-log');
+  document.getElementById('chat-body').textContent = msg;
+  log.classList.add('show');
+  clearTimeout(chatTimeout);
+  chatTimeout = setTimeout(() => log.classList.remove('show'), 3200);
+}
+</script>
+</body>
+</html>

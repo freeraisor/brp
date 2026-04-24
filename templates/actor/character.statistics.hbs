@@ -1,93 +1,342 @@
 <section class="actor tab statistics {{tab.cssClass}}" data-group="primary" data-tab="statistics">
+  <section class="brp-character-refresh">
+    <header class="brp-character-refresh-titlebar">
+      <div class="brp-character-refresh-title">
+        <i class="fas fa-user"></i>
+        <span>{{localize 'BRP.character'}}</span>
+      </div>
+      <div class="brp-character-refresh-lock" data-tooltip="{{#if isLocked}}{{localize 'BRP.locked'}}{{else}}{{localize 'BRP.unlocked'}}{{/if}}">
+        {{#if isLocked}}
+          <i class="fas fa-lock"></i>
+          <span>{{localize 'BRP.locked'}}</span>
+        {{else}}
+          <i class="fas fa-lock-open"></i>
+          <span>{{localize 'BRP.unlocked'}}</span>
+        {{/if}}
+      </div>
+    </header>
 
-    <div class="stats-tab-grid">
-      <div class="diff-label centre">{{ localize 'BRP.charShort'}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.initial'}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.redistribute'}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.cultural'}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.age'}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.experience'}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.effects'}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.total'}}</div>
-      <div class="diff-label centre">{{ localize 'BRP.dice'}}</div>
-      {{#unless statLocked}}
-        <div class="diff-label centre rollStats">
-          <a class="" data-action="rollCharStats" data-tooltip="{{ localize 'BRP.rollStats' }}"><i class="fas fa-dice"></i></a>
+    <section class="brp-character-refresh-section is-core-development {{#if characterView.state.collapsedSections.core}}is-collapsed{{/if}}" data-character-section="core">
+      <header class="brp-character-refresh-section-header">
+        <button type="button" class="brp-character-refresh-section-toggle" data-action="characterSectionToggle" data-section-id="core" aria-expanded="{{#if characterView.state.collapsedSections.core}}false{{else}}true{{/if}}" data-tooltip="{{#if characterView.state.collapsedSections.core}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+          <i class="fas fa-chevron-down brp-character-refresh-section-chevron"></i>
+          <span class="brp-character-refresh-section-title">{{localize 'BRP.characterCoreSection'}}</span>
+          <span class="brp-character-refresh-section-line"></span>
+        </button>
+      </header>
+      <div class="brp-character-refresh-section-body" {{#if characterView.state.collapsedSections.core}}hidden{{/if}}>
+        <div class="brp-character-refresh-core-cards">
+          {{#each characterView.coreCards as |card key|}}
+            <article class="brp-character-refresh-core-card {{#if card.empty}}is-empty{{else}}is-filled{{/if}} {{#if card.linked}}is-linked{{/if}}"
+              data-character-core-id="{{card.id}}"
+              {{#if card.empty}}data-tooltip="{{localize 'BRP.characterCoreCardDropHint' type=card.label}}"{{/if}}
+              {{#if card.itemId}}data-item-id="{{card.itemId}}" data-document-class="{{card.documentClass}}"{{/if}}
+              {{#if card.actions.remove}}data-remove-action="{{card.actions.remove.action}}"{{/if}}>
+              {{#if card.empty}}
+                <div class="brp-character-refresh-core-empty">
+                  <span>{{card.label}}</span>
+                  <strong>{{localize 'BRP.characterCoreCardDropHint' type=card.label}}</strong>
+                </div>
+              {{else}}
+                <div class="brp-character-refresh-core-main {{#if card.actions.open}}rollable{{/if}}"
+                  {{#if card.actions.open}}data-action="{{card.actions.open.action}}" data-item-id="{{card.actions.open.itemId}}" data-document-class="{{card.actions.open.documentClass}}"{{/if}}>
+                  <div class="brp-character-refresh-core-label">{{card.label}}</div>
+                  <div class="brp-character-refresh-core-title">{{card.displayTitle}}</div>
+                  {{#if card.description}}
+                    <div class="brp-character-refresh-core-description">{{card.description}}</div>
+                  {{else}}
+                    <div class="brp-character-refresh-core-description is-empty">{{localize 'BRP.none'}}</div>
+                  {{/if}}
+                </div>
+
+                <div class="brp-character-refresh-core-actions">
+                  {{#if card.actions.open}}
+                    <a class="brp-character-refresh-icon-action" data-action="{{card.actions.open.action}}" data-item-id="{{card.actions.open.itemId}}" data-document-class="{{card.actions.open.documentClass}}" data-tooltip="{{localize 'BRP.view'}}">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                  {{/if}}
+                  {{#if card.actions.remove}}
+                    <a class="brp-character-refresh-icon-action" data-action="{{card.actions.remove.action}}" data-tooltip="{{localize 'BRP.remove'}}">
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  {{/if}}
+                  {{#if card.actions.menu}}
+                    <button type="button" class="brp-character-refresh-icon-action brp-character-refresh-core-menu" data-tooltip="{{localize 'BRP.options'}}">
+                      <i class="fas fa-ellipsis-vertical"></i>
+                    </button>
+                  {{/if}}
+                </div>
+              {{/if}}
+            </article>
+          {{/each}}
         </div>
-      {{/unless}}
-      {{#each system.stats as |stat key|}}
-        {{#if stat.visible}}
-          <div class="stat-name centre new-row">
-            {{#unless ../statLocked}}
-              <a class="" data-action="redistStat" data-tooltip="{{ localize 'BRP.decrease' }}" data-type="decrease" data-stat={{key}}><i class="fas fa-caret-left"></i></a>
-            {{/unless}}
-            {{stat.labelShort}}
-            {{#unless ../statLocked}}
-              <a class="" data-action="redistStat" data-tooltip="{{ localize 'BRP.increase' }}" data-type="increase" data-stat={{key}}><i class="fas fa-caret-right"></i></a>
+      </div>
+    </section>
+
+    <section class="brp-character-refresh-section is-biography {{#if characterView.state.collapsedSections.biography}}is-collapsed{{/if}}" data-character-section="biography">
+      <header class="brp-character-refresh-section-header">
+        <button type="button" class="brp-character-refresh-section-toggle" data-action="characterSectionToggle" data-section-id="biography" aria-expanded="{{#if characterView.state.collapsedSections.biography}}false{{else}}true{{/if}}" data-tooltip="{{#if characterView.state.collapsedSections.biography}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+          <i class="fas fa-chevron-down brp-character-refresh-section-chevron"></i>
+          <span class="brp-character-refresh-section-title">{{localize 'BRP.biography'}}</span>
+          <span class="brp-character-refresh-section-line"></span>
+        </button>
+      </header>
+      <div class="brp-character-refresh-section-body" {{#if characterView.state.collapsedSections.biography}}hidden{{/if}}>
+        <div class="brp-character-refresh-bio-groups">
+          {{#each characterView.biographyGroups as |group key|}}
+            <section class="brp-character-refresh-bio-group {{#if group.wide}}is-wide{{/if}}" data-biography-group="{{group.id}}">
+              <header class="brp-character-refresh-bio-group-title">{{group.title}}</header>
+              <div class="brp-character-refresh-bio-grid">
+                {{#each group.fields as |field fieldKey|}}
+                  <label class="brp-character-refresh-bio-field {{#if field.wide}}is-wide{{/if}} {{#if field.multiline}}is-multiline{{/if}} {{#if field.empty}}is-empty{{/if}}">
+                    <span class="brp-character-refresh-bio-label">{{field.label}}</span>
+                    {{#if field.editable}}
+                      {{#if field.multiline}}
+                        <textarea class="brp-character-refresh-bio-input" name="{{field.path}}">{{field.value}}</textarea>
+                      {{else}}
+                        <input class="brp-character-refresh-bio-input" name="{{field.path}}" type="text" value="{{field.value}}" {{#if field.dtype}}data-dtype="{{field.dtype}}"{{/if}} />
+                      {{/if}}
+                    {{else}}
+                      <span class="brp-character-refresh-bio-value {{#if field.isLinked}}rollable{{/if}} {{#if field.empty}}is-empty{{/if}}"
+                        {{#if field.isLinked}}data-action="viewDoc" data-item-id="{{field.itemId}}" data-document-class="{{field.documentClass}}"{{/if}}>
+                        {{field.displayValue}}
+                      </span>
+                    {{/if}}
+                    {{#unless ../../isLocked}}
+                      {{#if field.canDelete}}
+                        <a class="brp-character-refresh-bio-delete" data-action="{{field.deleteAction}}" data-tooltip="{{localize 'BRP.deleteItem'}}">
+                          <i class="far fa-times-circle"></i>
+                        </a>
+                      {{/if}}
+                    {{/unless}}
+                  </label>
+                {{/each}}
+              </div>
+            </section>
+          {{/each}}
+        </div>
+      </div>
+    </section>
+
+    <section class="brp-character-refresh-section is-characteristics {{#if characterView.state.collapsedSections.characteristics}}is-collapsed{{/if}}" data-character-section="characteristics">
+      <header class="brp-character-refresh-section-header">
+        <button type="button" class="brp-character-refresh-section-toggle" data-action="characterSectionToggle" data-section-id="characteristics" aria-expanded="{{#if characterView.state.collapsedSections.characteristics}}false{{else}}true{{/if}}" data-tooltip="{{#if characterView.state.collapsedSections.characteristics}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+          <i class="fas fa-chevron-down brp-character-refresh-section-chevron"></i>
+          <span class="brp-character-refresh-section-title">{{localize 'BRP.characteristics'}}</span>
+          <span class="brp-character-refresh-section-line"></span>
+        </button>
+      </header>
+      <div class="brp-character-refresh-section-body" {{#if characterView.state.collapsedSections.characteristics}}hidden{{/if}}>
+        {{#unless statLocked}}
+          <div class="brp-character-refresh-characteristics-toolbar">
+            <button type="button" class="brp-character-refresh-icon-action" data-action="rollCharStats" data-tooltip="{{localize 'BRP.rollStats'}}">
+              <i class="fas fa-dice"></i>
+            </button>
+          </div>
+        {{/unless}}
+
+        <div class="brp-character-refresh-characteristic-rows">
+          {{#each characterView.characteristicRows as |row rowKey|}}
+            <div class="brp-character-refresh-characteristic-row {{#if row.activeCard}}has-active{{/if}}" data-characteristic-row="{{row.id}}">
+              {{#each row.cards as |stat statKey|}}
+                <article class="brp-character-refresh-characteristic-card {{#if stat.active}}is-active{{/if}}" data-characteristic="{{stat.key}}">
+                  <button type="button" class="brp-character-refresh-characteristic-toggle" data-action="characteristicToggle" data-characteristic="{{stat.key}}" data-tooltip="{{stat.name}}">
+                    <span class="brp-character-refresh-characteristic-code">{{stat.code}}</span>
+                    <strong class="brp-character-refresh-characteristic-total">{{stat.total}}</strong>
+                    <span class="brp-character-refresh-characteristic-name">{{stat.name}}</span>
+                    <i class="fas fa-chevron-down brp-character-refresh-characteristic-chevron"></i>
+                  </button>
+
+                  <div class="brp-character-refresh-characteristic-actions">
+                    {{#unless ../../statLocked}}
+                      <a class="brp-character-refresh-icon-action" data-action="{{stat.actions.decrease.action}}" data-type="{{stat.actions.decrease.type}}" data-stat="{{stat.actions.decrease.stat}}" data-tooltip="{{localize 'BRP.decrease'}}">
+                        <i class="fas fa-caret-left"></i>
+                      </a>
+                    {{/unless}}
+                    <a class="brp-character-refresh-icon-action" data-action="{{stat.actions.roll.action}}" data-characteristic="{{stat.actions.roll.characteristic}}" data-tooltip="{{localize 'BRP.charHint'}}">
+                      <i class="fas fa-dice-d20"></i>
+                    </a>
+                    {{#unless ../../statLocked}}
+                      <a class="brp-character-refresh-icon-action" data-action="{{stat.actions.increase.action}}" data-type="{{stat.actions.increase.type}}" data-stat="{{stat.actions.increase.stat}}" data-tooltip="{{localize 'BRP.increase'}}">
+                        <i class="fas fa-caret-right"></i>
+                      </a>
+                    {{/unless}}
+                  </div>
+                </article>
+              {{/each}}
+            </div>
+
+            {{#if row.activeCard}}
+              {{#with row.activeCard as |stat|}}
+                <div class="brp-character-refresh-characteristic-breakdown" data-characteristic-breakdown="{{stat.key}}">
+                  <header class="brp-character-refresh-characteristic-breakdown-header">
+                    <span>{{stat.code}}</span>
+                    <strong>{{stat.name}}</strong>
+                    <em>{{stat.total}}</em>
+                  </header>
+
+                  <div class="brp-character-refresh-characteristic-breakdown-grid">
+                    {{#each stat.breakdown as |entry entryKey|}}
+                      <label class="brp-character-refresh-characteristic-breakdown-row {{entry.className}} {{#if entry.total}}is-total{{/if}}">
+                        <span>{{entry.label}}</span>
+                        {{#if entry.editable}}
+                          <input type="text" name="{{entry.editablePath}}" value="{{entry.value}}" data-dtype="Number" />
+                        {{else}}
+                          <strong>{{entry.displayValue}}</strong>
+                        {{/if}}
+                      </label>
+                    {{/each}}
+
+                    <label class="brp-character-refresh-characteristic-breakdown-row is-formula">
+                      <span>{{localize 'BRP.dice'}}</span>
+                      {{#if stat.formulaEditable}}
+                        <input type="text" name="{{stat.formulaPath}}" value="{{stat.formula}}" />
+                      {{else}}
+                        <strong>{{stat.formula}}</strong>
+                      {{/if}}
+                    </label>
+                  </div>
+                </div>
+              {{/with}}
+            {{/if}}
+          {{/each}}
+        </div>
+      </div>
+    </section>
+
+    <section class="brp-character-refresh-section is-derived {{#if characterView.state.collapsedSections.derived}}is-collapsed{{/if}}" data-character-section="derived">
+      <header class="brp-character-refresh-section-header">
+        <button type="button" class="brp-character-refresh-section-toggle" data-action="characterSectionToggle" data-section-id="derived" aria-expanded="{{#if characterView.state.collapsedSections.derived}}false{{else}}true{{/if}}" data-tooltip="{{#if characterView.state.collapsedSections.derived}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+          <i class="fas fa-chevron-down brp-character-refresh-section-chevron"></i>
+          <span class="brp-character-refresh-section-title">{{localize 'BRP.derivedStats'}}</span>
+          <span class="brp-character-refresh-section-line"></span>
+        </button>
+      </header>
+      <div class="brp-character-refresh-section-body" {{#if characterView.state.collapsedSections.derived}}hidden{{/if}}>
+        <div class="brp-character-refresh-derived-grid">
+          {{#each characterView.derivedStats as |card key|}}
+            {{#if card.enabled}}
+              <article class="brp-character-refresh-derived-card {{#if card.tone}}is-{{card.tone}}{{/if}} {{#if card.placeholder}}is-placeholder{{/if}}" data-derived-id="{{card.id}}" {{#if card.tooltip}}data-tooltip="{{card.tooltip}}"{{/if}}>
+                <span class="brp-character-refresh-derived-label">{{card.label}}</span>
+                {{#if card.editable}}
+                  <input class="brp-character-refresh-derived-input" type="number" name="{{card.path}}" value="{{card.value}}" data-dtype="Number" />
+                {{else}}
+                  <strong class="brp-character-refresh-derived-value">{{card.displayValue}}</strong>
+                {{/if}}
+                <em class="brp-character-refresh-derived-formula">{{card.formula}}</em>
+                {{#if card.placeholder}}
+                  <small class="brp-character-refresh-derived-note">{{localize 'BRP.placeholder'}}</small>
+                {{/if}}
+              </article>
+            {{/if}}
+          {{/each}}
+        </div>
+
+        <div class="brp-character-refresh-skill-points">
+          {{#each characterView.skillPoints as |card key|}}
+            <article class="brp-character-refresh-skill-point-card {{#if card.overflow}}is-overflow{{/if}}" data-skill-point-id="{{card.id}}">
+              <header class="brp-character-refresh-skill-point-header">
+                <span>{{card.label}}</span>
+                <strong>{{card.usedDisplay}}</strong>
+              </header>
+              <div class="brp-character-refresh-skill-point-meter" aria-hidden="true">
+                <span style="width: {{card.percentageClamped}}%;"></span>
+              </div>
+              <footer class="brp-character-refresh-skill-point-footer">
+                <span>{{card.formula}}</span>
+              </footer>
+            </article>
+          {{/each}}
+        </div>
+      </div>
+    </section>
+
+    <section class="brp-character-refresh-section is-powers {{#if characterView.state.collapsedSections.powers}}is-collapsed{{/if}}" data-character-section="powers">
+      <header class="brp-character-refresh-section-header">
+        <button type="button" class="brp-character-refresh-section-toggle" data-action="characterSectionToggle" data-section-id="powers" aria-expanded="{{#if characterView.state.collapsedSections.powers}}false{{else}}true{{/if}}" data-tooltip="{{#if characterView.state.collapsedSections.powers}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+          <i class="fas fa-chevron-down brp-character-refresh-section-chevron"></i>
+          <span class="brp-character-refresh-section-title">{{localize 'BRP.powers'}}</span>
+          <span class="brp-character-refresh-section-line"></span>
+        </button>
+      </header>
+
+      <div class="brp-character-refresh-section-body" {{#if characterView.state.collapsedSections.powers}}hidden{{/if}}>
+        {{#if characterView.powerCards.length}}
+          <div class="brp-character-refresh-power-cards">
+            {{#each characterView.powerCards as |power key|}}
+              <article class="brp-character-refresh-power-card" data-power-id="{{power.id}}">
+                <button type="button" class="brp-character-refresh-power-main" data-action="{{power.actions.open.action}}" data-group="{{power.actions.open.group}}" data-tab="{{power.actions.open.tab}}" data-tooltip="{{localize 'BRP.view'}}">
+                  <span class="brp-character-refresh-power-icon"><i class="{{power.icon}}"></i></span>
+                  <span class="brp-character-refresh-power-name">{{power.label}}</span>
+                  <span class="brp-character-refresh-power-count">{{power.countDisplay}}</span>
+                </button>
+                <button type="button" class="brp-character-refresh-icon-action brp-character-refresh-power-add" data-action="{{power.actions.create.action}}" data-document-class="{{power.actions.create.documentClass}}" data-type="{{power.actions.create.type}}" data-tooltip="{{localize 'BRP.addItem' type=power.label}}">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </article>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="brp-character-refresh-empty">{{localize 'BRP.none'}}</div>
+        {{/if}}
+      </div>
+    </section>
+
+    <section class="brp-character-refresh-section is-custom-fields {{#if characterView.state.collapsedSections.custom}}is-collapsed{{/if}}" data-character-section="custom">
+      <header class="brp-character-refresh-section-header">
+        <button type="button" class="brp-character-refresh-section-toggle" data-action="characterSectionToggle" data-section-id="custom" aria-expanded="{{#if characterView.state.collapsedSections.custom}}false{{else}}true{{/if}}" data-tooltip="{{#if characterView.state.collapsedSections.custom}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+          <i class="fas fa-chevron-down brp-character-refresh-section-chevron"></i>
+          <span class="brp-character-refresh-section-title">{{localize 'BRP.characterCustomFields'}}</span>
+          <span class="brp-character-refresh-section-line"></span>
+        </button>
+      </header>
+      <div class="brp-character-refresh-section-body" {{#if characterView.state.collapsedSections.custom}}hidden{{/if}}>
+        {{#unless isLocked}}
+          <div class="brp-character-refresh-custom-toolbar">
+            <button type="button" class="brp-character-refresh-icon-action" data-action="characterCustomFieldAdd" data-tooltip="{{localize 'BRP.characterCustomFieldAdd'}}">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        {{/unless}}
+
+        {{#if characterView.customFields.length}}
+          <div class="brp-character-refresh-custom-fields">
+            {{#each characterView.customFields as |field key|}}
+              <article class="brp-character-refresh-custom-card {{#if field.empty}}is-empty{{/if}}" data-custom-field-id="{{field.id}}">
+                {{#unless ../isLocked}}
+                  <button type="button" class="brp-character-refresh-custom-handle" data-action="characterCustomFieldReorder" data-custom-field-drag="{{field.id}}" draggable="true" data-tooltip="{{localize 'BRP.changeOrder'}}">
+                    <i class="fas fa-grip-lines"></i>
+                  </button>
+                {{/unless}}
+                <div class="brp-character-refresh-custom-main">
+                  <strong class="brp-character-refresh-custom-title">{{field.displayTitle}}</strong>
+                  <p class="brp-character-refresh-custom-content">{{field.displayContent}}</p>
+                </div>
+                {{#unless ../isLocked}}
+                  <div class="brp-character-refresh-custom-actions">
+                    <button type="button" class="brp-character-refresh-icon-action" data-action="characterCustomFieldEdit" data-custom-field-id="{{field.id}}" data-tooltip="{{localize 'BRP.characterCustomFieldEdit'}}">
+                      <i class="fas fa-pen"></i>
+                    </button>
+                    <button type="button" class="brp-character-refresh-icon-action" data-action="characterCustomFieldDelete" data-custom-field-id="{{field.id}}" data-tooltip="{{localize 'BRP.characterCustomFieldDelete'}}">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                {{/unless}}
+              </article>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="brp-character-refresh-empty brp-character-refresh-custom-empty">
+            {{#unless isLocked}}
+              <button type="button" class="brp-character-refresh-icon-action" data-action="characterCustomFieldAdd" data-tooltip="{{localize 'BRP.characterCustomFieldAdd'}}">
+                <i class="fas fa-plus"></i>
+              </button>
+            {{else}}
+              {{localize 'BRP.none'}}
             {{/unless}}
           </div>
-          <div><input class="font16-inp centre" name="system.stats.{{key}}.base" type="text" value="{{stat.base}}" data-dtype="Number" /></div>
-          <div class="font16-disp centre {{#unless (eq ../system.redistTotal 0)}}grid-error{{/unless}}">{{stat.redist}}</div>
-          <div><input class="font16-inp centre" name="system.stats.{{key}}.culture" type="text" value="{{stat.culture}}" data-dtype="Number" /></div>
-          <div><input class="font16-inp centre" name="system.stats.{{key}}.age" type="text" value="{{stat.age}}" data-dtype="Number" /></div>
-          <div><input class="font16-inp centre" name="system.stats.{{key}}.exp" type="text" value="{{stat.exp}}" data-dtype="Number" /></div>
-          <div class="font16-disp centre" >{{stat.effects}}</div>
-          <div class="font16 centre bold" data-tooltip="{{stat.labelShort}}">{{stat.total}}</div>
-          {{#if ../statLocked}}
-            <div class="font16 centre">{{stat.formula}}</div>
-          {{else}}
-            <div><input class="font16-inp centre" name="system.stats.{{key}}.formula" type="text" value="{{stat.formula}}" /></div>
-          {{/if}}
         {{/if}}
-      {{/each}}
-    </div>
-
-    <br>
-    <div class="personal-stats-grid">
-
-
-      <div class="new-row bold">{{localize 'BRP.xpBonus'}}</div>
-      <div class="attrib-disp centre"> {{actor.system.xpBonus}}%</div>
-      <div></div>
-      <div class="bold">{{localize 'BRP.psp'}}</div>
-      <div class="attrib-disp centre"> {{actor.system.totalPers}}%</div>
-      <div class="bold">{{localize 'BRP.hpBonus' label=system.health.labelAbbr}}</div>
-      <div class="centre"><input class="attrib-inp centre" type="number" name="system.health.mod" value="{{system.health.mod}}"/></div>
-      <div></div>
-      <div class="bold">{{localize 'BRP.pfsp'}}</div>
-      <div class="attrib-disp centre"> {{actor.system.totalProf}}%</div>
-      <div class="bold">{{localize 'BRP.ppBonus' label=system.power.labelAbbr}}</div>
-      <div class="centre"><input class="attrib-inp centre" type="number" name="system.power.mod" value="{{system.power.mod}}"/></div>
-      <div></div>
-      <div class="bold">{{localize 'BRP.totalXP'}}</div>
-      <div class="attrib-disp centre"> {{actor.system.totalXP}}%</div>
-      {{#if useFP}}
-        <div class="bold">{{localize 'BRP.fpBonus' label=system.fatigue.labelAbbr}}</div>
-        <div class="centre"><input class="attrib-inp centre" type="number" name="system.fatigue.mod" value="{{system.fatigue.mod}}"/></div>
-        <div></div>
-      {{/if}}
-      <div class="bold">{{localize 'BRP.totalENC'}}</div>
-      <div class="attrib-disp centre"> {{actor.system.enc}}</div>
-    </div>
-
-    <br>
-    <div class="diff-label" style="width: 250px;" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.power')}}">{{ localize 'BRP.powers'}}</div>
-    <div class="powerList">
-      {{#unless (eq system.magic "")}}
-        <div class="item powerOwned rollable"  data-action="viewDoc" data-item-id="{{actor.system.magic}}" data-document-class="Item">{{magicLabel}}</div>
-      {{/unless}}
-      {{#unless (eq system.mutation "")}}
-        <div class="item powerOwned rollable"  data-action="viewDoc" data-item-id="{{actor.system.mutation}}" data-document-class="Item">{{mutationLabel}}</div>
-      {{/unless}}
-      {{#unless (eq system.psychic "")}}
-        <div class="item powerOwned rollable"  data-action="viewDoc" data-item-id="{{actor.system.psychic}}" data-document-class="Item">{{psychicLabel}}</div>
-      {{/unless}}
-      {{#unless (eq system.sorcery "")}}
-        <div class="item powerOwned rollable"  data-action="viewDoc" data-item-id="{{actor.system.sorcery}}" data-document-class="Item">{{sorceryLabel}}</div>
-      {{/unless}}
-      {{#unless (eq system.super "")}}
-        <div class="item powerOwned rollable"  data-action="viewDoc" data-item-id="{{actor.system.super}}" data-document-class="Item">{{superLabel}}</div>
-      {{/unless}}
-    </div>
-
+      </div>
+    </section>
+  </section>
 </section>

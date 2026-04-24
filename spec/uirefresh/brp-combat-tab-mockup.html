@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>BRP Character Sheet — Combat Tab Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-base: #1a1210;
+  --bg-card: #241a18;
+  --bg-elevated: #2d211f;
+  --bg-hover: #3a2a26;
+  --border: #4a1f1f;
+  --border-soft: #33211f;
+  --red: #c8302e;
+  --red-bright: #e24b4a;
+  --red-muted: #8a2a28;
+  --mint: #9ad8c4;
+  --mint-dim: #6fa894;
+  --blue: #5b8fd8;
+  --amber: #d4a04a;
+  --green: #7fb355;
+  --text: #e8e2dc;
+  --text-dim: #a89d94;
+  --text-muted: #6e6560;
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.sheet {
+  max-width: 1280px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  height: calc(100vh - 40px);
+  min-height: 720px;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--bg-base);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.workspace {
+  flex: 1;
+  min-width: 0;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.rail {
+  width: 52px;
+  background: var(--bg-base);
+  border-left: 1px solid var(--border);
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.avatar {
+  aspect-ratio: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.identity { text-align: center; }
+
+.identity .name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red-bright);
+}
+
+.identity .sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 10px 4px;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.status-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.status-icon:hover { background: var(--bg-hover); color: var(--text-dim); }
+
+.status-icon.active {
+  color: var(--red-bright);
+  background: rgba(226, 75, 74, 0.12);
+}
+
+.resource { display: flex; flex-direction: column; gap: 6px; }
+
+.resource-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.resource-head .label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+}
+
+.resource-head .value {
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  height: 8px;
+  background: var(--bg-card);
+  border-radius: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+}
+
+.bar.big { height: 12px; }
+.bar-fill { height: 100%; transition: width 0.3s; }
+
+.resource.compact .resource-head .label {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+}
+
+.resource.compact .resource-head .value { font-size: 11px; color: var(--text-dim); }
+.resource.compact .bar { height: 4px; }
+
+.divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+.rail-btn {
+  width: 52px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  position: relative;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+
+.rail-btn:hover { color: var(--text-dim); background: var(--bg-card); }
+
+.rail-btn.active {
+  color: var(--mint);
+  background: var(--bg-card);
+  border-left-color: var(--mint);
+}
+
+.rail-btn .tooltip {
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text);
+  white-space: nowrap;
+  border-radius: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 10;
+}
+
+.rail-btn:hover .tooltip { opacity: 1; }
+
+.tab-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--mint);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tab-title .lock {
+  margin-left: auto;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-top: 4px;
+}
+
+.section-header .title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+}
+
+.section-header .line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-soft);
+}
+
+.section-header .actions { display: flex; gap: 6px; }
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.icon-btn:hover { border-color: var(--red-muted); color: var(--red-bright); }
+.icon-btn svg { width: 14px; height: 14px; }
+
+.defense-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.defense-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.defense-card:hover {
+  border-color: var(--mint-dim);
+  background: var(--bg-card);
+}
+
+.defense-card .icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mint-dim);
+  background: rgba(154, 216, 196, 0.06);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.defense-card .name {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text);
+  font-weight: 600;
+  flex: 1;
+}
+
+.defense-card .name-sub {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 1px;
+}
+
+.defense-card .percent {
+  background: rgba(154, 216, 196, 0.08);
+  color: var(--mint);
+  border: 1px solid var(--mint-dim);
+  padding: 3px 10px;
+  border-radius: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  min-width: 56px;
+  text-align: center;
+}
+
+.weapons-list { display: flex; flex-direction: column; gap: 6px; }
+
+.weapon {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.weapon:hover { border-color: var(--border); }
+.weapon.expanded { border-color: var(--red-muted); }
+
+.weapon-row {
+  display: grid;
+  grid-template-columns: 12px 36px 1fr 56px 78px 84px 120px 22px;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+}
+
+.weapon-row .handle {
+  color: transparent;
+  cursor: grab;
+  font-size: 12px;
+  letter-spacing: -1px;
+  user-select: none;
+}
+
+.weapon:hover .weapon-row .handle { color: var(--text-muted); }
+
+.weapon-row .wicon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  color: var(--text-dim);
+}
+
+.weapon-row .wicon svg { width: 20px; height: 20px; }
+
+.weapon.type-melee .wicon { color: var(--red-bright); }
+.weapon.type-ranged .wicon { color: var(--amber); }
+.weapon.type-thrown .wicon { color: var(--green); }
+.weapon.type-bow .wicon { color: var(--mint); }
+
+.weapon-row .name-block { min-width: 0; }
+
+.weapon-row .name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.weapon-row .meta {
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 2px;
+  display: flex;
+  gap: 10px;
+}
+
+.weapon-row .meta .atk { color: var(--amber); font-weight: 600; }
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat .stat-label {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.stat .stat-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.percent-pill {
+  background: rgba(154, 216, 196, 0.08);
+  color: var(--mint);
+  border: 1px solid var(--mint-dim);
+  padding: 4px 0;
+  border-radius: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.percent-pill:hover { background: rgba(154, 216, 196, 0.18); }
+
+.damage-cell {
+  background: rgba(226, 75, 74, 0.08);
+  border: 1px solid var(--red-muted);
+  border-radius: 2px;
+  padding: 4px 0;
+  text-align: center;
+}
+
+.damage-cell .dmg { font-size: 12px; font-weight: 600; color: var(--red-bright); font-variant-numeric: tabular-nums; }
+.damage-cell .db { font-size: 9px; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 1px; }
+
+.range-cell {
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.ammo-cell { display: flex; flex-direction: column; gap: 2px; }
+.ammo-cell.empty { opacity: 0.25; }
+
+.ammo-mag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 2px 6px;
+  height: 22px;
+}
+
+.ammo-mag .ammo-label {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.ammo-mag .ammo-current { font-size: 12px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; margin-left: auto; }
+.ammo-mag .ammo-max { font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.ammo-mag.low .ammo-current { color: var(--amber); }
+.ammo-mag.critical .ammo-current { color: var(--red-bright); }
+
+.mag-row {
+  display: flex;
+  gap: 4px;
+  align-items: stretch;
+  height: 22px;
+}
+
+.mag-count {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 2px 6px;
+}
+
+.mag-count .label {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.mag-count .count { font-size: 11px; font-weight: 600; color: var(--text); margin-left: auto; font-variant-numeric: tabular-nums; }
+
+.reload-btn {
+  width: 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.reload-btn:hover { border-color: var(--mint-dim); color: var(--mint); background: rgba(154, 216, 196, 0.08); }
+.reload-btn svg { width: 12px; height: 12px; }
+
+.count-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 2px 6px;
+  height: 22px;
+  justify-content: center;
+}
+
+.count-pill .label {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.count-pill .count { font-size: 13px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+
+.chevron-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+
+.chevron-btn:hover { background: var(--bg-hover); color: var(--text); }
+.chevron-btn svg { width: 14px; height: 14px; transition: transform 0.2s; }
+.weapon.expanded .chevron-btn svg { transform: rotate(180deg); }
+
+.weapon-details {
+  display: none;
+  padding: 10px 16px 14px 62px;
+  border-top: 1px solid var(--border-soft);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.weapon.expanded .weapon-details { display: block; }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.detail-item { display: flex; flex-direction: column; gap: 2px; }
+
+.detail-item .dlabel {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.detail-item .dvalue { font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.detail-item .dvalue.hp { color: var(--red-bright); font-weight: 500; }
+.detail-item .notes { font-size: 11px; color: var(--text-dim); font-style: italic; grid-column: span 4; padding-top: 4px; border-top: 1px solid var(--border-soft); margin-top: 4px; }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 20px 22px;
+  min-width: 320px;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.modal h3 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red-bright);
+  margin-bottom: 10px;
+}
+
+.modal p { font-size: 13px; color: var(--text-dim); margin-bottom: 16px; line-height: 1.5; }
+
+.modal .buttons { display: flex; gap: 8px; justify-content: flex-end; }
+
+.modal button {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  color: var(--text);
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.modal button:hover { border-color: var(--red-muted); }
+.modal button.primary { background: var(--mint); color: var(--bg-base); border-color: var(--mint); font-weight: 600; }
+.modal button.primary:hover { background: var(--mint-dim); }
+
+.sort-menu {
+  position: absolute;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  min-width: 200px;
+  padding: 4px;
+  z-index: 40;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  display: none;
+}
+
+.sort-menu.show { display: block; }
+
+.sort-item {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-item:hover { background: var(--red-muted); }
+.sort-item svg { width: 14px; height: 14px; color: var(--text-muted); }
+.sort-item:hover svg { color: var(--text); }
+
+.chat-log {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  max-width: 380px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--text-dim);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.25s;
+  pointer-events: none;
+  z-index: 60;
+}
+
+.chat-log.show { opacity: 1; transform: translateY(0); }
+
+.chat-log .chat-head {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 4px;
+}
+
+.sidebar::-webkit-scrollbar, .workspace::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-track, .workspace::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb, .workspace::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.sidebar::-webkit-scrollbar-thumb:hover, .workspace::-webkit-scrollbar-thumb:hover { background: var(--red-muted); }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <aside class="sidebar">
+    <div class="avatar">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+      </svg>
+    </div>
+    <div class="identity">
+      <div class="name">Микки</div>
+      <div class="sub">Technician · 25</div>
+    </div>
+    <div class="status-row">
+      <div class="status-icon active"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1 3-6 9-6 13a6 6 0 0 0 12 0c0-4-5-10-6-13z"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 9l2 2m0-2l-2 2M14 9l2 2m0-2l-2 2"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18"/><circle cx="7" cy="14" r="2"/><path d="M9 14h10"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6a3 3 0 0 0 6 0V5"/><path d="M18 3v6a3 3 0 0 1-6 0"/><path d="M6 15a6 6 0 0 0 12 0"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h5l-4 4h4"/><path d="M14 14h5l-4 4h4"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/><path d="M4 15c-1 5 2 7 8 7s9-2 8-7c-1-4-3-11-8-11s-7 7-8 11z"/></svg></div>
+    </div>
+    <div class="resource">
+      <div class="resource-head"><span class="label">Hit points</span><span class="value" style="color: var(--red-bright)">18 / 22</span></div>
+      <div class="bar big"><div class="bar-fill" style="width:82%; background: var(--red-bright)"></div></div>
+    </div>
+    <div class="resource">
+      <div class="resource-head"><span class="label">Power points</span><span class="value" style="color: var(--blue)">1 / 11</span></div>
+      <div class="bar big"><div class="bar-fill" style="width:9%; background: var(--blue)"></div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="resource compact">
+      <div class="resource-head"><span class="label">Fatigue</span><span class="value">15 / 15</span></div>
+      <div class="bar"><div class="bar-fill" style="width:100%; background: var(--amber)"></div></div>
+    </div>
+    <div class="resource compact">
+      <div class="resource-head"><span class="label">Sanity</span><span class="value">53 / 65</span></div>
+      <div class="bar"><div class="bar-fill" style="width:82%; background: var(--green)"></div></div>
+    </div>
+    <div class="resource compact">
+      <div class="resource-head"><span class="label">Resource</span><span class="value" style="color: var(--text-muted)">0 / 0</span></div>
+      <div class="bar"></div>
+    </div>
+  </aside>
+
+  <main class="workspace">
+    <div class="tab-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14.5 17.5L3 6V3h3l11.5 11.5z"/>
+        <path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M21 3v3L9.5 17.5"/><path d="M8 14l-4 4"/>
+      </svg>
+      Combat
+      <span class="lock">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        Locked
+      </span>
+    </div>
+
+    <div class="section-header">
+      <span class="title">Defense</span>
+      <span class="line"></span>
+    </div>
+
+    <div class="defense-grid">
+      <div class="defense-card" data-action="dodge">
+        <div class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/>
+            <path d="M8 12l3 3 5-6"/>
+          </svg>
+        </div>
+        <div class="name">Dodge<span class="name-sub">DEX-based</span></div>
+        <div class="percent">44%</div>
+      </div>
+
+      <div class="defense-card" data-action="parry">
+        <div class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/>
+          </svg>
+        </div>
+        <div class="name">Parry<span class="name-sub">select weapon</span></div>
+        <div class="percent">—</div>
+      </div>
+
+      <div class="defense-card" data-action="shield">
+        <div class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l8 3v7c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5l8-3z"/>
+          </svg>
+        </div>
+        <div class="name">Shield<span class="name-sub">not equipped</span></div>
+        <div class="percent" style="opacity:0.4">—</div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <span class="title">Weapons</span>
+      <span class="line"></span>
+      <div class="actions">
+        <button class="icon-btn" id="sort-btn" title="Sort weapons">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M9 18h6"/></svg>
+        </button>
+        <button class="icon-btn" title="Add weapon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="sort-menu" id="sort-menu">
+      <div class="sort-item" data-sort="type">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        By type (ranged → thrown → melee)
+      </div>
+      <div class="sort-item" data-sort="name">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        By name (A–Z)
+      </div>
+      <div class="sort-item" data-sort="percent">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 19l14-14M9 5h10v10"/></svg>
+        By skill % (high to low)
+      </div>
+      <div class="sort-item" data-sort="custom">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        Custom (drag to reorder)
+      </div>
+    </div>
+
+    <div class="weapons-list" id="weapons-list">
+
+      <div class="weapon type-ranged" data-type="ranged" data-name="Pistol, Laser" data-percent="75">
+        <div class="weapon-row">
+          <span class="handle">⁝⁝</span>
+          <div class="wicon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M3 11h8l2 3h7v3h-4l-2 2h-5l-3-5H3z"/>
+              <path d="M11 11V8h5"/>
+            </svg>
+          </div>
+          <div class="name-block">
+            <div class="name">Pistol, Laser</div>
+            <div class="meta"><span class="atk">ATK ×3</span><span>1H</span><span>ENC 1</span></div>
+          </div>
+          <div class="percent-pill">75%</div>
+          <div class="damage-cell">
+            <div class="dmg">1D8</div>
+          </div>
+          <div class="range-cell">20 m</div>
+          <div class="ammo-cell">
+            <div class="ammo-mag"><span class="ammo-label">AMMO</span><span class="ammo-current">14</span><span class="ammo-max">/ 20</span></div>
+            <div class="mag-row">
+              <div class="mag-count"><span class="label">MAG</span><span class="count">2</span></div>
+              <button class="reload-btn" title="Reload">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="chevron-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+        </div>
+        <div class="weapon-details">
+          <div class="detail-grid">
+            <div class="detail-item"><span class="dlabel">Hand</span><span class="dvalue">One-handed</span></div>
+            <div class="detail-item"><span class="dlabel">ENC</span><span class="dvalue">1</span></div>
+            <div class="detail-item"><span class="dlabel">Malf</span><span class="dvalue">00</span></div>
+            <div class="detail-item"><span class="dlabel">HP</span><span class="dvalue hp">14 / 14</span></div>
+            <div class="notes">Standard sidearm. Uses energy cells; no DB applies.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="weapon type-ranged" data-type="ranged" data-name="Revolver, Medium" data-percent="48">
+        <div class="weapon-row">
+          <span class="handle">⁝⁝</span>
+          <div class="wicon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="9" cy="13" r="3"/>
+              <path d="M12 12h5l2 2v3h-4l-2 2"/>
+              <path d="M9 10V7h4"/>
+            </svg>
+          </div>
+          <div class="name-block">
+            <div class="name">Revolver, Medium</div>
+            <div class="meta"><span class="atk">ATK ×1</span><span>1H</span><span>ENC 1</span></div>
+          </div>
+          <div class="percent-pill">48%</div>
+          <div class="damage-cell">
+            <div class="dmg">1D8</div>
+          </div>
+          <div class="range-cell">25 m</div>
+          <div class="ammo-cell">
+            <div class="ammo-mag low"><span class="ammo-label">AMMO</span><span class="ammo-current">2</span><span class="ammo-max">/ 6</span></div>
+            <div class="mag-row">
+              <div class="mag-count"><span class="label">MAG</span><span class="count">3</span></div>
+              <button class="reload-btn" title="Reload">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="chevron-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+        </div>
+        <div class="weapon-details">
+          <div class="detail-grid">
+            <div class="detail-item"><span class="dlabel">Hand</span><span class="dvalue">One-handed</span></div>
+            <div class="detail-item"><span class="dlabel">ENC</span><span class="dvalue">1</span></div>
+            <div class="detail-item"><span class="dlabel">Malf</span><span class="dvalue">99–00</span></div>
+            <div class="detail-item"><span class="dlabel">HP</span><span class="dvalue hp">12 / 12</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="weapon type-bow" data-type="ranged" data-name="Hunting Bow" data-percent="55">
+        <div class="weapon-row">
+          <span class="handle">⁝⁝</span>
+          <div class="wicon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M5 3c8 2 12 8 14 18"/>
+              <path d="M5 3l14 18"/>
+              <path d="M3 12l4-1M17 13l4-1"/>
+            </svg>
+          </div>
+          <div class="name-block">
+            <div class="name">Hunting Bow</div>
+            <div class="meta"><span class="atk">ATK ×1</span><span>2H</span><span>ENC 1.5</span></div>
+          </div>
+          <div class="percent-pill">55%</div>
+          <div class="damage-cell">
+            <div class="dmg">1D6+1</div>
+            <div class="db">+DB</div>
+          </div>
+          <div class="range-cell">80 m</div>
+          <div class="ammo-cell">
+            <div class="ammo-mag"><span class="ammo-label">ARROWS</span><span class="ammo-current">18</span></div>
+          </div>
+          <div class="chevron-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+        </div>
+        <div class="weapon-details">
+          <div class="detail-grid">
+            <div class="detail-item"><span class="dlabel">Hand</span><span class="dvalue">Two-handed</span></div>
+            <div class="detail-item"><span class="dlabel">ENC</span><span class="dvalue">1.5</span></div>
+            <div class="detail-item"><span class="dlabel">DB applies</span><span class="dvalue">Yes (Strength bow)</span></div>
+            <div class="detail-item"><span class="dlabel">HP</span><span class="dvalue hp">10 / 10</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="weapon type-thrown" data-type="thrown" data-name="Grenade, Shrapnel" data-percent="58">
+        <div class="weapon-row">
+          <span class="handle">⁝⁝</span>
+          <div class="wicon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="14" r="7"/>
+              <path d="M10 3h4v4h-4z"/>
+              <path d="M12 7v3"/>
+              <path d="M9 12l6 4M15 12l-6 4"/>
+            </svg>
+          </div>
+          <div class="name-block">
+            <div class="name">Grenade, Shrapnel</div>
+            <div class="meta"><span class="atk">ATK ×1</span><span>1H</span><span>ENC 0.7</span></div>
+          </div>
+          <div class="percent-pill">58%</div>
+          <div class="damage-cell">
+            <div class="dmg">4D6</div>
+            <div class="db">+DB</div>
+          </div>
+          <div class="range-cell">Thrown</div>
+          <div class="count-pill"><span class="label">×</span><span class="count">4</span></div>
+          <div class="chevron-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+        </div>
+        <div class="weapon-details">
+          <div class="detail-grid">
+            <div class="detail-item"><span class="dlabel">Hand</span><span class="dvalue">One-handed</span></div>
+            <div class="detail-item"><span class="dlabel">ENC</span><span class="dvalue">0.7</span></div>
+            <div class="detail-item"><span class="dlabel">Radius</span><span class="dvalue">3 m</span></div>
+            <div class="detail-item"><span class="dlabel">HP</span><span class="dvalue hp">8 / 8</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="weapon type-thrown" data-type="thrown" data-name="Grenade, Stun" data-percent="58">
+        <div class="weapon-row">
+          <span class="handle">⁝⁝</span>
+          <div class="wicon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="14" r="7"/>
+              <path d="M10 3h4v4h-4z"/>
+              <path d="M8 13l3 2-2 3M16 13l-3 2 2 3"/>
+            </svg>
+          </div>
+          <div class="name-block">
+            <div class="name">Grenade, Stun</div>
+            <div class="meta"><span class="atk">ATK ×1</span><span>1H</span><span>ENC 0.5</span></div>
+          </div>
+          <div class="percent-pill">58%</div>
+          <div class="damage-cell">
+            <div class="dmg">3D8</div>
+            <div class="db">stun</div>
+          </div>
+          <div class="range-cell">Thrown</div>
+          <div class="count-pill"><span class="label">×</span><span class="count">2</span></div>
+          <div class="chevron-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+        </div>
+        <div class="weapon-details">
+          <div class="detail-grid">
+            <div class="detail-item"><span class="dlabel">Hand</span><span class="dvalue">One-handed</span></div>
+            <div class="detail-item"><span class="dlabel">ENC</span><span class="dvalue">0.5</span></div>
+            <div class="detail-item"><span class="dlabel">Effect</span><span class="dvalue">Stun, no lethal damage</span></div>
+            <div class="detail-item"><span class="dlabel">HP</span><span class="dvalue hp">8 / 8</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="weapon type-melee" data-type="melee" data-name="Combat Knife" data-percent="40">
+        <div class="weapon-row">
+          <span class="handle">⁝⁝</span>
+          <div class="wicon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M4 20L16 8l3-3 1 1-3 3L5 21z"/>
+              <path d="M14 6l4 4"/>
+            </svg>
+          </div>
+          <div class="name-block">
+            <div class="name">Combat Knife</div>
+            <div class="meta"><span class="atk">ATK ×1</span><span>1H</span><span>ENC 0.3</span></div>
+          </div>
+          <div class="percent-pill">40%</div>
+          <div class="damage-cell">
+            <div class="dmg">1D4+2</div>
+            <div class="db">+DB</div>
+          </div>
+          <div class="range-cell">Melee</div>
+          <div style="opacity:0"></div>
+          <div class="chevron-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+        </div>
+        <div class="weapon-details">
+          <div class="detail-grid">
+            <div class="detail-item"><span class="dlabel">Hand</span><span class="dvalue">One-handed</span></div>
+            <div class="detail-item"><span class="dlabel">ENC</span><span class="dvalue">0.3</span></div>
+            <div class="detail-item"><span class="dlabel">Parry</span><span class="dvalue">Yes</span></div>
+            <div class="detail-item"><span class="dlabel">HP</span><span class="dvalue hp">15 / 15</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <nav class="rail">
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg><span class="tooltip">Skills</span></div>
+    <div class="rail-btn active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14.5 17.5L3 6V3h3l11.5 11.5z"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M21 3v3L9.5 17.5"/><path d="M8 14l-4 4"/></svg><span class="tooltip">Combat</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg><span class="tooltip">Health</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg><span class="tooltip">Items</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span class="tooltip">Character</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="7" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/><circle cx="17" cy="8" r="3"/><path d="M22 20c0-2.76-2.24-5-5-5"/></svg><span class="tooltip">Social</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="tooltip">Story</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg><span class="tooltip">Effects</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg><span class="tooltip">Dev</span></div>
+  </nav>
+</div>
+
+<div class="modal-overlay" id="reload-modal">
+  <div class="modal">
+    <h3>Reload weapon</h3>
+    <p id="reload-text">Reload this weapon from your magazine pool?</p>
+    <div class="buttons">
+      <button id="reload-cancel">Cancel</button>
+      <button class="primary" id="reload-confirm">Reload</button>
+    </div>
+  </div>
+</div>
+
+<div class="chat-log" id="chat-log">
+  <div class="chat-head">Foundry chat</div>
+  <div class="chat-body" id="chat-body"></div>
+</div>
+
+<script>
+document.querySelectorAll('.chevron-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    btn.closest('.weapon').classList.toggle('expanded');
+  });
+});
+
+document.querySelectorAll('.percent-pill').forEach(p => {
+  p.addEventListener('click', e => {
+    e.stopPropagation();
+    const weapon = p.closest('.weapon');
+    const name = weapon.dataset.name;
+    showChat(`[ROLL] ${name} attack — target ${p.textContent}`);
+    p.style.background = 'rgba(154, 216, 196, 0.35)';
+    setTimeout(() => p.style.background = '', 180);
+  });
+});
+
+document.querySelectorAll('.defense-card').forEach(c => {
+  c.addEventListener('click', () => {
+    const name = c.querySelector('.name').childNodes[0].textContent.trim();
+    const pct = c.querySelector('.percent').textContent;
+    if (pct === '—') {
+      if (name === 'Parry') showChat('[PARRY] Select a weapon to parry with.');
+      else showChat(`[${name.toUpperCase()}] Not available.`);
+    } else {
+      showChat(`[ROLL] ${name} — target ${pct}`);
+    }
+  });
+});
+
+let reloadTarget = null;
+
+document.querySelectorAll('.reload-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    reloadTarget = btn.closest('.weapon');
+    const name = reloadTarget.dataset.name;
+    const magCountEl = reloadTarget.querySelector('.mag-count .count');
+    const mags = parseInt(magCountEl.textContent);
+    const modalText = document.getElementById('reload-text');
+    if (mags <= 0) {
+      showChat(`${name}: No magazines remaining.`);
+      return;
+    }
+    modalText.textContent = `Reload ${name}? You have ${mags} magazine${mags === 1 ? '' : 's'} left.`;
+    document.getElementById('reload-modal').classList.add('show');
+  });
+});
+
+document.getElementById('reload-cancel').addEventListener('click', () => {
+  document.getElementById('reload-modal').classList.remove('show');
+  reloadTarget = null;
+});
+
+document.getElementById('reload-confirm').addEventListener('click', () => {
+  if (!reloadTarget) return;
+  const name = reloadTarget.dataset.name;
+  const ammoCurrentEl = reloadTarget.querySelector('.ammo-current');
+  const ammoMaxEl = reloadTarget.querySelector('.ammo-max');
+  const magCountEl = reloadTarget.querySelector('.mag-count .count');
+  const max = parseInt(ammoMaxEl.textContent.replace('/', '').trim());
+  const mags = parseInt(magCountEl.textContent);
+  ammoCurrentEl.textContent = max;
+  magCountEl.textContent = mags - 1;
+  const ammoMag = reloadTarget.querySelector('.ammo-mag');
+  ammoMag.classList.remove('low', 'critical');
+  showChat(`Mikki reloaded ${name}. Ammo: ${max}/${max}. Magazines left: ${mags - 1}.`);
+  document.getElementById('reload-modal').classList.remove('show');
+  reloadTarget = null;
+});
+
+const sortBtn = document.getElementById('sort-btn');
+const sortMenu = document.getElementById('sort-menu');
+sortBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  const rect = sortBtn.getBoundingClientRect();
+  sortMenu.style.top = (rect.bottom + 4) + 'px';
+  sortMenu.style.right = (window.innerWidth - rect.right) + 'px';
+  sortMenu.classList.toggle('show');
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#sort-menu') && !e.target.closest('#sort-btn')) sortMenu.classList.remove('show');
+});
+
+const typeOrder = { ranged: 0, thrown: 1, melee: 2 };
+document.querySelectorAll('.sort-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const mode = item.dataset.sort;
+    const list = document.getElementById('weapons-list');
+    const weapons = Array.from(list.querySelectorAll('.weapon'));
+    if (mode === 'type') weapons.sort((a, b) => typeOrder[a.dataset.type] - typeOrder[b.dataset.type]);
+    if (mode === 'name') weapons.sort((a, b) => a.dataset.name.localeCompare(b.dataset.name));
+    if (mode === 'percent') weapons.sort((a, b) => parseInt(b.dataset.percent) - parseInt(a.dataset.percent));
+    weapons.forEach(w => list.appendChild(w));
+    sortMenu.classList.remove('show');
+  });
+});
+
+let chatTimeout;
+function showChat(msg) {
+  const log = document.getElementById('chat-log');
+  document.getElementById('chat-body').textContent = msg;
+  log.classList.add('show');
+  clearTimeout(chatTimeout);
+  chatTimeout = setTimeout(() => log.classList.remove('show'), 3200);
+}
+
+document.querySelectorAll('.rail-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

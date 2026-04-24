@@ -38,6 +38,8 @@ export class BRPArmourSheet extends BRPItemSheetV2 {
       context.hitLocOptions = await BRPSelectLists.getHitLocOptions(actor);
     };
     context.equippedOptions = await BRPSelectLists.getEquippedOptions(this.document.type);
+    context.inventoryUseEffectOptions = await BRPSelectLists.getInventoryUseEffectOptions();
+    context.currencyIconOptions = await BRPSelectLists.getCurrencyIconOptions();
     context.burdenName = game.i18n.localize("BRP." + this.item.system.burden);
     context.priceName = game.i18n.localize("BRP." + this.item.system.price);
     context.equippedName = game.i18n.localize("BRP." + this.item.system.equipStatus);

@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>BRP Character Sheet — Effects Tab Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-base: #1a1210;
+  --bg-card: #241a18;
+  --bg-elevated: #2d211f;
+  --bg-hover: #3a2a26;
+  --border: #4a1f1f;
+  --border-soft: #33211f;
+  --red: #c8302e;
+  --red-bright: #e24b4a;
+  --red-muted: #8a2a28;
+  --mint: #9ad8c4;
+  --mint-dim: #6fa894;
+  --blue: #5b8fd8;
+  --blue-dim: #3d6a9c;
+  --amber: #d4a04a;
+  --amber-dim: #8c6a2e;
+  --green: #7fb355;
+  --purple: #a77bc4;
+  --pink: #d47ba8;
+  --text: #e8e2dc;
+  --text-dim: #a89d94;
+  --text-muted: #6e6560;
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { background: var(--bg-base); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.4; padding: 20px; min-height: 100vh; }
+
+.sheet { max-width: 1280px; margin: 0 auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; display: flex; min-height: 820px; overflow: hidden; }
+
+.sidebar { width: 260px; background: var(--bg-base); border-right: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+.workspace { flex: 1; min-width: 0; padding: 20px 24px; overflow-y: auto; max-height: calc(100vh - 40px); }
+.rail { width: 52px; background: var(--bg-base); border-left: 1px solid var(--border); padding: 8px 0; display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+
+.avatar { aspect-ratio: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+.identity { text-align: center; }
+.identity .name { font-family: var(--font-display); font-size: 18px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--red-bright); }
+.identity .sub { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+.mov-line { display: flex; justify-content: center; gap: 10px; font-size: 10px; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; padding: 4px 0; border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+.mov-line .mov-val { color: var(--mint); font-weight: 600; }
+.status-row { display: flex; justify-content: space-between; gap: 4px; padding: 8px 4px; border-bottom: 1px solid var(--border-soft); }
+.status-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 3px; color: var(--text-muted); }
+.status-icon.active { color: var(--red-bright); background: rgba(226, 75, 74, 0.12); }
+
+.resource { display: flex; flex-direction: column; gap: 6px; }
+.resource-head { display: flex; justify-content: space-between; align-items: baseline; }
+.resource-head .label { font-family: var(--font-display); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); font-weight: 600; }
+.resource-head .value { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.bar { height: 8px; background: var(--bg-card); border-radius: 1px; overflow: hidden; border: 1px solid var(--border-soft); }
+.bar.big { height: 12px; }
+.bar-fill { height: 100%; transition: width 0.3s; }
+.resource.compact .resource-head .label { font-size: 10px; letter-spacing: 1.5px; color: var(--text-dim); }
+.resource.compact .resource-head .value { font-size: 11px; color: var(--text-dim); }
+.resource.compact .bar { height: 4px; }
+.divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+.rail-btn { width: 52px; height: 48px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; position: relative; border-left: 3px solid transparent; transition: all 0.15s; }
+.rail-btn:hover { color: var(--text-dim); background: var(--bg-card); }
+.rail-btn.active { color: var(--mint); background: var(--bg-card); border-left-color: var(--mint); }
+.rail-btn .tooltip { position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); background: var(--bg-elevated); border: 1px solid var(--border); padding: 4px 10px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text); white-space: nowrap; border-radius: 2px; opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 10; }
+.rail-btn:hover .tooltip { opacity: 1; }
+
+.tab-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--mint); padding-bottom: 12px; margin-bottom: 16px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 12px; }
+.tab-title .mode-badge {
+  background: var(--bg-base);
+  border: 1px solid var(--red-muted);
+  color: var(--red-bright);
+  padding: 3px 10px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: 2px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.tab-title .mode-badge svg { width: 11px; height: 11px; }
+.tab-title .lock { margin-left: auto; font-size: 10px; letter-spacing: 2px; color: var(--text-muted); font-family: var(--font-body); font-weight: 400; display: flex; align-items: center; gap: 6px; }
+
+.icon-btn { width: 28px; height: 28px; background: var(--bg-card); border: 1px solid var(--border-soft); color: var(--text-dim); border-radius: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.icon-btn:hover { border-color: var(--red-muted); color: var(--red-bright); }
+.icon-btn svg { width: 14px; height: 14px; }
+.icon-btn.small { width: 22px; height: 22px; }
+.icon-btn.small svg { width: 11px; height: 11px; }
+
+/* ============ TOOLBAR ============ */
+
+.toolbar {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.toolbar-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.filter-chip {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  padding: 4px 10px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.filter-chip:hover { border-color: var(--mint-dim); color: var(--mint); }
+.filter-chip.active { background: rgba(154, 216, 196, 0.08); border-color: var(--mint); color: var(--mint); }
+
+.filter-chip .fc-count { background: var(--bg-base); color: var(--text-muted); padding: 0 5px; border-radius: 8px; font-size: 9px; margin-left: 2px; }
+
+.toolbar .spacer { flex: 1; }
+
+.btn-primary {
+  background: var(--bg-base);
+  border: 1px solid var(--mint-dim);
+  color: var(--mint);
+  padding: 5px 12px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+
+.btn-primary:hover { background: rgba(154, 216, 196, 0.08); }
+.btn-primary svg { width: 12px; height: 12px; }
+
+/* ============ GROUP ============ */
+
+.effects-group { margin-bottom: 18px; }
+
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.group-header .chevron { width: 12px; height: 12px; color: var(--text-muted); transition: transform 0.15s; }
+.effects-group.collapsed .chevron { transform: rotate(-90deg); }
+.effects-group.collapsed .group-body { display: none; }
+
+.group-header .source-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+}
+
+.group-header .source-icon svg { width: 14px; height: 14px; }
+
+.group-header[data-source-type="items"] .source-icon { color: var(--amber); }
+.group-header[data-source-type="status"] .source-icon { color: var(--red-bright); }
+.group-header[data-source-type="wounds"] .source-icon { color: var(--red); }
+.group-header[data-source-type="magic"] .source-icon { color: var(--purple); }
+.group-header[data-source-type="injuries"] .source-icon { color: var(--red-muted); }
+.group-header[data-source-type="manual"] .source-icon { color: var(--mint); }
+
+.group-header .title {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+}
+
+.group-header .count {
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: 1px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+}
+
+.group-header .line { flex: 1; height: 1px; background: var(--border-soft); }
+
+.group-body { display: flex; flex-direction: column; gap: 4px; }
+
+/* ============ EFFECT CARD ============ */
+
+.effect-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 9px 12px;
+  display: grid;
+  grid-template-columns: 28px 1fr 180px 90px auto auto;
+  gap: 10px;
+  align-items: center;
+  transition: all 0.15s;
+}
+
+.effect-card:hover { border-color: var(--border); }
+.effect-card.inactive { opacity: 0.45; }
+.effect-card.hidden-from-player { background: rgba(167, 123, 196, 0.04); border-style: dashed; }
+
+.ec-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  color: var(--text-dim);
+}
+
+.effect-card[data-source-type="items"] .ec-icon { color: var(--amber); }
+.effect-card[data-source-type="status"] .ec-icon { color: var(--red-bright); }
+.effect-card[data-source-type="wounds"] .ec-icon { color: var(--red); }
+.effect-card[data-source-type="magic"] .ec-icon { color: var(--purple); }
+.effect-card[data-source-type="injuries"] .ec-icon { color: var(--red-muted); }
+.effect-card[data-source-type="manual"] .ec-icon { color: var(--mint); }
+
+.ec-icon svg { width: 14px; height: 14px; }
+
+.ec-name-block { min-width: 0; }
+
+.ec-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ec-source {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ec-source .src-link {
+  color: var(--mint-dim);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+}
+
+.ec-source .src-link:hover { color: var(--mint); }
+
+.ec-target {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 3px 8px;
+  font-size: 11px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.ec-target .target-category {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  display: block;
+}
+
+.ec-target .target-name {
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.ec-mod {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  padding: 3px 10px;
+  border-radius: 2px;
+  text-align: center;
+  min-width: 70px;
+}
+
+.ec-mod .mod-label {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.ec-mod .mod-value {
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ec-mod.negative .mod-value { color: var(--red-bright); }
+.ec-mod.positive .mod-value { color: var(--mint); }
+.ec-mod.neutral .mod-value { color: var(--text); }
+
+.ec-duration {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  min-width: 60px;
+}
+
+.ec-duration-badge {
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border: 1px solid;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.ec-duration-badge.permanent { color: var(--text-dim); border-color: var(--border-soft); background: var(--bg-card); }
+.ec-duration-badge.timed { color: var(--amber); border-color: var(--amber-dim); background: rgba(212, 160, 74, 0.08); }
+.ec-duration-badge.conditional { color: var(--mint); border-color: var(--mint-dim); background: rgba(154, 216, 196, 0.08); }
+.ec-duration-badge svg { width: 9px; height: 9px; }
+
+.ec-actions { display: flex; gap: 4px; }
+
+.toggle-btn {
+  width: 30px;
+  height: 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.toggle-btn::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.toggle-btn.on { background: rgba(154, 216, 196, 0.2); border-color: var(--mint-dim); }
+.toggle-btn.on::after { left: 12px; background: var(--mint); }
+
+/* ============ MODAL ============ */
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center; z-index: 100; }
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 22px 24px;
+  width: 560px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.modal h3 {
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red-bright);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal h3 svg { width: 16px; height: 16px; }
+
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 10px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
+.field input, .field textarea, .field select { width: 100%; background: var(--bg-base); border: 1px solid var(--border-soft); color: var(--text); padding: 7px 10px; font-family: inherit; font-size: 12px; border-radius: 2px; outline: none; }
+.field textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--mint-dim); }
+
+.field-row { display: grid; gap: 10px; }
+.field-row.two { grid-template-columns: 1fr 1fr; }
+.field-row.target { grid-template-columns: 1fr 1fr; }
+.field-row.mod { grid-template-columns: 1fr 1fr 1fr; }
+.field-row.duration { grid-template-columns: 1fr 1fr 1fr; }
+
+.field-group {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.field-group-title {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.advanced-toggle {
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 2px 6px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--bg-card);
+}
+
+.advanced-toggle:hover { color: var(--mint); border-color: var(--mint-dim); }
+.advanced-toggle.on { color: var(--mint); border-color: var(--mint); background: rgba(154, 216, 196, 0.08); }
+
+.advanced-field { display: none; }
+.advanced-field.show { display: block; }
+
+.picker-row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; }
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  padding: 6px 0;
+}
+
+.checkbox-field input { width: 14px; height: 14px; margin: 0; accent-color: var(--mint); cursor: pointer; }
+
+.checkbox-field .cb-hint {
+  color: var(--text-muted);
+  font-size: 10px;
+  margin-left: 6px;
+}
+
+.preview-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.preview-box .pv-label {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.preview-box .pv-text {
+  color: var(--text);
+  font-family: 'SF Mono', monospace;
+  font-size: 11px;
+}
+
+.preview-box .pv-text .pv-target { color: var(--mint); }
+.preview-box .pv-text .pv-mod { color: var(--amber); font-weight: 600; }
+
+.modal-buttons { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-soft); }
+.modal-buttons button { background: var(--bg-base); border: 1px solid var(--border-soft); color: var(--text); padding: 8px 18px; font-family: inherit; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 2px; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+.modal-buttons button:hover { border-color: var(--red-muted); }
+.modal-buttons button.primary { background: var(--mint); color: var(--bg-base); border-color: var(--mint); font-weight: 600; }
+.modal-buttons button.primary:hover { background: var(--mint-dim); }
+
+/* ============ CTX ============ */
+
+.ctx { position: fixed; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 2px; min-width: 180px; padding: 4px; z-index: 120; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); display: none; }
+.ctx.show { display: block; }
+.ctx-item { padding: 7px 12px; font-size: 12px; color: var(--text); cursor: pointer; border-radius: 1px; display: flex; align-items: center; gap: 10px; letter-spacing: 0.3px; }
+.ctx-item svg { width: 13px; height: 13px; color: var(--text-muted); }
+.ctx-item:hover { background: var(--red-muted); }
+.ctx-item:hover svg { color: var(--text); }
+.ctx-item.danger { color: var(--red-bright); }
+.ctx-divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+.chat-log { position: fixed; bottom: 20px; right: 20px; max-width: 380px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 3px; padding: 12px 14px; font-size: 12px; color: var(--text-dim); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; z-index: 150; }
+.chat-log.show { opacity: 1; transform: translateY(0); }
+.chat-log .chat-head { font-family: var(--font-display); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mint); margin-bottom: 4px; }
+
+.workspace::-webkit-scrollbar { width: 6px; }
+.workspace::-webkit-scrollbar-track { background: transparent; }
+.workspace::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.workspace::-webkit-scrollbar-thumb:hover { background: var(--red-muted); }
+
+.empty-state { background: var(--bg-base); border: 1px dashed var(--border-soft); border-radius: 2px; padding: 20px 14px; text-align: center; font-style: italic; color: var(--text-muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <aside class="sidebar">
+    <div class="avatar"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div>
+    <div class="identity"><div class="name">Арсэн</div><div class="sub">Pilot · 27</div></div>
+    <div class="mov-line"><span>MOV <span class="mov-val">10</span></span><span>Run <span class="mov-val">30m/rd</span></span></div>
+    <div class="status-row">
+      <div class="status-icon active"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1 3-6 9-6 13a6 6 0 0 0 12 0c0-4-5-10-6-13z"/></svg></div>
+      <div class="status-icon active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 9l2 2m0-2l-2 2M14 9l2 2m0-2l-2 2"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18"/><circle cx="7" cy="14" r="2"/><path d="M9 14h10"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6a3 3 0 0 0 6 0V5"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h5l-4 4h4"/></svg></div>
+      <div class="status-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="11" r="1"/></svg></div>
+    </div>
+    <div class="resource"><div class="resource-head"><span class="label">Hit points</span><span class="value" style="color: var(--red-bright)">14 / 20</span></div><div class="bar big"><div class="bar-fill" style="width:70%; background: var(--red-bright)"></div></div></div>
+    <div class="resource"><div class="resource-head"><span class="label">Power points</span><span class="value" style="color: var(--blue)">10 / 10</span></div><div class="bar big"><div class="bar-fill" style="width:100%; background: var(--blue)"></div></div></div>
+    <div class="divider"></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Fatigue</span><span class="value">14 / 16</span></div><div class="bar"><div class="bar-fill" style="width:88%; background: var(--amber)"></div></div></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Sanity</span><span class="value">5 / 5</span></div><div class="bar"><div class="bar-fill" style="width:100%; background: var(--green)"></div></div></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Resource</span><span class="value" style="color: var(--text-muted)">0 / 0</span></div><div class="bar"></div></div>
+  </aside>
+
+  <main class="workspace">
+    <div class="tab-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg>
+      Effects
+      <span class="mode-badge" title="GM-only area"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 5v7c0 5-3.5 8.5-9 10-5.5-1.5-9-5-9-10V7z"/></svg>GM Area</span>
+      <span class="lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Locked</span>
+    </div>
+
+    <div class="toolbar">
+      <span class="toolbar-label">Show</span>
+      <button class="filter-chip active" data-filter="all">All <span class="fc-count" id="count-all">0</span></button>
+      <button class="filter-chip" data-filter="active-only">Active only <span class="fc-count" id="count-active">0</span></button>
+      <button class="filter-chip" data-filter="temporary">Temporary <span class="fc-count" id="count-temp">0</span></button>
+      <button class="filter-chip" data-filter="hidden">Hidden from player <span class="fc-count" id="count-hidden">0</span></button>
+      <div class="spacer"></div>
+      <button class="btn-primary" id="add-effect">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        New Effect
+      </button>
+    </div>
+
+    <div id="groups-container">
+      <!-- Groups rendered by JS -->
+    </div>
+
+  </main>
+
+  <nav class="rail">
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg><span class="tooltip">Skills</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14.5 17.5L3 6V3h3l11.5 11.5z"/></svg><span class="tooltip">Combat</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg><span class="tooltip">Health</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg><span class="tooltip">Items</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span class="tooltip">Character</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="7" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg><span class="tooltip">Social</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-7-4.5-7-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-7 10-7 10h-4z"/></svg><span class="tooltip">Personality</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/></svg><span class="tooltip">Story</span></div>
+    <div class="rail-btn active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg><span class="tooltip">Effects</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4"/></svg><span class="tooltip">Dev</span></div>
+  </nav>
+</div>
+
+<!-- ========= EFFECT BUILDER MODAL ========= -->
+<div class="modal-overlay" id="effect-modal">
+  <div class="modal">
+    <h3 id="modal-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg> New effect</h3>
+
+    <div class="field-group">
+      <div class="field-group-title">Identification</div>
+      <div class="field">
+        <label>Name</label>
+        <input type="text" id="f-name" placeholder="e.g. Blessing of Silver Hand">
+      </div>
+      <div class="field">
+        <label>Icon (optional)</label>
+        <input type="text" id="f-icon" placeholder="e.g. icons/magic/holy/blessing-light.webp">
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea id="f-description" placeholder="Что делает эффект, при каких условиях..."></textarea>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-group-title">
+        <span>Target & modifier</span>
+        <button class="advanced-toggle" id="advanced-toggle">Advanced mode</button>
+      </div>
+
+      <div id="simple-picker">
+        <div class="picker-row">
+          <div class="field">
+            <label>Category</label>
+            <select id="f-target-category">
+              <option value="skill-category">Skill category (all skills of type)</option>
+              <option value="skill-specific">Specific skill</option>
+              <option value="characteristic">Characteristic (STR/CON/...)</option>
+              <option value="derived">Derived stat (HP/MOV/ENC/...)</option>
+              <option value="armor">Armor Points</option>
+              <option value="resource">Resource (HP/PP/FP/SAN max)</option>
+              <option value="other">Other (raw path)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Target</label>
+            <select id="f-target-name">
+              <option value="physical">Physical</option>
+              <option value="mental">Mental</option>
+              <option value="communication">Communication</option>
+              <option value="perception">Perception</option>
+              <option value="combat">Combat</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="advanced-picker" style="display: none">
+        <div class="field">
+          <label>Attribute path</label>
+          <input type="text" id="f-target-path" placeholder="system.skills.Repair.current" value="">
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px; letter-spacing: 0.3px">Foundry Active Effect key. Используется для нестандартных или специфичных для системы путей.</div>
+        </div>
+      </div>
+
+      <div class="field-row mod">
+        <div class="field">
+          <label>Mode</label>
+          <select id="f-mode">
+            <option value="ADD">Add (±N)</option>
+            <option value="MULTIPLY">Multiply (×N)</option>
+            <option value="OVERRIDE">Override (= N)</option>
+            <option value="UPGRADE">Upgrade (max)</option>
+            <option value="DOWNGRADE">Downgrade (min)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Value</label>
+          <input type="number" id="f-value" value="-5">
+        </div>
+        <div class="field">
+          <label>Priority</label>
+          <input type="number" id="f-priority" value="20">
+        </div>
+      </div>
+
+      <div class="preview-box">
+        <span class="pv-label">Preview</span>
+        <span class="pv-text" id="preview">Physical skill category <span class="pv-mod">−5</span> (ADD)</span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-group-title">Duration</div>
+      <div class="field">
+        <label>Type</label>
+        <select id="f-duration-type">
+          <option value="permanent">Permanent (until manually removed)</option>
+          <option value="timed">Timed (noted, manual removal required)</option>
+          <option value="conditional">Conditional (tied to source: armor/weapon/status)</option>
+        </select>
+      </div>
+      <div class="field" id="timed-field" style="display: none">
+        <label>Timer note</label>
+        <input type="text" id="f-timer-note" placeholder="e.g. 3 rounds, until end of scene, 1 day">
+        <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px">Текстовая пометка. Автоматические таймеры — в backlog.</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-group-title">Visibility</div>
+      <label class="checkbox-field">
+        <input type="checkbox" id="f-hidden">
+        Hidden from player
+        <span class="cb-hint">Игрок не видит эффект в своём листе, GM видит</span>
+      </label>
+      <label class="checkbox-field">
+        <input type="checkbox" id="f-active" checked>
+        Active
+        <span class="cb-hint">Эффект применяется сейчас</span>
+      </label>
+    </div>
+
+    <div class="modal-buttons">
+      <button id="modal-cancel">Cancel</button>
+      <button class="primary" id="modal-save">Save effect</button>
+    </div>
+  </div>
+</div>
+
+<div class="ctx" id="ctx"></div>
+
+<div class="chat-log" id="chat-log"><div class="chat-head">Foundry chat</div><div class="chat-body" id="chat-body"></div></div>
+
+<script>
+// ============ DATA ============
+const effects = [
+  // ITEMS
+  { id: 'e1', name: 'Combat helmet', source_type: 'items', source_name: 'Combat helmet', source_link: 'item:a1', target_category: 'Skill category', target_name: 'Perception', mod_mode: 'ADD', mod_value: -5, duration: 'conditional', active: true, hidden: false },
+  { id: 'e2', name: 'Kevlar vest, heavy', source_type: 'items', source_name: 'Kevlar vest, heavy', source_link: 'item:a2', target_category: 'Skill category', target_name: 'Physical', mod_mode: 'ADD', mod_value: -5, duration: 'conditional', active: true, hidden: false },
+  { id: 'e3', name: 'Medkit bonus', source_type: 'items', source_name: 'Медицинский набор', source_link: 'item:t1', target_category: 'Specific skill', target_name: 'First Aid', mod_mode: 'ADD', mod_value: 20, duration: 'conditional', active: true, hidden: false },
+
+  // STATUS
+  { id: 'e4', name: 'Stunned', source_type: 'status', source_name: 'Stunned condition', source_link: 'status:stunned', target_category: 'Skill category', target_name: 'All skills', mod_mode: 'ADD', mod_value: -10, duration: 'timed', timer_note: 'Until end of next round', active: true, hidden: false },
+  { id: 'e5', name: 'Bleeding', source_type: 'status', source_name: 'Bleeding condition', source_link: 'status:bleeding', target_category: 'Resource', target_name: 'HP (per round)', mod_mode: 'ADD', mod_value: -1, duration: 'timed', timer_note: 'Until treated', active: true, hidden: false },
+
+  // WOUNDS
+  { id: 'e6', name: 'Gunshot wound (Left Leg)', source_type: 'wounds', source_name: 'Wound: Left Leg', source_link: 'wound:w1', target_category: 'Derived', target_name: 'MOV', mod_mode: 'ADD', mod_value: -3, duration: 'conditional', active: true, hidden: false },
+
+  // MAGIC
+  { id: 'e7', name: "Blessing of Silver Hand", source_type: 'magic', source_name: "Silver Hand spell", source_link: 'spell:blessing', target_category: 'Skill category', target_name: 'Combat', mod_mode: 'ADD', mod_value: 10, duration: 'timed', timer_note: '1 hour or until dispelled', active: true, hidden: false },
+
+  // INJURIES (permanent)
+  { id: 'e8', name: 'Scarred (old wound)', source_type: 'injuries', source_name: 'Permanent injury', source_link: null, target_category: 'Characteristic', target_name: 'CHA', mod_mode: 'ADD', mod_value: -1, duration: 'permanent', active: true, hidden: false },
+
+  // MANUAL
+  { id: 'e9', name: 'Plot fatigue (hidden)', source_type: 'manual', source_name: 'GM narrative', source_link: null, target_category: 'Characteristic', target_name: 'INT', mod_mode: 'ADD', mod_value: -2, duration: 'timed', timer_note: 'Until story event', active: true, hidden: true },
+  { id: 'e10', name: 'Heroic resolve (inactive test)', source_type: 'manual', source_name: 'GM manual', source_link: null, target_category: 'Characteristic', target_name: 'POW', mod_mode: 'ADD', mod_value: 3, duration: 'permanent', active: false, hidden: false }
+];
+
+const GROUP_DEFS = [
+  { type: 'items', title: 'From items', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg>` },
+  { type: 'status', title: 'From status conditions', icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1 3-6 9-6 13a6 6 0 0 0 12 0c0-4-5-10-6-13z"/></svg>` },
+  { type: 'wounds', title: 'From wounds', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M14 2l-4 10 6-2-4 10"/></svg>` },
+  { type: 'magic', title: 'From magic / powers', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>` },
+  { type: 'injuries', title: 'From injuries (permanent)', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 20V10m0 0L2 14m4-4l4 4M18 4v10m0 0l4-4m-4 4l-4-4"/></svg>` },
+  { type: 'manual', title: 'Manual / GM-applied', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>` }
+];
+
+// ============ STATE ============
+const filterState = { mode: 'all' };
+
+// ============ RENDER ============
+function filterEffects(list) {
+  switch (filterState.mode) {
+    case 'active-only': return list.filter(e => e.active);
+    case 'temporary': return list.filter(e => e.duration === 'timed');
+    case 'hidden': return list.filter(e => e.hidden);
+    case 'all':
+    default: return list;
+  }
+}
+
+function renderGroups() {
+  const container = document.getElementById('groups-container');
+  const filtered = filterEffects(effects);
+
+  document.getElementById('count-all').textContent = effects.length;
+  document.getElementById('count-active').textContent = effects.filter(e => e.active).length;
+  document.getElementById('count-temp').textContent = effects.filter(e => e.duration === 'timed').length;
+  document.getElementById('count-hidden').textContent = effects.filter(e => e.hidden).length;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty-state">No effects match the current filter.</div>`;
+    return;
+  }
+
+  container.innerHTML = GROUP_DEFS.map(def => {
+    const groupEffects = filtered.filter(e => e.source_type === def.type);
+    if (groupEffects.length === 0) return '';
+
+    return `
+      <div class="effects-group" data-group="${def.type}">
+        <div class="group-header" data-source-type="${def.type}">
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          <span class="source-icon">${def.icon}</span>
+          <span class="title">${def.title}</span>
+          <span class="count">${groupEffects.length}</span>
+          <span class="line"></span>
+        </div>
+        <div class="group-body">
+          ${groupEffects.map(renderEffect).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  attachHandlers();
+}
+
+function renderEffect(e) {
+  const modSign = e.mod_value > 0 ? 'positive' : (e.mod_value < 0 ? 'negative' : 'neutral');
+  const modDisplay = e.mod_value > 0 ? `+${e.mod_value}` : `${e.mod_value}`;
+  const modLabel = e.mod_mode === 'MULTIPLY' ? 'Multiply' : e.mod_mode === 'OVERRIDE' ? 'Override' : e.mod_mode === 'UPGRADE' ? 'Upgrade' : e.mod_mode === 'DOWNGRADE' ? 'Downgrade' : 'Add';
+
+  const durIcon = {
+    permanent: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`,
+    timed: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>`,
+    conditional: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>`
+  }[e.duration];
+  const durLabel = e.duration.charAt(0).toUpperCase() + e.duration.slice(1);
+
+  const iconSvg = {
+    items: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg>`,
+    status: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1 3-6 9-6 13a6 6 0 0 0 12 0c0-4-5-10-6-13z"/></svg>`,
+    wounds: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M14 2l-4 10 6-2-4 10"/></svg>`,
+    magic: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>`,
+    injuries: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 20V10m0 0L2 14m4-4l4 4"/></svg>`,
+    manual: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>`
+  }[e.source_type];
+
+  return `
+    <div class="effect-card ${e.active ? '' : 'inactive'} ${e.hidden ? 'hidden-from-player' : ''}" data-id="${e.id}" data-source-type="${e.source_type}">
+      <div class="ec-icon">${iconSvg}</div>
+      <div class="ec-name-block">
+        <div class="ec-name">
+          ${e.name}
+          ${e.hidden ? '<span style="font-size: 9px; color: var(--purple); letter-spacing: 1px; text-transform: uppercase; padding: 1px 6px; border: 1px solid var(--purple); border-radius: 8px; background: rgba(167,123,196,0.08)">Hidden</span>' : ''}
+        </div>
+        <div class="ec-source">
+          Source: ${e.source_link ? `<span class="src-link" data-src-link="${e.source_link}">${e.source_name}</span>` : e.source_name}
+          ${e.timer_note ? ` · ${e.timer_note}` : ''}
+        </div>
+      </div>
+      <div class="ec-target">
+        <span class="target-category">${e.target_category}</span>
+        <span class="target-name">${e.target_name}</span>
+      </div>
+      <div class="ec-mod ${modSign}">
+        <div class="mod-label">${modLabel}</div>
+        <div class="mod-value">${modDisplay}</div>
+      </div>
+      <div class="ec-duration">
+        <span class="ec-duration-badge ${e.duration}">${durIcon} ${durLabel}</span>
+      </div>
+      <div class="ec-actions">
+        <button class="toggle-btn ${e.active ? 'on' : ''}" data-action="toggle-active" data-id="${e.id}" title="${e.active ? 'Disable' : 'Enable'}"></button>
+        <button class="icon-btn small" data-action="menu" data-id="${e.id}" title="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+      </div>
+    </div>
+  `;
+}
+
+function attachHandlers() {
+  document.querySelectorAll('.group-header').forEach(h => {
+    h.addEventListener('click', () => {
+      h.parentElement.classList.toggle('collapsed');
+    });
+  });
+
+  document.querySelectorAll('[data-action="toggle-active"]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const eff = effects.find(x => x.id === btn.dataset.id);
+      eff.active = !eff.active;
+      renderGroups();
+      showChat(`Effect "${eff.name}" ${eff.active ? 'enabled' : 'disabled'}`);
+    });
+  });
+
+  document.querySelectorAll('[data-action="menu"]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const rect = btn.getBoundingClientRect();
+      showEffectCtx(rect.right, rect.bottom, btn.dataset.id);
+    });
+  });
+
+  document.querySelectorAll('[data-src-link]').forEach(lnk => {
+    lnk.addEventListener('click', e => {
+      e.stopPropagation();
+      showChat(`[OPEN SOURCE] ${lnk.dataset.srcLink}`);
+    });
+  });
+
+  document.querySelectorAll('.effect-card').forEach(c => {
+    c.addEventListener('dblclick', e => {
+      if (e.target.closest('.ec-actions') || e.target.closest('[data-src-link]')) return;
+      openEditModal(c.dataset.id);
+    });
+  });
+}
+
+function showEffectCtx(x, y, id) {
+  const eff = effects.find(x => x.id === id);
+  const ctx = document.getElementById('ctx');
+  ctx.innerHTML = `
+    <div class="ctx-item" data-ctx="edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Edit effect</div>
+    <div class="ctx-item" data-ctx="toggle-hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${eff.hidden ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>' : '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/>'}</svg>${eff.hidden ? 'Unhide from player' : 'Hide from player'}</div>
+    <div class="ctx-item" data-ctx="duplicate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Duplicate</div>
+    ${eff.source_link ? `<div class="ctx-item" data-ctx="open-source"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg>Open source</div>` : ''}
+    <div class="ctx-divider"></div>
+    <div class="ctx-item danger" data-ctx="remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Remove effect</div>
+  `;
+  ctx.classList.add('show');
+  ctx.style.left = Math.min(x, window.innerWidth - 220) + 'px';
+  ctx.style.top = Math.min(y, window.innerHeight - 250) + 'px';
+
+  ctx.querySelectorAll('[data-ctx]').forEach(item => {
+    item.addEventListener('click', () => {
+      const a = item.dataset.ctx;
+      if (a === 'edit') openEditModal(id);
+      else if (a === 'toggle-hidden') {
+        eff.hidden = !eff.hidden;
+        renderGroups();
+        showChat(`Effect "${eff.name}" ${eff.hidden ? 'hidden from player' : 'visible to player'}`);
+      }
+      else if (a === 'duplicate') {
+        const clone = { ...eff, id: 'e' + Date.now(), name: eff.name + ' (copy)' };
+        effects.push(clone);
+        renderGroups();
+        showChat(`Duplicated: ${eff.name}`);
+      }
+      else if (a === 'open-source') showChat(`[OPEN] ${eff.source_link}`);
+      else if (a === 'remove') {
+        effects.splice(effects.indexOf(eff), 1);
+        renderGroups();
+        showChat(`Removed: ${eff.name}`);
+      }
+      ctx.classList.remove('show');
+    });
+  });
+}
+
+// ============ FILTERS ============
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    filterState.mode = chip.dataset.filter;
+    renderGroups();
+  });
+});
+
+// ============ BUILDER MODAL ============
+let editingId = null;
+
+function openEditModal(id) {
+  const eff = id ? effects.find(x => x.id === id) : null;
+  editingId = id;
+
+  document.getElementById('modal-title').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg> ${id ? 'Edit effect' : 'New effect'}`;
+
+  if (eff) {
+    document.getElementById('f-name').value = eff.name;
+    document.getElementById('f-icon').value = eff.icon || '';
+    document.getElementById('f-description').value = eff.description || '';
+    document.getElementById('f-target-category').value = mapCategoryToKey(eff.target_category);
+    document.getElementById('f-target-name').value = eff.target_name;
+    document.getElementById('f-mode').value = eff.mod_mode;
+    document.getElementById('f-value').value = eff.mod_value;
+    document.getElementById('f-priority').value = eff.priority || 20;
+    document.getElementById('f-duration-type').value = eff.duration;
+    document.getElementById('f-timer-note').value = eff.timer_note || '';
+    document.getElementById('f-hidden').checked = eff.hidden;
+    document.getElementById('f-active').checked = eff.active;
+  } else {
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-icon').value = '';
+    document.getElementById('f-description').value = '';
+    document.getElementById('f-value').value = -5;
+    document.getElementById('f-priority').value = 20;
+    document.getElementById('f-timer-note').value = '';
+    document.getElementById('f-hidden').checked = false;
+    document.getElementById('f-active').checked = true;
+  }
+
+  updateDurationField();
+  updatePreview();
+  document.getElementById('effect-modal').classList.add('show');
+}
+
+function mapCategoryToKey(cat) {
+  return { 'Skill category': 'skill-category', 'Specific skill': 'skill-specific', 'Characteristic': 'characteristic', 'Derived': 'derived', 'Armor': 'armor', 'Resource': 'resource' }[cat] || 'other';
+}
+
+document.getElementById('add-effect').addEventListener('click', () => openEditModal(null));
+document.getElementById('modal-cancel').addEventListener('click', () => document.getElementById('effect-modal').classList.remove('show'));
+
+document.getElementById('modal-save').addEventListener('click', () => {
+  showChat(editingId ? 'Effect updated (mock)' : 'New effect created (mock)');
+  document.getElementById('effect-modal').classList.remove('show');
+});
+
+// Advanced toggle
+const advBtn = document.getElementById('advanced-toggle');
+advBtn.addEventListener('click', () => {
+  const isAdv = advBtn.classList.toggle('on');
+  document.getElementById('simple-picker').style.display = isAdv ? 'none' : '';
+  document.getElementById('advanced-picker').style.display = isAdv ? '' : 'none';
+  advBtn.textContent = isAdv ? 'Simple mode' : 'Advanced mode';
+});
+
+// Duration field toggle
+document.getElementById('f-duration-type').addEventListener('change', updateDurationField);
+function updateDurationField() {
+  const type = document.getElementById('f-duration-type').value;
+  document.getElementById('timed-field').style.display = type === 'timed' ? '' : 'none';
+}
+
+// Category change updates target options
+document.getElementById('f-target-category').addEventListener('change', () => {
+  const cat = document.getElementById('f-target-category').value;
+  const targetSelect = document.getElementById('f-target-name');
+  let options = [];
+  if (cat === 'skill-category') options = ['Physical', 'Mental', 'Communication', 'Perception', 'Combat', 'All skills'];
+  else if (cat === 'skill-specific') options = ['First Aid', 'Medicine', 'Spot', 'Listen', 'Persuade', 'Dodge', 'Brawl', 'Pilot', 'Navigate'];
+  else if (cat === 'characteristic') options = ['STR', 'CON', 'INT', 'SIZ', 'POW', 'DEX', 'CHA', 'EDU'];
+  else if (cat === 'derived') options = ['MOV', 'Damage Mod', 'XP Bonus', 'Total ENC', 'HP Bonus', 'PP Bonus', 'FP Bonus'];
+  else if (cat === 'armor') options = ['All locations', 'Head', 'Chest', 'Abdomen', 'Arms', 'Legs'];
+  else if (cat === 'resource') options = ['HP (max)', 'HP (current)', 'PP (max)', 'FP (max)', 'Sanity (max)', 'HP (per round)', 'PP (per round)'];
+  else options = ['Custom target'];
+  targetSelect.innerHTML = options.map(o => `<option value="${o}">${o}</option>`).join('');
+  updatePreview();
+});
+
+['f-target-name', 'f-mode', 'f-value'].forEach(id => document.getElementById(id).addEventListener('change', updatePreview));
+document.getElementById('f-value').addEventListener('input', updatePreview);
+
+function updatePreview() {
+  const t = document.getElementById('f-target-name').value;
+  const mode = document.getElementById('f-mode').value;
+  const v = parseInt(document.getElementById('f-value').value) || 0;
+  const cat = document.getElementById('f-target-category').options[document.getElementById('f-target-category').selectedIndex].text.split(' (')[0];
+
+  const vDisplay = v > 0 ? `+${v}` : v;
+  let text = `<span class="pv-target">${cat}: ${t}</span> <span class="pv-mod">${mode === 'MULTIPLY' ? '×' + v : mode === 'OVERRIDE' ? '= ' + v : vDisplay}</span> (${mode})`;
+  document.getElementById('preview').innerHTML = text;
+}
+
+// ============ CTX ============
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ctx')) document.getElementById('ctx').classList.remove('show');
+});
+
+// ============ RAIL ============
+document.querySelectorAll('.rail-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+let chatTimeout;
+function showChat(msg) {
+  const log = document.getElementById('chat-log');
+  document.getElementById('chat-body').textContent = msg;
+  log.classList.add('show');
+  clearTimeout(chatTimeout);
+  chatTimeout = setTimeout(() => log.classList.remove('show'), 3200);
+}
+
+renderGroups();
+</script>
+</body>
+</html>

@@ -113,18 +113,38 @@
         </div>
       {{/unless}}
 
-      {{#if isAmmo}}
-        <div class="weapon-main-scores">
-          <div class="skill-display">{{localize 'BRP.rof'}}</div>
-          <div class="weapon-input"><input name="system.rof" type="text" value="{{item.system.rof}}" /></div>
+      <div class="brp-weapon-ammo-panel">
+        <div class="brp-weapon-ammo-header">
+          <span>{{localize 'BRP.weaponAmmoConfig'}}</span>
+          <span data-tooltip="{{localize ammoModeHintKey}}">{{ammoModeName}}</span>
         </div>
-        <div class="weapon-2main-scores">
-          <div class="skill-display">{{localize 'BRP.ammoCapType'}}</div>
-          <div class="weapon-input"><input name="system.ammo" type="text" value="{{item.system.ammo}}"
-              data-dtype="Number" /></div>
-          <div class="weapon-input"><input name="system.ammoType" type="text" value="{{item.system.ammoType}}" /></div>
+        <div class="brp-weapon-ammo-grid">
+          <label class="brp-weapon-field" data-tooltip="{{localize 'BRP.ammoModeHint'}}">
+            <span>{{localize 'BRP.ammoMode'}}</span>
+            <select data-handle-change name="system.ammoMode">
+              {{selectOptions ammoModeOptions selected=ammoMode}}
+            </select>
+          </label>
+          <label class="brp-weapon-field" data-tooltip="{{localize 'BRP.weaponSortOrderHint'}}">
+            <span>{{localize 'BRP.weaponSortOrder'}}</span>
+            <input name="system.sortOrder" type="text" value="{{sortOrder}}" data-dtype="Number" />
+          </label>
+          {{#if isAmmo}}
+            <label class="brp-weapon-field">
+              <span>{{localize 'BRP.rof'}}</span>
+              <input name="system.rof" type="text" value="{{item.system.rof}}" />
+            </label>
+            <label class="brp-weapon-field" data-tooltip="{{localize 'BRP.ammoCapacityHint'}}">
+              <span>{{localize 'BRP.ammoCap'}}</span>
+              <input name="system.ammo" type="text" value="{{item.system.ammo}}" data-dtype="Number" />
+            </label>
+            <label class="brp-weapon-field" data-tooltip="{{localize 'BRP.ammoTypeHint'}}">
+              <span>{{localize 'BRP.type'}}</span>
+              <input name="system.ammoType" type="text" value="{{item.system.ammoType}}" />
+            </label>
+          {{/if}}
         </div>
-      {{/if}}
+      </div>
 
       <div class="weapon-main-scores">
         <div class="skill-display">{{localize 'BRP.malfunction'}}</div>
@@ -209,17 +229,36 @@
         </div>
       {{/unless}}
 
-      {{#if isAmmo}}
-        <div class="weapon-main-scores">
-          <div class="skill-display">{{localize 'BRP.rof'}}</div>
-          <div class="weapon-display centre boxed">{{item.system.rof}}</div>
+      <div class="brp-weapon-ammo-panel">
+        <div class="brp-weapon-ammo-header">
+          <span>{{localize 'BRP.weaponAmmoConfig'}}</span>
+          <span data-tooltip="{{localize ammoModeHintKey}}">{{ammoModeName}}</span>
         </div>
-        <div class="weapon-2main-scores">
-          <div class="skill-display">{{localize 'BRP.ammoCapType'}}</div>
-          <div class="weapon-display centre boxed">{{item.system.ammo}}</div>
-          <div class="weapon-display centre boxed">{{item.system.ammoType}}</div>
+        <div class="brp-weapon-ammo-grid">
+          <div class="brp-weapon-field" data-tooltip="{{localize ammoModeHintKey}}">
+            <span>{{localize 'BRP.ammoMode'}}</span>
+            <div class="weapon-display centre boxed">{{ammoModeName}}</div>
+          </div>
+          <div class="brp-weapon-field" data-tooltip="{{localize 'BRP.weaponSortOrderHint'}}">
+            <span>{{localize 'BRP.weaponSortOrder'}}</span>
+            <div class="weapon-display centre boxed">{{sortOrder}}</div>
+          </div>
+          {{#if isAmmo}}
+            <div class="brp-weapon-field">
+              <span>{{localize 'BRP.rof'}}</span>
+              <div class="weapon-display centre boxed">{{item.system.rof}}</div>
+            </div>
+            <div class="brp-weapon-field" data-tooltip="{{localize 'BRP.ammoCapacityHint'}}">
+              <span>{{localize 'BRP.ammoCap'}}</span>
+              <div class="weapon-display centre boxed">{{item.system.ammo}}</div>
+            </div>
+            <div class="brp-weapon-field" data-tooltip="{{localize 'BRP.ammoTypeHint'}}">
+              <span>{{localize 'BRP.type'}}</span>
+              <div class="weapon-display centre boxed">{{item.system.ammoType}}</div>
+            </div>
+          {{/if}}
         </div>
-      {{/if}}
+      </div>
 
       <div class="weapon-main-scores">
         <div class="skill-display">{{localize 'BRP.malfunction'}}</div>
@@ -286,6 +325,62 @@
     </div>
     <br>
 
+    <div class="item-title">{{localize 'BRP.inventoryFields'}}:</div>
+    <div class="weapon-main-scores">
+      <div class="skill-display" data-tooltip="{{localize 'BRP.containerIdHint'}}">{{localize 'BRP.containerId'}}</div>
+      <div class="weapon-input"><input name="system.containerId" type="text" value="{{item.system.containerId}}" /></div>
+    </div>
+    <div class="item-title">{{localize 'BRP.bonuses'}}:</div>
+    <div class="brp-item-bonus-editor">
+      <input type="hidden" name="system.bonusesEditor" value="1" />
+      <div class="brp-item-bonus-editor-head">
+        <span>{{localize 'BRP.inventoryBonusEditorHint'}}</span>
+        <button type="button" class="brp-item-bonus-add" data-action="inventoryBonusAdd" data-tooltip="{{localize 'BRP.inventoryBonusAdd'}}">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+      <div class="brp-item-bonus-list">
+        {{#each bonusEditorRows as |bonus|}}
+          <div class="brp-item-bonus-row brp-item-bonus-row-{{bonus.mode}}">
+            <label class="brp-item-bonus-field">
+              <span>{{localize 'BRP.inventoryBonusMode'}}</span>
+              <select name="system.bonusesEditor.{{bonus.index}}.mode">
+                {{selectOptions ../bonusModeOptions selected=bonus.mode}}
+              </select>
+            </label>
+            <label class="brp-item-bonus-field">
+              <span>{{localize 'BRP.inventoryBonusTarget'}}</span>
+              <input name="system.bonusesEditor.{{bonus.index}}.skill" type="text" value="{{bonus.skill}}" />
+            </label>
+            <label class="brp-item-bonus-field">
+              <span>{{localize 'BRP.inventoryBonusValue'}}</span>
+              <input name="system.bonusesEditor.{{bonus.index}}.value" type="text" value="{{bonus.value}}" />
+            </label>
+            <label class="brp-item-bonus-field">
+              <span>{{localize 'BRP.difficulty'}}</span>
+              <select name="system.bonusesEditor.{{bonus.index}}.difficulty">
+                {{selectOptions ../bonusDifficultyOptions selected=bonus.difficulty}}
+              </select>
+            </label>
+            <label class="brp-item-bonus-field">
+              <span>{{localize 'BRP.inventoryBonusNote'}}</span>
+              <input name="system.bonusesEditor.{{bonus.index}}.text" type="text" value="{{bonus.text}}" />
+            </label>
+            <label class="brp-item-bonus-check" data-tooltip="{{localize 'BRP.inventoryBonusRequiresCarried'}}">
+              <input name="system.bonusesEditor.{{bonus.index}}.requiresCarried" type="checkbox" {{checked bonus.requiresCarried}} />
+              <span>{{localize 'BRP.carried'}}</span>
+            </label>
+            <button type="button" class="brp-item-bonus-delete" data-action="inventoryBonusDelete" data-bonus-index="{{bonus.index}}" data-tooltip="{{localize 'BRP.delete'}}">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        {{else}}
+          <div class="brp-item-bonus-empty">{{localize 'BRP.none'}}</div>
+        {{/each}}
+      </div>
+    </div>
+    <br>
+
     {{#if hasOwner}}
       <div class="weapon-2main-scores">
         <div class="skill-display" data-tooltip="{{ localize 'BRP.actualENCHint'}}">{{localize 'BRP.actualENC'}}/{{localize
@@ -296,20 +391,36 @@
             {{selectOptions equippedOptions selected=item.system.equipStatus}}
           </select>
         </div>
-        <div class="skill-display">{{localize 'BRP.hpCurr' label=item.system.healthLabelAbbr}}/{{localize 'BRP.ammo'}}
-        </div>
+        <div class="skill-display">{{localize 'BRP.hpCurr' label=item.system.healthLabelAbbr}}</div>
         <div class="weapon-input"><input name="system.hpCurr" type="text" value="{{item.system.hpCurr}}"
             data-dtype="Number" /></div>
-        <div class="weapon-input"><input name="system.ammoCurr" type="text" value="{{item.system.ammoCurr}}"
-            data-dtype="Number" /></div>
-        <div class="skill-display">{{localize 'BRP.quantity'}}</div>
-        <div class="weapon-input"><input name="system.quantity" type="text" value="{{item.system.quantity}}"
-            data-dtype="Number" /></div>
+        <div></div>
         {{#if npcOwner}}
           <div class="skill-display new-row">{{localize 'BRP.base'}}%</div>
           <div class="weapon-input"><input name="system.npcVal" type="text" value="{{item.system.npcVal}}"
               data-dtype="Number" /></div>
+          <div></div>
         {{/if}}
+      </div>
+      <div class="brp-weapon-ammo-panel brp-weapon-ammo-state">
+        <div class="brp-weapon-ammo-header">
+          <span>{{localize 'BRP.weaponAmmoState'}}</span>
+          <span data-tooltip="{{localize ammoModeHintKey}}">{{ammoModeName}}</span>
+        </div>
+        <div class="brp-weapon-ammo-grid">
+          <label class="brp-weapon-field" data-tooltip="{{localize 'BRP.ammoCurrentHint'}}">
+            <span>{{localize 'BRP.ammoCurr'}}</span>
+            <input name="system.ammoCurr" type="text" value="{{item.system.ammoCurr}}" data-dtype="Number" />
+          </label>
+          <label class="brp-weapon-field" data-tooltip="{{localize ammoQuantityHintKey}}">
+            <span>{{localize 'BRP.quantity'}}</span>
+            <input name="system.quantity" type="text" value="{{item.system.quantity}}" data-dtype="Number" />
+          </label>
+          <label class="brp-weapon-field" data-tooltip="{{localize 'BRP.magazineCountHint'}}">
+            <span>{{localize 'BRP.magazineCount'}}</span>
+            <input name="system.magazineCount" type="text" value="{{magazineCount}}" data-dtype="Number" />
+          </label>
+        </div>
       </div>
     {{/if}}
 </section>

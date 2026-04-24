@@ -1,0 +1,377 @@
+<section class="actor tab health {{tab.cssClass}}" data-group="primary" data-tab="health">
+  <section class="brp-health brp-health-tab {{#if healthView.useHPL}}is-hpl{{else}}is-non-hpl{{/if}}">
+    <header class="brp-health-tab-title">
+      <i class="fas fa-plus"></i>
+      <span>{{localize 'BRP.health'}}</span>
+      <div class="brp-health-lock" data-tooltip="{{#if isLocked}}{{localize 'BRP.locked'}}{{else}}{{localize 'BRP.unlocked'}}{{/if}}">
+        <i class="fas {{#if isLocked}}fa-lock{{else}}fa-lock-open{{/if}}"></i>
+        <span>{{#if isLocked}}{{localize 'BRP.locked'}}{{else}}{{localize 'BRP.unlocked'}}{{/if}}</span>
+      </div>
+    </header>
+
+    <section class="brp-health-body-viz">
+      <div class="brp-health-silhouette-panel">
+        <div class="brp-health-viz-tabs">
+          {{#each healthView.silhouette.modes as |mode key|}}
+            <button type="button" class="brp-health-viz-tab brp-health-viz-tab-{{mode.id}} {{#if mode.active}}is-active{{/if}}" data-action="healthVizMode" data-mode="{{mode.id}}">
+              {{localize mode.label}}
+            </button>
+          {{/each}}
+          {{#unless isLocked}}
+            {{#if healthView.useHPL}}
+              <button type="button" class="brp-health-viz-tab brp-health-viz-tab-settings" data-action="{{healthView.silhouette.settingsAction}}" data-tooltip="{{localize 'BRP.healthSilhouetteSettings'}}">
+                <i class="fas fa-gear"></i>
+              </button>
+            {{/if}}
+          {{/unless}}
+        </div>
+
+        <div class="brp-health-silhouette-wrap">
+          <svg class="brp-health-silhouette" viewBox="0 0 100 180" role="img" aria-label="{{localize 'BRP.health'}}">
+            {{#each healthView.silhouette.parts as |part key|}}
+              <path class="brp-health-silhouette-part {{#if part.isMapped}}is-mapped{{else}}is-unmapped{{/if}}"
+                d="{{part.path}}" style="--brp-health-part-fill: {{part.fill}};"
+                {{#if part.locationId}}data-action="healthAddDamage" data-item-id="{{part.locationId}}" data-type="wound"{{/if}}
+                data-tooltip="{{part.tooltip}}" />
+              {{#if part.woundCount}}
+                <text class="brp-health-silhouette-count" x="{{part.labelX}}" y="{{part.labelY}}">{{part.woundCount}}</text>
+              {{/if}}
+            {{/each}}
+          </svg>
+        </div>
+
+        <div class="brp-health-silhouette-legend">{{localize healthView.silhouette.legend}}</div>
+      </div>
+
+      <div class="brp-health-summary-panel">
+        <div>
+          <div class="brp-health-summary-label">Overview</div>
+          <div class="brp-health-summary-grid">
+            <div class="brp-health-summary-card">
+              <div class="brp-health-summary-card-label">{{localize 'BRP.health'}}</div>
+              <div class="brp-health-summary-card-value is-red">{{healthView.summary.hp.value}} / {{healthView.summary.hp.max}}</div>
+              <div class="brp-health-summary-note">Current / maximum</div>
+            </div>
+
+            {{#if healthView.useHPL}}
+              <div class="brp-health-summary-card">
+                <div class="brp-health-summary-card-label">{{localize 'BRP.wounds'}}</div>
+                <div class="brp-health-summary-card-value is-mint">{{healthView.summary.activeWounds}}</div>
+                <div class="brp-health-summary-note">Across {{healthView.summary.woundedLocations}} locations</div>
+              </div>
+            {{else}}
+              <div class="brp-health-summary-card">
+                <div class="brp-health-summary-card-label">{{localize 'BRP.majorWound'}}</div>
+                <div class="brp-health-summary-card-value is-mint">{{healthView.summary.majorThreshold}}</div>
+                <div class="brp-health-summary-note">Single wound threshold</div>
+              </div>
+            {{/if}}
+
+            <div class="brp-health-summary-card">
+              <div class="brp-health-summary-card-label">{{localize 'BRP.naturalHealing'}}</div>
+              <div class="brp-health-summary-card-value">{{healthView.summary.naturalHealingLabel}}</div>
+              <div class="brp-health-summary-note">Natural recovery</div>
+            </div>
+
+            {{#if healthView.useHPL}}
+              <div class="brp-health-summary-card">
+                <div class="brp-health-summary-card-label">{{localize 'BRP.healthDisabledLocations'}}</div>
+                <div class="brp-health-summary-card-value is-red">{{healthView.summary.disabledLocations}}</div>
+                <div class="brp-health-summary-note">{{localize 'BRP.healthWoundedLocations'}}: {{healthView.summary.woundedLocations}}</div>
+              </div>
+            {{else}}
+              <div class="brp-health-summary-card">
+                <div class="brp-health-summary-card-label">Worst wound</div>
+                <div class="brp-health-summary-card-value is-red">{{#if healthView.summary.worstWound}}{{healthView.summary.worstWound.damageRemaining}} dmg{{else}}0 dmg{{/if}}</div>
+                <div class="brp-health-summary-note">Below / above threshold</div>
+              </div>
+            {{/if}}
+          </div>
+        </div>
+
+        <div>
+          <div class="brp-health-summary-label">{{localize 'BRP.healthActiveConditions'}}</div>
+          <div class="brp-health-condition-box">
+            <div class="brp-health-condition-list">
+              {{#if healthView.summary.activeConditions.length}}
+                {{#each healthView.summary.activeConditions as |condition key|}}
+                  <span class="brp-health-condition-badge is-severe" data-tooltip="{{condition.tooltipText}}">
+                    <i class="{{condition.icon}}"></i>
+                    {{localize condition.label}}
+                  </span>
+                {{/each}}
+              {{else}}
+                <span class="brp-health-condition-badge is-empty">{{localize 'BRP.none'}}</span>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+
+        {{#if healthView.silhouette.unmatchedCount}}
+          <div class="brp-health-unmatched-note">
+            <i class="fas fa-list"></i>
+            {{localize 'BRP.healthUnmatchedLocations' count=healthView.silhouette.unmatchedCount}}
+          </div>
+        {{/if}}
+      </div>
+    </section>
+
+    {{#if healthView.useHPL}}
+      <section class="brp-health-section brp-health-location-section {{#if healthView.settings.locationsCollapsed}}is-collapsed{{/if}}">
+        <div class="brp-health-section-header">
+          <span class="brp-health-section-title">{{localize 'BRP.hitLoc'}}</span>
+          <span class="brp-health-section-line"></span>
+          <button type="button" class="brp-health-section-icon-btn" data-action="healthLocationToggle"
+            data-tooltip="{{#if healthView.settings.locationsCollapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}"
+            aria-expanded="{{#if healthView.settings.locationsCollapsed}}false{{else}}true{{/if}}">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+
+        <ol class="brp-health-locations-list">
+          {{#each healthView.hitLocations as |location key|}}
+            <li class="item brp-health-location {{#if location.hp.disabled}}is-critical{{/if}} {{#if location.expanded}}is-expanded{{/if}}" data-item-id="{{location.id}}" data-document-class="Item">
+              <div class="brp-health-loc-row" data-action="healthLocationRowToggle">
+                <div class="brp-health-loc-name-block">
+                  <div class="brp-health-loc-name rollable" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.hit-location')}}">
+                    {{location.name}}
+                    {{#if location.hp.disabled}}<span class="brp-health-status-inline is-disabled">{{localize 'BRP.incapacitated'}}</span>{{/if}}
+                    {{#if location.status.bleeding}}<span class="brp-health-status-inline is-bleeding">{{localize 'BRP.bleeding'}}</span>{{/if}}
+                    {{#if location.status.severed}}<span class="brp-health-status-inline is-severed">{{localize 'BRP.severed'}}</span>{{/if}}
+                  </div>
+                  {{#unless (eq location.locType 'general')}}
+                    <div class="brp-health-loc-range">{{localize 'BRP.hitLocRange'}} {{location.range}}</div>
+                  {{/unless}}
+                  {{#unless location.isMappedToSilhouette}}
+                    <div class="brp-health-loc-range is-warning">{{localize 'BRP.healthNotShownOnSilhouette'}}</div>
+                  {{/unless}}
+                </div>
+
+                {{#unless (eq location.locType 'general')}}
+                  <div class="brp-health-loc-hp" style="--brp-health-bar-pct: {{location.hp.pct}}%; --brp-health-bar-color: {{location.hp.color}};">
+                    <div class="brp-health-loc-hp-label">
+                      <span>{{../system.health.labelAbbr}}</span>
+                      <strong>{{location.hp.value}} / {{location.hp.max}}</strong>
+                    </div>
+                    <div class="brp-health-bar"><div class="brp-health-bar-fill"></div></div>
+                  </div>
+
+                  {{#if ../useAVRand}}
+                    <div class="brp-health-loc-ap rollable" data-action="armourRoll" data-item-id="{{location.id}}" data-property="ap" data-tooltip="{{localize 'BRP.armour'}} / Shift: {{localize 'BRP.ballistic'}}">
+                      <span>{{localize 'BRP.ap'}}</span>
+                      <strong>{{location.armour.randomValue}}</strong>
+                    </div>
+                  {{else}}
+                    <div class="brp-health-loc-ap rollable" data-action="armourRoll" data-item-id="{{location.id}}" data-property="ap" data-tooltip="{{localize 'BRP.armour'}} / Shift: {{localize 'BRP.ballistic'}}">
+                      <span>{{localize 'BRP.ap'}}</span>
+                      <strong>{{location.armour.value}}</strong>
+                    </div>
+                  {{/if}}
+
+                  <div class="brp-health-loc-wounds {{#unless location.woundCount}}is-empty{{/unless}}">
+                    <span class="brp-health-wound-count">{{location.woundCount}}</span>
+                    <span>{{localize 'BRP.wounds'}}</span>
+                  </div>
+                {{/unless}}
+
+                <div class="brp-health-loc-actions">
+                  <button type="button" class="brp-health-loc-add-btn" data-action="healthAddDamage" data-item-id="{{location.id}}" data-type="wound" data-tooltip="{{localize 'BRP.healthApplyDamage'}} / Shift: {{localize 'BRP.ballistic'}}">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+                <div class="brp-health-loc-chevron"><i class="fas fa-chevron-down"></i></div>
+              </div>
+
+              <div class="brp-health-loc-body">
+                {{#if location.wounds.length}}
+                  <div class="brp-health-wounds-inline">
+                    {{#each location.wounds as |wound key|}}
+                      <div class="brp-health-wound {{#if wound.expanded}}is-expanded{{/if}}" data-wound-id="{{wound.id}}">
+                        <div class="brp-health-wound-row" data-action="healthWoundRowToggle">
+                          <div class="brp-health-wound-icon"><i class="fas fa-droplet"></i></div>
+                          <div class="brp-health-wound-main">
+                            <div class="brp-health-wound-name" data-action="viewWound" data-wound-id="{{wound.id}}" data-item-id="{{../id}}">{{wound.name}}</div>
+                            <div class="brp-health-wound-meta">
+                              <span>{{wound.damageTypeLabel}}</span>
+                              {{#if wound.locationName}}<span>{{wound.locationName}}</span>{{/if}}
+                            </div>
+                          </div>
+                          <div class="brp-health-wound-damage">{{wound.damageRemaining}} / {{wound.damage}} dmg</div>
+                          <div class="brp-health-wound-status is-{{wound.statusClass}}">{{wound.statusLabel}}</div>
+                          <div class="brp-health-wound-chevron"><i class="fas fa-chevron-down"></i></div>
+                        </div>
+                        <div class="brp-health-wound-details">
+                          <div class="brp-health-wound-actions">
+                            <button type="button" data-action="healthHealWound" data-item-id="{{wound.id}}" data-healing="medical">{{localize 'BRP.firstAid'}}</button>
+                            <button type="button" data-action="healthHealWound" data-item-id="{{wound.id}}" data-healing="medicine">{{localize 'BRP.medicine'}}</button>
+                            <button type="button" data-action="healthOtherHeal" data-item-id="{{wound.id}}" data-healing="manual">{{localize 'BRP.other'}}</button>
+                            {{#unless ../../isLocked}}
+                              <button type="button" class="is-danger" data-action="healthWoundDelete" data-wound-id="{{wound.id}}">{{localize 'BRP.deleteItem'}}</button>
+                            {{/unless}}
+                          </div>
+                        </div>
+                      </div>
+                    {{/each}}
+                  </div>
+                {{else}}
+                  <div class="brp-health-empty-wounds">No active wounds on this location</div>
+                {{/if}}
+              </div>
+            </li>
+          {{/each}}
+        </ol>
+      </section>
+    {{else}}
+      <section class="brp-health-section">
+        <div class="brp-health-section-header">
+          <span class="brp-health-section-title">{{localize 'BRP.general'}}</span>
+          <span class="brp-health-section-line"></span>
+          <button type="button" class="brp-health-section-icon-btn" data-action="healthAddDamage" data-item-id="total" data-type="wound" data-tooltip="{{localize 'BRP.healthApplyDamage'}} / Shift: {{localize 'BRP.ballistic'}}">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+
+        <ol class="brp-health-locations-list">
+          <li class="brp-health-location is-expanded">
+            <div class="brp-health-loc-row">
+              <div class="brp-health-loc-name-block">
+                <div class="brp-health-loc-name">{{localize 'BRP.general'}}</div>
+                <div class="brp-health-loc-range">Non-HPL - single HP pool</div>
+              </div>
+              <div class="brp-health-loc-hp" style="--brp-health-bar-pct: {{healthView.summary.hp.pct}}%; --brp-health-bar-color: {{healthView.summary.hp.color}};">
+                <div class="brp-health-loc-hp-label">
+                  <span>{{system.health.labelAbbr}}</span>
+                  <strong>{{healthView.summary.hp.value}} / {{healthView.summary.hp.max}}</strong>
+                </div>
+                <div class="brp-health-bar"><div class="brp-health-bar-fill"></div></div>
+              </div>
+              <div class="brp-health-loc-ap rollable" data-action="armourRoll" data-property="cap" data-tooltip="{{localize 'BRP.armour'}} / Shift: {{localize 'BRP.ballistic'}}">
+                <span>{{localize 'BRP.ap'}}</span>
+                <strong>{{healthView.summary.armourPrimary}}</strong>
+              </div>
+              <div class="brp-health-loc-wounds {{#unless healthView.summary.activeWounds}}is-empty{{/unless}}">
+                <span class="brp-health-wound-count">{{healthView.summary.activeWounds}}</span>
+                <span>{{localize 'BRP.wounds'}}</span>
+              </div>
+            </div>
+            <div class="brp-health-loc-body">
+              {{#each healthView.wounds as |wound key|}}
+                <div class="brp-health-wound {{#if wound.expanded}}is-expanded{{/if}}" data-wound-id="{{wound.id}}">
+                  <div class="brp-health-wound-row" data-action="healthWoundRowToggle">
+                    <div class="brp-health-wound-icon"><i class="fas fa-droplet"></i></div>
+                    <div class="brp-health-wound-main">
+                      <div class="brp-health-wound-name" data-action="viewWound" data-wound-id="{{wound.id}}" data-item-id="{{wound.id}}">{{wound.name}}</div>
+                      <div class="brp-health-wound-meta">
+                        <span>{{wound.damageTypeLabel}}</span>
+                        <span>{{wound.statusLabel}}</span>
+                      </div>
+                    </div>
+                    <div class="brp-health-wound-damage">{{wound.damageRemaining}} / {{wound.damage}} dmg</div>
+                    <div class="brp-health-wound-status is-{{wound.statusClass}}">{{wound.statusLabel}}</div>
+                    <div class="brp-health-wound-chevron"><i class="fas fa-chevron-down"></i></div>
+                  </div>
+                  <div class="brp-health-wound-details">
+                    <div class="brp-health-wound-actions">
+                      <button type="button" data-action="healthHealWound" data-item-id="{{wound.id}}" data-healing="medical">{{localize 'BRP.firstAid'}}</button>
+                      <button type="button" data-action="healthHealWound" data-item-id="{{wound.id}}" data-healing="medicine">{{localize 'BRP.medicine'}}</button>
+                      <button type="button" data-action="healthOtherHeal" data-item-id="{{wound.id}}" data-healing="manual">{{localize 'BRP.other'}}</button>
+                      {{#unless ../isLocked}}
+                        <button type="button" class="is-danger" data-action="healthWoundDelete" data-wound-id="{{wound.id}}">{{localize 'BRP.deleteItem'}}</button>
+                      {{/unless}}
+                    </div>
+                  </div>
+                </div>
+              {{else}}
+                <div class="brp-health-empty-wounds">No active wounds</div>
+              {{/each}}
+            </div>
+          </li>
+        </ol>
+      </section>
+    {{/if}}
+
+    <section class="brp-health-section brp-health-armour-section">
+      <div class="brp-health-section-header">
+        <span class="brp-health-section-title">{{localize 'BRP.armour'}}</span>
+        <span class="brp-health-section-line"></span>
+      </div>
+
+      <ol class="brp-health-armour-list">
+        {{#each healthView.wornArmor as |armour key|}}
+          <li class="item brp-health-armour-row" data-item-id="{{armour.id}}" data-document-class="Item">
+            <div class="brp-health-armour-icon" aria-hidden="true">
+              <svg class="brp-health-armour-svg" viewBox="{{armour.icon.viewBox}}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="{{armour.icon.path}}"></path>
+              </svg>
+            </div>
+            <div class="brp-health-armour-main">
+              <div class="brp-health-armour-name rollable" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.armour')}}">{{armour.name}}</div>
+              {{#if armour.hitLocationName}}
+                <div class="brp-health-armour-location"><span>{{armour.hitLocationName}}</span></div>
+              {{/if}}
+            </div>
+            <div class="brp-health-armour-side">
+              {{#if armour.energy.enabled}}
+                <div class="brp-health-armour-energy" style="--brp-health-energy-pct: {{armour.energy.pct}}%;">
+                  <div class="brp-health-armour-energy-main">
+                    <div class="brp-health-armour-energy-label">
+                      <span>{{localize 'BRP.energy'}}</span>
+                      <strong>{{armour.energy.current}} / {{armour.energy.max}}</strong>
+                    </div>
+                    <div class="brp-health-armour-energy-bar"><div class="brp-health-armour-energy-fill"></div></div>
+                  </div>
+                  <button type="button" class="brp-health-armour-energy-btn" data-action="healthReduceArmorEnergy" data-item-id="{{armour.id}}" data-tooltip="{{localize 'BRP.energy'}} - {{localize 'BRP.amount'}}">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="brp-health-armour-energy-btn" data-action="healthAddArmorEnergy" data-item-id="{{armour.id}}" data-tooltip="{{localize 'BRP.add'}} {{localize 'BRP.energy'}}">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              {{/if}}
+              <div class="brp-health-armour-ap rollable" data-action="armourRoll" data-item-id="{{armour.id}}" data-property="ap" data-tooltip="{{localize 'BRP.armour'}} / Shift: {{localize 'BRP.ballistic'}}">
+                <span>{{localize 'BRP.ap'}}</span>
+                <strong>{{#if ../useAVRand}}{{armour.randomAp}}{{else}}{{armour.ap}}{{/if}}</strong>
+                <small>
+                  {{localize 'BRP.bap'}} {{#if ../useAVRand}}{{armour.randomBap}}{{else}}{{armour.bap}}{{/if}}
+                  {{#if ../useAVRand}}{{#if armour.average}} - avg {{armour.average}}{{/if}}{{/if}}
+                </small>
+              </div>
+              <div class="brp-health-armour-enc">{{localize 'BRP.enc'}} {{armour.enc}}</div>
+            </div>
+          </li>
+        {{else}}
+          <li class="brp-health-armour-empty">{{localize 'BRP.healthNoWornArmor'}}</li>
+        {{/each}}
+      </ol>
+    </section>
+
+    <section class="brp-health-section brp-healing-section">
+      <div class="brp-health-section-header">
+        <span class="brp-health-section-title">{{localize 'BRP.healing'}}</span>
+        <span class="brp-health-section-line"></span>
+      </div>
+
+      <div class="brp-health-healing-panel">
+        <div class="brp-health-healing-actions">
+          {{#each healthView.healingActions as |healing key|}}
+            <button type="button" class="brp-health-heal-btn" data-action="{{healing.action}}" data-prop="{{healing.prop}}" data-healing="{{healing.healing}}" data-tooltip="{{localize healing.tooltip}}">
+              <i class="{{healing.icon}}"></i>
+              <span class="brp-health-heal-title">{{localize healing.label}}</span>
+              <span class="brp-health-heal-sub">{{healing.sub}}</span>
+            </button>
+          {{/each}}
+        </div>
+        {{#if healthView.healingUtilityActions.length}}
+          <div class="brp-health-healing-utilities">
+            {{#each healthView.healingUtilityActions as |healing key|}}
+              <button type="button" class="brp-health-heal-utility" data-action="{{healing.action}}" data-prop="{{healing.prop}}" data-healing="{{healing.healing}}" data-tooltip="{{localize healing.tooltip}}">
+                <i class="{{healing.icon}}"></i>
+                <span>{{localize healing.label}}</span>
+              </button>
+            {{/each}}
+          </div>
+        {{/if}}
+      </div>
+    </section>
+  </section>
+</section>

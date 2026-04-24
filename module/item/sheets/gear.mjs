@@ -38,6 +38,10 @@ export class BRPGearSheet extends BRPItemSheetV2 {
       context.hitLocOptions = await BRPSelectLists.getHitLocOptions(actor);
     };
     context.equippedOptions = await BRPSelectLists.getEquippedOptions(this.document.type);
+    context.inventoryKindOptions = await BRPSelectLists.getInventoryKindOptions();
+    context.inventoryUseEffectOptions = await BRPSelectLists.getInventoryUseEffectOptions();
+    context.currencyIconOptions = await BRPSelectLists.getCurrencyIconOptions();
+    context.inventoryKind = this.item.system.inventoryKind || 'equipment';
     context.priceName = game.i18n.localize("BRP." + this.item.system.price);
     context.priceOptions = await BRPSelectLists.getPriceOptions();
     context.effects = BRPActiveEffectSheet.getItemEffectsFromSheet(this.document)
@@ -142,7 +146,3 @@ export class BRPGearSheet extends BRPItemSheetV2 {
 
   //-----------------------ACTIONS-----------------------------------
 }
-
-
-
-

@@ -5,13 +5,13 @@ import { BRPItem } from '../item/item.mjs'
 import { BRP } from "../setup/config.mjs";
 import ChaosiumCanvasInterfaceInit from '../apps/chaosium-canvas-interface-init.mjs'
 import { registerSettings } from '../settings/register-settings.mjs'
-import { handlebarsHelper } from '../setup/handlebar-helper.mjs';
+import { handlebarsHelper, loadHandlebarsPartials } from '../setup/handlebar-helper.mjs';
 import { BRPCombat } from "../combat/combat.mjs";
 import { BRPCombatTracker } from "../combat/combat-tracker.mjs";
 import { BRPActiveEffect } from "../apps/active-effect.mjs";
 import { BRPCheck } from '../apps/check.mjs';
 
-export default function Init() {
+export default async function Init() {
   //Add classes to global game object
   game.brp = {
     BRPActor,
@@ -27,6 +27,7 @@ export default function Init() {
   //Register Settings and Handlebar Helpers
   registerSettings();
   handlebarsHelper();
+  await loadHandlebarsPartials();
 
   // Define custom Document classes
   CONFIG.Actor.documentClass = BRPActor;

@@ -1,63 +1,445 @@
 <section class="actor tab social {{tab.cssClass}}" data-group="primary" data-tab="social">
-    {{#if useAlleg}}
-      <div class="magic-listitem">
-        <div class="diff-label">{{ localize 'BRP.allegiance'}}</div>
-        <div></div>
-        <div class="diff-label centre">{{ localize 'BRP.total'}}</div>
-        <div class="diff-label centre">{{ localize 'BRP.title'}}</div>
-        <div class="diff-label centre">{{ localize 'BRP.rank'}}</div>
-        <div class="diff-label centre">{{ localize "BRP.enemy" }}</div>
-        <div class="diff-label centre">{{ localize "BRP.opposed" }}</div>
-        <div class="diff-label centre" data-tooltip="{{ localize 'BRP.addItem' type=(localize 'TYPES.Item.allegiance') }}"
-          data-action="createDoc" data-document-class="Item" data-type="allegiance">
-          <a class="largeIcon"><i class="item-control fas fa-plus"></i></a>
+  {{#with socialRefresh as |social|}}
+    <section class="brp-social-refresh">
+      <header class="brp-social-refresh-titlebar">
+        <div class="brp-social-refresh-heading">
+          <i class="fas fa-user-group"></i>
+          <span>{{localize 'BRP.social'}}</span>
         </div>
-      </div>
-      <ol class="gr-list">
-        {{#each allegiances as |allegiance id|}}
-          <li class="item magic-listitem" data-item-id="{{allegiance._id}}" data-document-class="Item" data-drag='true'>
-            <div class="rollable" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.allegiance') }}">{{allegiance.name}}</div>
-            <div data-tooltip="{{ localize 'BRP.improve' }}"><a class="" data-action="itemToggle" data-property="improve"><i class="{{#if allegiance.system.improve}}fa-regular fa-square-check{{else}}fa-regular fa-square{{/if}}"></i></a></div>
-            <div class="centre rollable allegiance-name" data-action="allegianceRoll">{{allegiance.system.total}}%</div>
-            <div class="centre">{{allegiance.system.allegTitle}}</div>
-            <div class="centre">{{allegiance.system.rank}}</div>
-            <div class="centre"><a class="mediumIcon"><i class="{{#if allegiance.system.allegEnemy}}fa-solid fa-skull{{/if}}"></i></a></div>
-            <div class="centre truncate">{{allegiance.system.opposeAlleg}}</div>
-          </li>
-        {{/each}}
-      </ol>
-      <br>
-    {{/if}}
 
+        <div class="brp-social-refresh-controls">
+          <div class="brp-social-refresh-lock">
+            <i class="fas {{#if system.lock}}fa-lock{{else}}fa-lock-open{{/if}}"></i>
+            <span>{{#if system.lock}}{{localize 'BRP.locked'}}{{else}}{{localize 'BRP.unlocked'}}{{/if}}</span>
+          </div>
 
-    {{#if (gt useReputation "0")}}
-      <div class="magic-listitem">
-        <div class="diff-label">{{ localize 'BRP.reputation'}}</div>
-        <div></div>
-        <div class="diff-label centre">{{ localize 'BRP.total'}}</div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div class="diff-label centre" data-tooltip="{{ localize 'BRP.addItem' type=(localize 'TYPES.Item.reputation') }}"
-          data-action="createDoc" data-document-class="Item" data-type="reputation">
-          <a class="largeIcon"><i class="item-control fas fa-plus"></i></a>
+          <div class="brp-social-refresh-settings">
+            <button type="button" class="brp-social-refresh-settings-button" data-action="socialSettingsToggle" aria-expanded="false" data-tooltip="Show sections">
+              <i class="fas fa-sliders"></i>
+            </button>
+
+            <div class="brp-social-refresh-settings-menu" hidden>
+              <div class="brp-social-refresh-settings-label">Show sections</div>
+              {{#each social.orderedSections as |section|}}
+                <button type="button" class="brp-social-refresh-settings-option {{#if section.visible}}is-active{{/if}}" data-action="socialSectionVisibilityToggle" data-section-id="{{section.id}}" aria-pressed="{{#if section.visible}}true{{else}}false{{/if}}">
+                  <i class="fas {{#if section.visible}}fa-check{{else}}fa-minus{{/if}}"></i>
+                  <span>{{section.label}}</span>
+                </button>
+              {{/each}}
+            </div>
+          </div>
         </div>
-      </div>
-      <ol class="gr-list">
-      {{#each reputations as |reputation id|}}
-        <li class="item magic-listitem" data-item-id="{{reputation._id}}" data-document-class="Item" data-drag='true'>
-          <div class="new-row rollable" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.allegiance') }}">{{reputation.name}}</div>
-          <div></div>
-          {{#if ../system.lock}}
-            <div class="centre rollable" data-action="reputationRoll">{{reputation.system.total}}%</div>
-          {{else}}
-            <div><input class="item skill-cell-input centre inline-edit" data-field="base"
-              name="reputation.system.base" type="number"
-              value="{{reputation.system.base}}"/></div>
-          {{/if}}
-        </li>
-      {{/each}}
-      </ol>
-    {{/if}}
+      </header>
+
+      {{#with social.sections.allegiance as |section|}}
+        {{#if section.visible}}
+          <section class="brp-social-refresh-section {{#if section.collapsed}}is-collapsed{{/if}} {{#unless section.rulesEnabled}}is-disabled{{/unless}}" data-social-section="allegiance">
+            <header class="brp-social-refresh-section-header">
+              <button type="button" class="brp-social-refresh-section-toggle" data-action="socialSectionToggle" data-section-id="allegiance" aria-expanded="{{#if section.collapsed}}false{{else}}true{{/if}}" data-tooltip="{{#if section.collapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <h3 class="brp-social-refresh-section-title">{{section.label}}</h3>
+              <span class="brp-social-refresh-section-count">{{section.count}}</span>
+              <span class="brp-social-refresh-section-line"></span>
+              <div class="brp-social-refresh-section-actions">
+                <button type="button" class="brp-icon-button {{#if @root.system.lock}}is-disabled{{else}}{{#unless section.canCreate}}is-disabled{{/unless}}{{/if}}" {{#if @root.system.lock}}disabled{{else}}{{#if section.canCreate}}data-action="{{section.createAction.action}}" data-document-class="{{section.createAction.documentClass}}" data-type="{{section.createAction.type}}"{{else}}disabled{{/if}}{{/if}} data-tooltip="{{#if @root.system.lock}}{{localize 'BRP.locked'}}{{else}}{{#if section.canCreate}}{{localize 'BRP.addItem' type=(localize 'TYPES.Item.allegiance')}}{{else}}{{section.disabledReason}}{{/if}}{{/if}}">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </header>
+
+            <div class="brp-social-refresh-section-body" {{#if section.collapsed}}hidden{{/if}}>
+              {{#unless section.rulesEnabled}}
+                <div class="brp-social-refresh-disabled">{{section.disabledReason}}</div>
+              {{/unless}}
+
+              {{#if section.hasRows}}
+                <ol class="brp-social-refresh-allegiance-list">
+                  {{#each section.rows as |row|}}
+                    <li class="item brp-social-refresh-allegiance-card {{#if row.isPrimary}}is-primary{{/if}} {{#if row.isTranscendent}}is-transcendent{{/if}} {{#if row.expanded}}is-actions-open{{/if}} {{#unless section.rulesEnabled}}is-disabled{{/unless}}" data-item-id="{{row.itemId}}" data-document-class="Item" data-drag="true" data-social-row-key="{{row.rowKey}}" data-social-track="allegiance">
+                      <div class="brp-social-refresh-allegiance-header">
+                        <button type="button" class="brp-social-refresh-primary-toggle {{#if row.isPrimary}}is-active{{/if}} {{#if @root.system.lock}}is-disabled{{/if}}" {{#if @root.system.lock}}disabled{{else}}{{#if section.rulesEnabled}}data-action="{{row.actions.primary.action}}" data-item-id="{{row.actions.primary.itemId}}"{{else}}disabled{{/if}}{{/if}} data-tooltip="{{#if @root.system.lock}}{{localize 'BRP.locked'}}{{else}}{{#if row.isPrimary}}Primary allegiance{{else}}Set as primary allegiance{{/if}}{{/if}}">
+                          <i class="fas fa-star"></i>
+                        </button>
+
+                        <div class="brp-social-refresh-allegiance-main">
+                          <div class="brp-social-refresh-allegiance-name rollable truncate" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.allegiance')}}">
+                            {{row.name}}
+                          </div>
+                          <div class="brp-social-refresh-allegiance-badges">
+                            {{#if row.isPrimary}}
+                              <span class="brp-social-refresh-badge is-primary">
+                                <i class="fas fa-star"></i>
+                                <span>Primary</span>
+                              </span>
+                            {{/if}}
+                            {{#if row.isTranscendent}}<span class="brp-social-refresh-badge is-transcendent">75%+</span>{{/if}}
+                            {{#if row.improve}}
+                              <span class="brp-social-refresh-badge is-improve">
+                                <i class="fas fa-check"></i>
+                                <span>ImpCheck</span>
+                              </span>
+                            {{/if}}
+                          </div>
+                        </div>
+
+                        <a class="brp-social-refresh-allegiance-total {{#if section.rulesEnabled}}rollable{{/if}} {{#if (gt row.total 74)}}is-transcendent{{else}}{{#if (gt row.total 49)}}is-high{{else}}{{#if (gt row.total 24)}}is-mid{{else}}is-low{{/if}}{{/if}}{{/if}}" {{#if section.rulesEnabled}}data-action="allegianceRoll" data-tooltip="{{localize 'BRP.allegiance'}}"{{/if}}>
+                          {{row.totalDisplay}}
+                        </a>
+
+                        <div class="brp-social-refresh-card-actions">
+                          <button type="button" class="brp-social-refresh-card-action" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.allegiance')}}">
+                            <i class="fas fa-eye"></i>
+                          </button>
+                          <button type="button" class="brp-social-refresh-card-action {{#unless section.rulesEnabled}}is-disabled{{/unless}}" {{#if section.rulesEnabled}}data-action="{{row.actions.menu.action}}" data-section-id="{{row.actions.menu.sectionId}}" data-item-id="{{row.actions.menu.itemId}}"{{else}}disabled{{/if}} data-tooltip="Allegiance actions">
+                            <i class="fas fa-ellipsis-h"></i>
+                          </button>
+                          <button type="button" class="brp-social-refresh-card-action brp-social-refresh-row-toggle {{#if row.expanded}}is-active{{/if}}" data-action="{{row.actions.toggle.action}}" data-row-key="{{row.actions.toggle.rowKey}}" aria-expanded="{{#if row.expanded}}true{{else}}false{{/if}}" data-tooltip="Show controls">
+                            <i class="fas fa-chevron-down"></i>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="brp-social-refresh-allegiance-bar">
+                        <span class="brp-social-refresh-allegiance-bar-fill" style="width: {{row.totalBarPercent}}%"></span>
+                        <i class="brp-social-refresh-allegiance-threshold"></i>
+                      </div>
+
+                      <dl class="brp-social-refresh-allegiance-details">
+                        <div class="brp-social-refresh-detail">
+                          <dt>{{localize 'BRP.title'}}</dt>
+                          <dd class="{{#unless row.item.system.allegTitle}}{{#if row.isTranscendent}}is-suggestion{{else}}is-placeholder{{/if}}{{/unless}}">
+                            {{#if row.item.system.allegTitle}}{{row.item.system.allegTitle}}{{else}}{{#if row.isTranscendent}}Insert title (75%+ earned){{else}}&mdash;{{/if}}{{/if}}
+                          </dd>
+                        </div>
+
+                        <div class="brp-social-refresh-detail">
+                          <dt>{{localize 'BRP.rank'}}</dt>
+                          <dd class="{{#unless row.item.system.rankText}}{{#unless row.item.system.allegApoth}}{{#unless row.item.system.allegAllied}}is-placeholder{{/unless}}{{/unless}}{{/unless}}">
+                            {{row.displayRank}}
+                          </dd>
+                        </div>
+
+                        <div class="brp-social-refresh-detail">
+                          <dt>Enemy allegiance</dt>
+                          <dd class="{{#unless row.enemy.name}}is-placeholder{{/unless}}">
+                            {{#if row.enemy.name}}
+                              <span class="brp-social-refresh-enemy-name">
+                                <i class="fas fa-skull"></i>
+                                <span class="truncate">{{row.enemy.displayName}}</span>
+                              </span>
+                            {{else}}
+                              &mdash;
+                            {{/if}}
+                          </dd>
+                        </div>
+
+                        <div class="brp-social-refresh-detail">
+                          <dt>Enemy points</dt>
+                          <dd class="{{#unless row.enemy.name}}is-placeholder{{/unless}}">
+                            {{row.enemy.totalDisplay}}
+                          </dd>
+                        </div>
+                      </dl>
+
+                      <div class="brp-social-refresh-action-tray" {{#unless row.expanded}}hidden{{/unless}}>
+                        <button type="button" class="brp-social-refresh-action-button is-view" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.allegiance')}}">
+                          <i class="fas fa-eye"></i>
+                          <span>View</span>
+                        </button>
+                        <button type="button" class="brp-social-refresh-action-button is-improve {{#if row.improve}}is-active{{/if}} {{#if @root.system.lock}}is-disabled{{else}}{{#unless section.rulesEnabled}}is-disabled{{/unless}}{{/if}}" {{#if @root.system.lock}}disabled{{else}}{{#if section.rulesEnabled}}data-action="{{row.actions.improve.action}}" data-social-track="{{row.actions.improve.socialTrack}}" data-item-id="{{row.actions.improve.itemId}}"{{else}}disabled{{/if}}{{/if}} data-tooltip="{{#if row.improve}}Remove improvement check{{else}}Add improvement check{{/if}}">
+                          <i class="fas fa-check"></i>
+                          <span>{{#if row.improve}}ImpCheck Added{{else}}Add ImpCheck{{/if}}</span>
+                        </button>
+                        <button type="button" class="brp-social-refresh-action-button is-increase {{#if @root.system.lock}}is-disabled{{else}}{{#unless section.rulesEnabled}}is-disabled{{/unless}}{{/if}}" {{#if @root.system.lock}}disabled{{else}}{{#if section.rulesEnabled}}data-action="{{row.actions.increase.action}}" data-social-track="{{row.actions.increase.socialTrack}}" data-item-id="{{row.actions.increase.itemId}}" data-direction="{{row.actions.increase.direction}}"{{else}}disabled{{/if}}{{/if}} data-tooltip="Increase allegiance">
+                          <i class="fas fa-plus"></i>
+                        </button>
+                        <button type="button" class="brp-social-refresh-action-button is-decrease {{#if @root.system.lock}}is-disabled{{else}}{{#unless section.rulesEnabled}}is-disabled{{/unless}}{{/if}}" {{#if @root.system.lock}}disabled{{else}}{{#if section.rulesEnabled}}data-action="{{row.actions.decrease.action}}" data-social-track="{{row.actions.decrease.socialTrack}}" data-item-id="{{row.actions.decrease.itemId}}" data-direction="{{row.actions.decrease.direction}}"{{else}}disabled{{/if}}{{/if}} data-tooltip="Decrease allegiance">
+                          <i class="fas fa-minus"></i>
+                        </button>
+                      </div>
+                    </li>
+                  {{/each}}
+                </ol>
+              {{else}}
+                {{#if section.rulesEnabled}}
+                  <div class="brp-social-refresh-empty">{{section.emptyText}}</div>
+                {{/if}}
+              {{/if}}
+            </div>
+          </section>
+        {{/if}}
+      {{/with}}
+
+      {{#with social.sections.reputation as |section|}}
+        {{#if section.visible}}
+          <section class="brp-social-refresh-section {{#if section.collapsed}}is-collapsed{{/if}} {{#unless section.rulesEnabled}}is-disabled{{/unless}}" data-social-section="reputation">
+            <header class="brp-social-refresh-section-header">
+              <button type="button" class="brp-social-refresh-section-toggle" data-action="socialSectionToggle" data-section-id="reputation" aria-expanded="{{#if section.collapsed}}false{{else}}true{{/if}}" data-tooltip="{{#if section.collapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <h3 class="brp-social-refresh-section-title">{{section.label}}</h3>
+              <span class="brp-social-refresh-section-count">{{section.count}}</span>
+              <span class="brp-social-refresh-section-line"></span>
+              <div class="brp-social-refresh-section-actions">
+                <button type="button" class="brp-icon-button {{#if @root.system.lock}}is-disabled{{else}}{{#unless section.canCreate}}is-disabled{{/unless}}{{/if}}" {{#if @root.system.lock}}disabled{{else}}{{#if section.canCreate}}data-action="{{section.createAction.action}}" data-document-class="{{section.createAction.documentClass}}" data-type="{{section.createAction.type}}"{{else}}disabled{{/if}}{{/if}} data-tooltip="{{#if @root.system.lock}}{{localize 'BRP.locked'}}{{else}}{{#if section.canCreate}}{{localize 'BRP.addItem' type=(localize 'TYPES.Item.reputation')}}{{else}}{{section.createDisabledReason}}{{/if}}{{/if}}">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </header>
+
+            <div class="brp-social-refresh-section-body" {{#if section.collapsed}}hidden{{/if}}>
+              {{#unless section.rulesEnabled}}
+                <div class="brp-social-refresh-disabled">{{section.disabledReason}}</div>
+              {{/unless}}
+
+              {{#if section.hasRows}}
+                <ol class="brp-social-refresh-reputation-list">
+                  {{#each section.rows as |row|}}
+                    <li class="item brp-social-refresh-reputation-row brp-social-refresh-reputation-{{row.category}} {{#if row.expanded}}is-actions-open{{/if}} {{#unless section.rulesEnabled}}is-disabled{{/unless}}" data-item-id="{{row.itemId}}" data-document-class="Item" data-drag="true" data-social-row-key="{{row.rowKey}}" data-social-track="reputation">
+                      <div class="brp-social-refresh-reputation-main">
+                        <div class="brp-social-refresh-reputation-head">
+                          <div class="brp-social-refresh-reputation-name rollable truncate" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.reputation')}}">
+                            {{row.name}}
+                          </div>
+                          <div class="brp-social-refresh-reputation-badges">
+                            <span class="brp-social-refresh-category-badge brp-social-refresh-category-{{row.category}}">{{row.categoryLabel}}</span>
+                            {{#if row.improve}}
+                              <span class="brp-social-refresh-badge is-improve">
+                                <i class="fas fa-check"></i>
+                                <span>ImpCheck</span>
+                              </span>
+                            {{/if}}
+                          </div>
+                        </div>
+                        <div class="brp-social-refresh-reputation-scope {{#if row.scope}}has-value{{/if}}">{{row.displayScope}}</div>
+                      </div>
+
+                      <div class="brp-social-refresh-reputation-bar">
+                        <span class="brp-social-refresh-reputation-bar-fill" style="width: {{row.totalBarPercent}}%"></span>
+                      </div>
+
+                      <a class="brp-social-refresh-reputation-total {{#if section.rulesEnabled}}rollable{{/if}}" {{#if section.rulesEnabled}}data-action="reputationRoll" data-tooltip="{{localize 'BRP.reputation'}}"{{/if}}>
+                        {{row.totalDisplay}}
+                      </a>
+
+                      <div class="brp-social-refresh-card-actions">
+                        <button type="button" class="brp-social-refresh-card-action" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.reputation')}}">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button type="button" class="brp-social-refresh-card-action {{#unless section.rulesEnabled}}is-disabled{{/unless}}" {{#if section.rulesEnabled}}data-action="{{row.actions.menu.action}}" data-section-id="{{row.actions.menu.sectionId}}" data-item-id="{{row.actions.menu.itemId}}"{{else}}disabled{{/if}} data-tooltip="Reputation actions">
+                          <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <button type="button" class="brp-social-refresh-card-action brp-social-refresh-row-toggle {{#if row.expanded}}is-active{{/if}}" data-action="{{row.actions.toggle.action}}" data-row-key="{{row.actions.toggle.rowKey}}" aria-expanded="{{#if row.expanded}}true{{else}}false{{/if}}" data-tooltip="Show controls">
+                          <i class="fas fa-chevron-down"></i>
+                        </button>
+                      </div>
+
+                      <div class="brp-social-refresh-action-tray" {{#unless row.expanded}}hidden{{/unless}}>
+                        <button type="button" class="brp-social-refresh-action-button is-view" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.reputation')}}">
+                          <i class="fas fa-eye"></i>
+                          <span>View</span>
+                        </button>
+                        <button type="button" class="brp-social-refresh-action-button is-improve {{#if row.improve}}is-active{{/if}} {{#if @root.system.lock}}is-disabled{{else}}{{#unless section.rulesEnabled}}is-disabled{{/unless}}{{/if}}" {{#if @root.system.lock}}disabled{{else}}{{#if section.rulesEnabled}}data-action="{{row.actions.improve.action}}" data-social-track="{{row.actions.improve.socialTrack}}" data-item-id="{{row.actions.improve.itemId}}"{{else}}disabled{{/if}}{{/if}} data-tooltip="{{#if row.improve}}Remove improvement check{{else}}Add improvement check{{/if}}">
+                          <i class="fas fa-check"></i>
+                          <span>{{#if row.improve}}ImpCheck Added{{else}}Add ImpCheck{{/if}}</span>
+                        </button>
+                        <button type="button" class="brp-social-refresh-action-button is-increase {{#if @root.system.lock}}is-disabled{{else}}{{#unless section.rulesEnabled}}is-disabled{{/unless}}{{/if}}" {{#if @root.system.lock}}disabled{{else}}{{#if section.rulesEnabled}}data-action="{{row.actions.increase.action}}" data-social-track="{{row.actions.increase.socialTrack}}" data-item-id="{{row.actions.increase.itemId}}" data-direction="{{row.actions.increase.direction}}"{{else}}disabled{{/if}}{{/if}} data-tooltip="Increase reputation">
+                          <i class="fas fa-plus"></i>
+                        </button>
+                        <button type="button" class="brp-social-refresh-action-button is-decrease {{#if @root.system.lock}}is-disabled{{else}}{{#unless section.rulesEnabled}}is-disabled{{/unless}}{{/if}}" {{#if @root.system.lock}}disabled{{else}}{{#if section.rulesEnabled}}data-action="{{row.actions.decrease.action}}" data-social-track="{{row.actions.decrease.socialTrack}}" data-item-id="{{row.actions.decrease.itemId}}" data-direction="{{row.actions.decrease.direction}}"{{else}}disabled{{/if}}{{/if}} data-tooltip="Decrease reputation">
+                          <i class="fas fa-minus"></i>
+                        </button>
+                      </div>
+                    </li>
+                  {{/each}}
+                </ol>
+              {{else}}
+                {{#if section.rulesEnabled}}
+                  <div class="brp-social-refresh-empty">{{section.emptyText}}</div>
+                {{/if}}
+              {{/if}}
+            </div>
+          </section>
+        {{/if}}
+      {{/with}}
+
+      {{#with social.sections.contacts as |section|}}
+        {{#if section.visible}}
+          <section class="brp-social-refresh-section {{#if section.collapsed}}is-collapsed{{/if}}" data-social-section="contacts">
+            <header class="brp-social-refresh-section-header">
+              <button type="button" class="brp-social-refresh-section-toggle" data-action="socialSectionToggle" data-section-id="contacts" aria-expanded="{{#if section.collapsed}}false{{else}}true{{/if}}" data-tooltip="{{#if section.collapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <h3 class="brp-social-refresh-section-title">{{section.label}}</h3>
+              <span class="brp-social-refresh-section-count">{{section.count}}</span>
+              <span class="brp-social-refresh-section-line"></span>
+              <div class="brp-social-refresh-section-actions">
+                <button type="button" class="brp-icon-button {{#if @root.system.lock}}is-disabled{{/if}}" {{#if @root.system.lock}}disabled{{else}}data-action="{{section.createAction.action}}" data-document-class="{{section.createAction.documentClass}}" data-type="{{section.createAction.type}}"{{/if}} data-tooltip="{{#if @root.system.lock}}{{localize 'BRP.locked'}}{{else}}{{localize 'BRP.addItem' type=(localize 'TYPES.Item.contact')}}{{/if}}">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </header>
+
+            <div class="brp-social-refresh-section-body" {{#if section.collapsed}}hidden{{/if}}>
+              {{#if section.hasRows}}
+                <ol class="brp-social-refresh-contact-list">
+                  {{#each section.rows as |row|}}
+                    <li class="item brp-social-refresh-contact-row brp-social-refresh-contact-{{row.relation}}" data-item-id="{{row.itemId}}" data-document-class="Item" data-drag="true">
+                      <div class="brp-social-refresh-contact-avatar">
+                        {{#if row.linkedActor.image}}
+                          <img src="{{row.linkedActor.image}}" alt="{{#if row.linkedActor.name}}{{row.linkedActor.name}}{{else}}{{row.name}}{{/if}}" />
+                        {{else}}
+                          <span>{{row.initials}}</span>
+                        {{/if}}
+                      </div>
+
+                      <div class="brp-social-refresh-contact-main">
+                        <div class="brp-social-refresh-contact-name {{#if row.linkedActor.found}}is-linked{{/if}} rollable truncate" data-action="viewDoc" data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.contact')}}">
+                          {{row.name}}
+                        </div>
+                        <div class="brp-social-refresh-contact-role truncate">{{row.displayRole}}</div>
+                      </div>
+
+                      <div class="brp-social-refresh-contact-relation">
+                        <span class="brp-social-refresh-relation-badge brp-social-refresh-relation-{{row.relation}}">{{row.relationLabel}}</span>
+                      </div>
+
+                      <div class="brp-social-refresh-contact-location truncate">{{row.displayLocation}}</div>
+
+                      <div class="brp-social-refresh-card-actions">
+                        {{#if row.linkedActor.found}}
+                          <button type="button" class="brp-social-refresh-card-action" data-action="{{row.actions.openLinked.action}}" data-actor-uuid="{{row.actions.openLinked.actorUuid}}" data-item-id="{{row.actions.openLinked.itemId}}" data-tooltip="Open linked actor">
+                            <i class="fas fa-user"></i>
+                          </button>
+                        {{/if}}
+                        <button type="button" class="brp-social-refresh-card-action" data-action="{{row.actions.menu.action}}" data-section-id="{{row.actions.menu.sectionId}}" data-item-id="{{row.actions.menu.itemId}}" data-tooltip="Contact actions">
+                          <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                      </div>
+                    </li>
+                  {{/each}}
+                </ol>
+              {{else}}
+                <div class="brp-social-refresh-empty">{{section.emptyText}}</div>
+              {{/if}}
+            </div>
+          </section>
+        {{/if}}
+      {{/with}}
+
+      {{#with social.sections.factions as |section|}}
+        {{#if section.visible}}
+          <section class="brp-social-refresh-section {{#if section.collapsed}}is-collapsed{{/if}}" data-social-section="factions">
+            <header class="brp-social-refresh-section-header">
+              <button type="button" class="brp-social-refresh-section-toggle" data-action="socialSectionToggle" data-section-id="factions" aria-expanded="{{#if section.collapsed}}false{{else}}true{{/if}}" data-tooltip="{{#if section.collapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}">
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <h3 class="brp-social-refresh-section-title">{{section.label}}</h3>
+              <span class="brp-social-refresh-section-count">{{section.count}}</span>
+              <span class="brp-social-refresh-section-line"></span>
+              <div class="brp-social-refresh-section-actions">
+                <button type="button" class="brp-icon-button {{#if @root.system.lock}}is-disabled{{/if}}" {{#if @root.system.lock}}disabled{{else}}data-action="{{section.linkAction.action}}"{{/if}} data-tooltip="{{#if @root.system.lock}}{{localize 'BRP.locked'}}{{else}}Link faction{{/if}}">
+                  <i class="fas fa-link"></i>
+                </button>
+                <button type="button" class="brp-icon-button {{#if @root.system.lock}}is-disabled{{/if}}" {{#if @root.system.lock}}disabled{{else}}data-action="{{section.createAction.action}}"{{/if}} data-tooltip="{{#if @root.system.lock}}{{localize 'BRP.locked'}}{{else}}Create faction{{/if}}">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </header>
+
+            <div class="brp-social-refresh-section-body" {{#if section.collapsed}}hidden{{/if}}>
+              {{#if section.hasRows}}
+                <ol class="brp-social-refresh-faction-list">
+                  {{#each section.rows as |row|}}
+                    <li class="brp-social-refresh-faction-card {{#unless row.linked}}is-missing{{/unless}} {{#if row.expanded}}is-actions-open{{/if}}" data-membership-index="{{row.membershipIndex}}" data-item-id="{{row.itemId}}" data-faction-uuid="{{row.uuid}}" data-social-row-key="{{row.rowKey}}" data-social-track="faction">
+                      <div class="brp-social-refresh-faction-header">
+                        <div class="brp-social-refresh-faction-main">
+                          <div class="brp-social-refresh-faction-name rollable truncate" data-action="{{row.actions.membership.action}}" data-membership-index="{{row.actions.membership.membershipIndex}}" data-tooltip="View membership">
+                            {{row.name}}
+                          </div>
+                          {{#if row.description}}
+                            <div class="brp-social-refresh-faction-summary">{{row.description}}</div>
+                          {{else}}
+                            {{#unless row.linked}}
+                              <div class="brp-social-refresh-faction-summary is-missing">Missing linked faction item</div>
+                            {{/unless}}
+                          {{/if}}
+                        </div>
+
+                        <div class="brp-social-refresh-faction-side">
+                          <span class="brp-social-refresh-faction-rank">{{row.displayRank}}</span>
+                          {{#if row.improve}}
+                            <span class="brp-social-refresh-badge is-improve">
+                              <i class="fas fa-check"></i>
+                              <span>ImpCheck</span>
+                            </span>
+                          {{/if}}
+                          <div class="brp-social-refresh-card-actions">
+                            <button type="button" class="brp-social-refresh-card-action" data-action="{{row.actions.membership.action}}" data-membership-index="{{row.actions.membership.membershipIndex}}" data-tooltip="View membership">
+                              <i class="fas fa-eye"></i>
+                            </button>
+                            <button type="button" class="brp-social-refresh-card-action" data-action="{{row.actions.menu.action}}" data-section-id="{{row.actions.menu.sectionId}}" data-membership-index="{{row.actions.menu.membershipIndex}}" data-uuid="{{row.actions.menu.uuid}}" data-tooltip="Faction actions">
+                              <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <button type="button" class="brp-social-refresh-card-action brp-social-refresh-row-toggle {{#if row.expanded}}is-active{{/if}}" data-action="{{row.actions.toggle.action}}" data-row-key="{{row.actions.toggle.rowKey}}" aria-expanded="{{#if row.expanded}}true{{else}}false{{/if}}" data-tooltip="Show controls">
+                              <i class="fas fa-chevron-down"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <dl class="brp-social-refresh-faction-meta">
+                        <div class="brp-social-refresh-detail">
+                          <dt>Role</dt>
+                          <dd>{{row.displayRole}}</dd>
+                        </div>
+                        <div class="brp-social-refresh-detail">
+                          <dt>Reputation within</dt>
+                          <dd class="is-reputation">{{row.reputationWithinDisplay}}</dd>
+                        </div>
+                        <div class="brp-social-refresh-detail">
+                          <dt>{{localize 'BRP.notes'}}</dt>
+                          <dd class="{{#unless row.notes}}{{#unless row.description}}is-placeholder{{/unless}}{{/unless}}">
+                            {{#if row.notes}}{{row.displayNotes}}{{else}}{{#if row.description}}{{row.description}}{{else}}&mdash;{{/if}}{{/if}}
+                          </dd>
+                        </div>
+                      </dl>
+
+                      <div class="brp-social-refresh-action-tray" {{#unless row.expanded}}hidden{{/unless}}>
+                        <button type="button" class="brp-social-refresh-action-button is-view" data-action="{{row.actions.membership.action}}" data-membership-index="{{row.actions.membership.membershipIndex}}" data-tooltip="View membership">
+                          <i class="fas fa-eye"></i>
+                          <span>View</span>
+                        </button>
+                        <button type="button" class="brp-social-refresh-action-button is-link {{#unless row.linked}}is-disabled{{/unless}}" {{#if row.linked}}data-action="{{row.actions.open.action}}" data-uuid="{{row.actions.open.uuid}}" data-membership-index="{{row.actions.open.membershipIndex}}"{{else}}disabled{{/if}} data-tooltip="{{#if row.linked}}Open faction{{else}}Linked faction missing{{/if}}">
+                          <i class="fas fa-link"></i>
+                          <span>Open Faction</span>
+                        </button>
+                        <button type="button" class="brp-social-refresh-action-button is-improve {{#if row.improve}}is-active{{/if}} {{#if @root.system.lock}}is-disabled{{/if}}" {{#if @root.system.lock}}disabled{{else}}data-action="{{row.actions.improve.action}}" data-social-track="{{row.actions.improve.socialTrack}}" data-membership-index="{{row.actions.improve.membershipIndex}}"{{/if}} data-tooltip="{{#if row.improve}}Remove improvement check{{else}}Add improvement check{{/if}}">
+                          <i class="fas fa-check"></i>
+                          <span>{{#if row.improve}}ImpCheck Added{{else}}Add ImpCheck{{/if}}</span>
+                        </button>
+                        <button type="button" class="brp-social-refresh-action-button is-increase {{#if @root.system.lock}}is-disabled{{/if}}" {{#if @root.system.lock}}disabled{{else}}data-action="{{row.actions.increase.action}}" data-social-track="{{row.actions.increase.socialTrack}}" data-membership-index="{{row.actions.increase.membershipIndex}}" data-direction="{{row.actions.increase.direction}}"{{/if}} data-tooltip="Increase reputation within">
+                          <i class="fas fa-plus"></i>
+                        </button>
+                        <button type="button" class="brp-social-refresh-action-button is-decrease {{#if @root.system.lock}}is-disabled{{/if}}" {{#if @root.system.lock}}disabled{{else}}data-action="{{row.actions.decrease.action}}" data-social-track="{{row.actions.decrease.socialTrack}}" data-membership-index="{{row.actions.decrease.membershipIndex}}" data-direction="{{row.actions.decrease.direction}}"{{/if}} data-tooltip="Decrease reputation within">
+                          <i class="fas fa-minus"></i>
+                        </button>
+                      </div>
+                    </li>
+                  {{/each}}
+                </ol>
+              {{else}}
+                <div class="brp-social-refresh-empty">{{section.emptyText}}</div>
+              {{/if}}
+            </div>
+          </section>
+        {{/if}}
+      {{/with}}
+    </section>
+  {{else}}
+    <section class="brp-social-refresh">
+      <div class="brp-social-refresh-empty">Social view unavailable.</div>
+    </section>
+  {{/with}}
 </section>

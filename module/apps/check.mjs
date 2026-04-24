@@ -682,8 +682,11 @@ export class BRPCheck {
           actor = await BRPactorDetails._getParticipant(i.particId, i.particType)
           item = await actor.items.get(i.skillId)
           if (item.type != 'reputation') {
-            if (item.type === 'persTrait' && i.opp === 'true') {
-              await item.update({ 'system.oppimprove': true })
+            if (item.type === 'persTrait') {
+              await item.update({
+                'system.improve': true,
+                'system.oppimprove': false
+              })
             } else {
               await item.update({ 'system.improve': true })
             }

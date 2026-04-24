@@ -1,5 +1,11 @@
 <section class="item tab details {{tab.cssClass}}" data-group="primary" data-tab="details">
   <div class="armour-scores">
+    <div class="skill-display">{{localize 'BRP.inventoryKind'}}</div>
+    <div class="stat-input-small">
+      <select data-handle-change name="system.inventoryKind">
+        {{selectOptions inventoryKindOptions selected=inventoryKind}}
+      </select>
+    </div>
     <div class="skill-display">{{localize 'BRP.enc'}}</div>
     <div class="weapon-input"><input name="system.enc" type="text" value="{{item.system.enc}}" data-dtype="Number" />
     </div>
@@ -22,6 +28,89 @@
     <div class="skill-display">{{localize 'BRP.ppStoreMax' label=item.system.powerLabelAbbr}}</div>
     <div class="weapon-input"><input name="system.pSMax" type="text" value="{{item.system.pSMax}}"
         data-dtype="Number" /></div>
+  </div>
+  <br>
+
+  <div class="item-title">{{localize 'BRP.inventoryFields'}}:</div>
+  <div class="armour-scores">
+    <div class="skill-display" data-tooltip="{{localize 'BRP.containerIdHint'}}">{{localize 'BRP.containerId'}}</div>
+    <div class="weapon-input"><input name="system.containerId" type="text" value="{{item.system.containerId}}" /></div>
+
+    {{#if (eq inventoryKind 'container')}}
+      <div class="skill-display" data-tooltip="{{localize 'BRP.capacityEncHint'}}">{{localize 'BRP.capacityEnc'}}</div>
+      <div class="weapon-input"><input name="system.capacityEnc" type="text" value="{{item.system.capacityEnc}}" data-dtype="Number" /></div>
+      <div class="skill-display" data-tooltip="{{localize 'BRP.encReductionPctHint'}}">{{localize 'BRP.encReductionPct'}}</div>
+      <div class="weapon-input"><input name="system.encReductionPct" type="text" value="{{item.system.encReductionPct}}" data-dtype="Number" /></div>
+    {{/if}}
+
+    {{#if (eq inventoryKind 'consumable')}}
+      <div class="skill-display">{{localize 'BRP.stackable'}}</div>
+      <div class="weapon-input"><input name="system.stackable" type="checkbox" {{checked item.system.stackable}} /></div>
+      <div class="skill-display">{{localize 'BRP.useEffect'}}</div>
+      <div class="stat-input-small">
+        <select data-handle-change name="system.useEffect">
+          {{selectOptions inventoryUseEffectOptions selected=item.system.useEffect}}
+        </select>
+      </div>
+      <div class="skill-display">{{localize 'BRP.usesRemaining'}}</div>
+      <div class="weapon-input"><input name="system.usesRemaining" type="text" value="{{item.system.usesRemaining}}" data-dtype="Number" /></div>
+    {{/if}}
+
+    {{#if (eq inventoryKind 'loot')}}
+      <div class="skill-display">{{localize 'BRP.value'}}</div>
+      <div class="weapon-input"><input name="system.value" type="text" value="{{item.system.value}}" /></div>
+    {{/if}}
+  </div>
+  <br>
+
+  <div class="item-title">{{localize 'BRP.bonuses'}}:</div>
+  <div class="brp-item-bonus-editor">
+    <input type="hidden" name="system.bonusesEditor" value="1" />
+    <div class="brp-item-bonus-editor-head">
+      <span>{{localize 'BRP.inventoryBonusEditorHint'}}</span>
+      <button type="button" class="brp-item-bonus-add" data-action="inventoryBonusAdd" data-tooltip="{{localize 'BRP.inventoryBonusAdd'}}">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+    <div class="brp-item-bonus-list">
+      {{#each bonusEditorRows as |bonus|}}
+        <div class="brp-item-bonus-row brp-item-bonus-row-{{bonus.mode}}">
+          <label class="brp-item-bonus-field">
+            <span>{{localize 'BRP.inventoryBonusMode'}}</span>
+            <select name="system.bonusesEditor.{{bonus.index}}.mode">
+              {{selectOptions ../bonusModeOptions selected=bonus.mode}}
+            </select>
+          </label>
+          <label class="brp-item-bonus-field">
+            <span>{{localize 'BRP.inventoryBonusTarget'}}</span>
+            <input name="system.bonusesEditor.{{bonus.index}}.skill" type="text" value="{{bonus.skill}}" />
+          </label>
+          <label class="brp-item-bonus-field">
+            <span>{{localize 'BRP.inventoryBonusValue'}}</span>
+            <input name="system.bonusesEditor.{{bonus.index}}.value" type="text" value="{{bonus.value}}" />
+          </label>
+          <label class="brp-item-bonus-field">
+            <span>{{localize 'BRP.difficulty'}}</span>
+            <select name="system.bonusesEditor.{{bonus.index}}.difficulty">
+              {{selectOptions ../bonusDifficultyOptions selected=bonus.difficulty}}
+            </select>
+          </label>
+          <label class="brp-item-bonus-field">
+            <span>{{localize 'BRP.inventoryBonusNote'}}</span>
+            <input name="system.bonusesEditor.{{bonus.index}}.text" type="text" value="{{bonus.text}}" />
+          </label>
+          <label class="brp-item-bonus-check" data-tooltip="{{localize 'BRP.inventoryBonusRequiresCarried'}}">
+            <input name="system.bonusesEditor.{{bonus.index}}.requiresCarried" type="checkbox" {{checked bonus.requiresCarried}} />
+            <span>{{localize 'BRP.carried'}}</span>
+          </label>
+          <button type="button" class="brp-item-bonus-delete" data-action="inventoryBonusDelete" data-bonus-index="{{bonus.index}}" data-tooltip="{{localize 'BRP.delete'}}">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      {{else}}
+        <div class="brp-item-bonus-empty">{{localize 'BRP.none'}}</div>
+      {{/each}}
+    </div>
   </div>
   <br>
 

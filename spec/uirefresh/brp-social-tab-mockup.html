@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>BRP Character Sheet — Social Tab Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-base: #1a1210;
+  --bg-card: #241a18;
+  --bg-elevated: #2d211f;
+  --bg-hover: #3a2a26;
+  --border: #4a1f1f;
+  --border-soft: #33211f;
+  --red: #c8302e;
+  --red-bright: #e24b4a;
+  --red-muted: #8a2a28;
+  --mint: #9ad8c4;
+  --mint-dim: #6fa894;
+  --blue: #5b8fd8;
+  --blue-dim: #3d6a9c;
+  --amber: #d4a04a;
+  --amber-dim: #8c6a2e;
+  --green: #7fb355;
+  --purple: #a77bc4;
+  --text: #e8e2dc;
+  --text-dim: #a89d94;
+  --text-muted: #6e6560;
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.sheet {
+  max-width: 1280px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  min-height: 820px;
+  overflow: hidden;
+}
+
+.sidebar { width: 260px; background: var(--bg-base); border-right: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+.workspace { flex: 1; min-width: 0; padding: 20px 24px; overflow-y: auto; max-height: calc(100vh - 40px); }
+.rail { width: 52px; background: var(--bg-base); border-left: 1px solid var(--border); padding: 8px 0; display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+
+.avatar { aspect-ratio: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+.identity { text-align: center; }
+.identity .name { font-family: var(--font-display); font-size: 18px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--red-bright); }
+.identity .sub { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+.mov-line { display: flex; justify-content: center; gap: 10px; font-size: 10px; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; padding: 4px 0; border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+.mov-line .mov-val { color: var(--mint); font-weight: 600; }
+.status-row { display: flex; justify-content: space-between; gap: 4px; padding: 8px 4px; border-bottom: 1px solid var(--border-soft); }
+.status-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 3px; color: var(--text-muted); }
+.status-icon.active { color: var(--red-bright); background: rgba(226, 75, 74, 0.12); }
+
+.resource { display: flex; flex-direction: column; gap: 6px; }
+.resource-head { display: flex; justify-content: space-between; align-items: baseline; }
+.resource-head .label { font-family: var(--font-display); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); font-weight: 600; }
+.resource-head .value { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.bar { height: 8px; background: var(--bg-card); border-radius: 1px; overflow: hidden; border: 1px solid var(--border-soft); }
+.bar.big { height: 12px; }
+.bar-fill { height: 100%; transition: width 0.3s; }
+.resource.compact .resource-head .label { font-size: 10px; letter-spacing: 1.5px; color: var(--text-dim); }
+.resource.compact .resource-head .value { font-size: 11px; color: var(--text-dim); }
+.resource.compact .bar { height: 4px; }
+.divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+.rail-btn { width: 52px; height: 48px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; position: relative; border-left: 3px solid transparent; transition: all 0.15s; }
+.rail-btn:hover { color: var(--text-dim); background: var(--bg-card); }
+.rail-btn.active { color: var(--mint); background: var(--bg-card); border-left-color: var(--mint); }
+.rail-btn .tooltip { position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); background: var(--bg-elevated); border: 1px solid var(--border); padding: 4px 10px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text); white-space: nowrap; border-radius: 2px; opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 10; }
+.rail-btn:hover .tooltip { opacity: 1; }
+
+.tab-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--mint); padding-bottom: 12px; margin-bottom: 16px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 12px; }
+.tab-title .lock { margin-left: auto; font-size: 10px; letter-spacing: 2px; color: var(--text-muted); font-family: var(--font-body); font-weight: 400; display: flex; align-items: center; gap: 6px; }
+
+/* ============ SECTIONS TOGGLE ============ */
+
+.sections-toggle {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sections-toggle .st-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.section-chip {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  padding: 4px 10px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.section-chip:hover { border-color: var(--mint-dim); color: var(--mint); }
+.section-chip.active { background: rgba(154, 216, 196, 0.08); border-color: var(--mint); color: var(--mint); }
+.section-chip.forced { opacity: 0.5; cursor: default; }
+.section-chip.forced:hover { border-color: var(--border-soft); color: var(--text-dim); }
+.section-chip .check svg { width: 11px; height: 11px; }
+
+/* ============ SECTION COMMON ============ */
+
+.section { margin-bottom: 20px; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding-top: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-header .chevron { width: 12px; height: 12px; color: var(--text-muted); transition: transform 0.15s; }
+.section.collapsed .chevron { transform: rotate(-90deg); }
+.section.collapsed .section-body { display: none; }
+
+.section-header .title { font-family: var(--font-display); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); font-weight: 600; }
+.section-header .count { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); background: var(--bg-card); padding: 1px 8px; border-radius: 10px; border: 1px solid var(--border-soft); }
+.section-header .line { flex: 1; height: 1px; background: var(--border-soft); }
+.section-header .actions { display: flex; gap: 6px; }
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.icon-btn:hover { border-color: var(--red-muted); color: var(--red-bright); }
+.icon-btn svg { width: 14px; height: 14px; }
+
+.icon-btn.small { width: 22px; height: 22px; }
+.icon-btn.small svg { width: 11px; height: 11px; }
+
+.section-body { display: flex; flex-direction: column; gap: 6px; }
+
+/* ============ ALLEGIANCE CARD ============ */
+
+.allegiance-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 12px 14px;
+  position: relative;
+  transition: all 0.15s;
+}
+
+.allegiance-card:hover { border-color: var(--border); }
+.allegiance-card.primary { border-left: 2px solid var(--amber); background: linear-gradient(90deg, rgba(212,160,74,0.05), transparent 60%); }
+.allegiance-card.transcendent { border-left: 2px solid var(--mint); }
+
+.ac-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.ac-primary-toggle {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.ac-primary-toggle:hover { border-color: var(--amber); }
+.ac-primary-toggle.on { background: var(--amber); border-color: var(--amber); }
+.ac-primary-toggle.on::after { content: '★'; color: var(--bg-base); font-size: 11px; font-weight: 700; }
+
+.ac-name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text);
+  flex: 1;
+}
+
+.ac-name .primary-label {
+  font-family: var(--font-body);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--amber);
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid var(--amber-dim);
+  border-radius: 8px;
+  background: rgba(212, 160, 74, 0.08);
+  text-transform: uppercase;
+}
+
+.ac-name .transcendent-label {
+  font-family: var(--font-body);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--mint);
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid var(--mint-dim);
+  border-radius: 8px;
+  background: rgba(154, 216, 196, 0.08);
+  text-transform: uppercase;
+}
+
+.ac-total {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--mint);
+  font-variant-numeric: tabular-nums;
+  margin-right: 4px;
+}
+
+.ac-total.low { color: var(--text-muted); }
+.ac-total.mid { color: var(--text); }
+.ac-total.high { color: var(--mint); }
+.ac-total.transcendent { color: var(--amber); }
+
+.ac-actions { display: flex; gap: 4px; }
+
+.ac-bar {
+  height: 4px;
+  background: var(--bg-card);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.ac-bar-fill {
+  height: 100%;
+  background: var(--mint);
+  transition: width 0.3s;
+}
+
+.ac-bar-threshold {
+  position: absolute;
+  left: 75%;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--amber);
+  opacity: 0.6;
+}
+
+.ac-bar-threshold::after {
+  content: '75%';
+  position: absolute;
+  left: 4px;
+  top: -12px;
+  font-size: 8px;
+  color: var(--amber);
+  letter-spacing: 0.5px;
+}
+
+.ac-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 16px;
+  font-size: 11px;
+}
+
+.ac-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ac-detail .ad-label {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.ac-detail .ad-val {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.ac-detail .ad-val.empty { color: var(--text-muted); font-style: italic; }
+.ac-detail .ad-val.suggest { color: var(--amber); font-style: italic; }
+
+.ac-detail .ad-val.linked {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ac-detail .ad-val.linked .enemy-icon { color: var(--red-bright); }
+.ac-detail .ad-val.linked .enemy-pct { color: var(--red-bright); font-weight: 500; font-variant-numeric: tabular-nums; margin-left: auto; }
+
+/* ============ REPUTATION CARD (unified social scores) ============ */
+
+.rep-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 14px;
+  transition: border-color 0.15s;
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.rep-card:hover { border-color: var(--border); }
+
+.rep-name-block { min-width: 0; }
+
+.rep-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.rep-scope {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+.rep-category-badge {
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-weight: 500;
+  margin-left: 6px;
+}
+
+.rep-category-badge.reputation { background: rgba(91, 143, 216, 0.1); color: var(--blue); border: 1px solid var(--blue-dim); }
+.rep-category-badge.honor { background: rgba(212, 160, 74, 0.1); color: var(--amber); border: 1px solid var(--amber-dim); }
+.rep-category-badge.status { background: rgba(167, 123, 196, 0.1); color: var(--purple); border: 1px solid var(--purple); }
+
+.rep-bar-wrap { width: 140px; }
+
+.rep-bar {
+  height: 6px;
+  background: var(--bg-card);
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+}
+
+.rep-bar-fill { height: 100%; background: var(--blue); transition: width 0.3s; }
+
+.rep-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+  text-align: right;
+}
+
+.rep-actions { display: flex; gap: 4px; }
+
+/* ============ CONTACTS ============ */
+
+.contact-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 10px 14px;
+  display: grid;
+  grid-template-columns: 32px 1fr auto auto auto;
+  gap: 12px;
+  align-items: center;
+  transition: border-color 0.15s;
+}
+
+.contact-card:hover { border-color: var(--border); }
+
+.contact-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.contact-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.contact-role {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+
+.contact-location {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-align: right;
+  min-width: 100px;
+}
+
+.contact-relation-badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.contact-relation-badge.ally { background: rgba(127, 179, 85, 0.12); color: var(--green); border: 1px solid rgba(127, 179, 85, 0.4); }
+.contact-relation-badge.friend { background: rgba(154, 216, 196, 0.1); color: var(--mint); border: 1px solid var(--mint-dim); }
+.contact-relation-badge.neutral { background: var(--bg-card); color: var(--text-dim); border: 1px solid var(--border-soft); }
+.contact-relation-badge.suspect { background: rgba(212, 160, 74, 0.1); color: var(--amber); border: 1px solid var(--amber-dim); }
+.contact-relation-badge.enemy { background: rgba(226, 75, 74, 0.1); color: var(--red-bright); border: 1px solid var(--red-muted); }
+
+/* ============ FACTIONS ============ */
+
+.faction-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 2px;
+  padding: 12px 14px;
+  transition: border-color 0.15s;
+}
+
+.faction-card:hover { border-color: var(--border); }
+
+.fc-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.fc-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text);
+  font-weight: 600;
+  flex: 1;
+}
+
+.fc-rank-inline {
+  font-size: 10px;
+  color: var(--amber);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.fc-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px 16px;
+  font-size: 11px;
+}
+
+.fc-meta .m-label { font-size: 9px; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+.fc-meta .m-val { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+/* ============ MODAL ============ */
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center; z-index: 100; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 3px; padding: 20px 22px; width: 440px; max-height: 85vh; overflow-y: auto; }
+.modal h3 { font-family: var(--font-display); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--red-bright); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-soft); }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 10px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
+.field input, .field textarea, .field select { width: 100%; background: var(--bg-base); border: 1px solid var(--border-soft); color: var(--text); padding: 7px 10px; font-family: inherit; font-size: 12px; border-radius: 2px; outline: none; }
+.field textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--mint-dim); }
+
+.modal-buttons { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-soft); }
+.modal-buttons button { background: var(--bg-base); border: 1px solid var(--border-soft); color: var(--text); padding: 8px 18px; font-family: inherit; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 2px; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+.modal-buttons button:hover { border-color: var(--red-muted); }
+.modal-buttons button.primary { background: var(--mint); color: var(--bg-base); border-color: var(--mint); font-weight: 600; }
+
+/* ============ CONTEXT MENU ============ */
+
+.ctx { position: fixed; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 2px; min-width: 180px; padding: 4px; z-index: 120; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); display: none; }
+.ctx.show { display: block; }
+.ctx-item { padding: 7px 12px; font-size: 12px; color: var(--text); cursor: pointer; border-radius: 1px; display: flex; align-items: center; gap: 10px; letter-spacing: 0.3px; }
+.ctx-item svg { width: 13px; height: 13px; color: var(--text-muted); }
+.ctx-item:hover { background: var(--red-muted); }
+.ctx-item:hover svg { color: var(--text); }
+.ctx-item.danger { color: var(--red-bright); }
+.ctx-divider { height: 1px; background: var(--border-soft); margin: 4px 0; }
+
+.chat-log { position: fixed; bottom: 20px; right: 20px; max-width: 380px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 3px; padding: 12px 14px; font-size: 12px; color: var(--text-dim); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; z-index: 150; }
+.chat-log.show { opacity: 1; transform: translateY(0); }
+.chat-log .chat-head { font-family: var(--font-display); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mint); margin-bottom: 4px; }
+
+.workspace::-webkit-scrollbar { width: 6px; }
+.workspace::-webkit-scrollbar-track { background: transparent; }
+.workspace::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.workspace::-webkit-scrollbar-thumb:hover { background: var(--red-muted); }
+
+.hidden { display: none !important; }
+
+.empty-state {
+  background: var(--bg-base);
+  border: 1px dashed var(--border-soft);
+  border-radius: 2px;
+  padding: 20px 14px;
+  text-align: center;
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <aside class="sidebar">
+    <div class="avatar">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+    </div>
+    <div class="identity">
+      <div class="name">Арсэн</div>
+      <div class="sub">Pilot · 27</div>
+    </div>
+    <div class="mov-line">
+      <span>MOV <span class="mov-val">10</span></span>
+      <span>Run <span class="mov-val">30m/rd</span></span>
+    </div>
+    <div class="status-row">
+      <div class="status-icon active" title="Bleeding"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1 3-6 9-6 13a6 6 0 0 0 12 0c0-4-5-10-6-13z"/></svg></div>
+      <div class="status-icon" title="Stunned"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 9l2 2m0-2l-2 2M14 9l2 2m0-2l-2 2"/></svg></div>
+      <div class="status-icon" title="Prone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18"/><circle cx="7" cy="14" r="2"/><path d="M9 14h10"/></svg></div>
+      <div class="status-icon" title="Grappled"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6a3 3 0 0 0 6 0V5"/><path d="M18 3v6a3 3 0 0 1-6 0"/><path d="M6 15a6 6 0 0 0 12 0"/></svg></div>
+      <div class="status-icon" title="Unconscious"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h5l-4 4h4"/><path d="M14 14h5l-4 4h4"/></svg></div>
+      <div class="status-icon" title="Dying"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/><path d="M4 15c-1 5 2 7 8 7s9-2 8-7c-1-4-3-11-8-11s-7 7-8 11z"/></svg></div>
+    </div>
+    <div class="resource">
+      <div class="resource-head"><span class="label">Hit points</span><span class="value" style="color: var(--red-bright)">18 / 20</span></div>
+      <div class="bar big"><div class="bar-fill" style="width:90%; background: var(--red-bright)"></div></div>
+    </div>
+    <div class="resource">
+      <div class="resource-head"><span class="label">Power points</span><span class="value" style="color: var(--blue)">10 / 10</span></div>
+      <div class="bar big"><div class="bar-fill" style="width:100%; background: var(--blue)"></div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Fatigue</span><span class="value">16 / 16</span></div><div class="bar"><div class="bar-fill" style="width:100%; background: var(--amber)"></div></div></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Sanity</span><span class="value">5 / 5</span></div><div class="bar"><div class="bar-fill" style="width:100%; background: var(--green)"></div></div></div>
+    <div class="resource compact"><div class="resource-head"><span class="label">Resource</span><span class="value" style="color: var(--text-muted)">0 / 0</span></div><div class="bar"></div></div>
+  </aside>
+
+  <main class="workspace">
+    <div class="tab-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/><circle cx="17" cy="8" r="3"/><path d="M22 20c0-2.76-2.24-5-5-5"/></svg>
+      Social
+      <span class="lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Locked</span>
+    </div>
+
+    <div class="sections-toggle" id="sections-toggle">
+      <span class="st-label">Show sections</span>
+      <button class="section-chip active forced" data-section="allegiance"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></span>Allegiance</button>
+      <button class="section-chip active forced" data-section="reputation"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></span>Reputation</button>
+      <button class="section-chip active" data-section="contacts"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></span>Contacts</button>
+      <button class="section-chip active" data-section="factions"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></span>Factions</button>
+    </div>
+
+    <!-- ========= ALLEGIANCE ========= -->
+    <div class="section" data-section-body="allegiance">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Allegiance</span>
+        <span class="count">3</span>
+        <span class="line"></span>
+        <div class="actions">
+          <button class="icon-btn" title="Add allegiance" data-add="allegiance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+      <div class="section-body" id="allegiance-body">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- ========= REPUTATION ========= -->
+    <div class="section" data-section-body="reputation">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Reputation & Status</span>
+        <span class="count">5</span>
+        <span class="line"></span>
+        <div class="actions">
+          <button class="icon-btn" title="Add reputation" data-add="reputation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+      <div class="section-body" id="reputation-body">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- ========= CONTACTS ========= -->
+    <div class="section" data-section-body="contacts">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Contacts</span>
+        <span class="count">4</span>
+        <span class="line"></span>
+        <div class="actions">
+          <button class="icon-btn" title="Add contact" data-add="contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+      <div class="section-body" id="contacts-body">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- ========= FACTIONS ========= -->
+    <div class="section" data-section-body="factions">
+      <div class="section-header">
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="title">Factions</span>
+        <span class="count">2</span>
+        <span class="line"></span>
+        <div class="actions">
+          <button class="icon-btn" title="Add faction" data-add="faction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+      <div class="section-body" id="factions-body">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <nav class="rail">
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg><span class="tooltip">Skills</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14.5 17.5L3 6V3h3l11.5 11.5z"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M21 3v3L9.5 17.5"/><path d="M8 14l-4 4"/></svg><span class="tooltip">Combat</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg><span class="tooltip">Health</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg><span class="tooltip">Items</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span class="tooltip">Character</span></div>
+    <div class="rail-btn active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="7" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/><circle cx="17" cy="8" r="3"/><path d="M22 20c0-2.76-2.24-5-5-5"/></svg><span class="tooltip">Social</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="tooltip">Story</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg><span class="tooltip">Effects</span></div>
+    <div class="rail-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg><span class="tooltip">Dev</span></div>
+  </nav>
+</div>
+
+<div class="ctx" id="ctx"></div>
+
+<div class="chat-log" id="chat-log">
+  <div class="chat-head">Foundry chat</div>
+  <div class="chat-body" id="chat-body"></div>
+</div>
+
+<script>
+// ============ DATA ============
+const state = {
+  sectionsEnabled: { allegiance: true, reputation: true, contacts: true, factions: true }
+};
+
+const allegiances = [
+  { id: 'a1', name: 'Order of the Silver Hand', total: 82, title: 'Knight-Commander', rank: 'Lieutenant', enemy_id: 'a2', is_primary: true, is_transcendent: true },
+  { id: 'a2', name: 'Shadow Covenant', total: 15, title: '', rank: '', enemy_id: 'a1', is_primary: false, is_transcendent: false },
+  { id: 'a3', name: 'Free Stars Alliance', total: 48, title: '', rank: 'Member', enemy_id: null, is_primary: false, is_transcendent: false }
+];
+
+const reputations = [
+  { id: 'r1', name: 'Reputation', category: 'reputation', scope: 'Global', total: 35 },
+  { id: 'r2', name: 'Pilot renown', category: 'reputation', scope: 'Kassia sector', total: 58 },
+  { id: 'r3', name: 'Honor', category: 'honor', scope: 'Personal', total: 72 },
+  { id: 'r4', name: 'Guild Standing', category: 'status', scope: 'Pilots Guild', total: 41 },
+  { id: 'r5', name: 'Military rank', category: 'status', scope: 'Former Navy', total: 60 }
+];
+
+const contacts = [
+  { id: 'c1', name: 'Дорн Келлер', role: 'Бывший командир · Служба безопасности', location: 'Port Kassia', relation: 'ally', notes: 'Должен услугу за дело с контрабандистами.' },
+  { id: 'c2', name: 'Мила', role: 'Бармен', location: 'Железная звезда, L-3', relation: 'friend', notes: 'Знает слухи первой.' },
+  { id: 'c3', name: 'Тарн Кримс', role: 'Брат', location: 'Тарсис-7 (unreachable)', relation: 'neutral', notes: 'Не общаемся с инцидента.' },
+  { id: 'c4', name: 'Эйс Витторио', role: 'Информатор синдиката', location: 'Unknown', relation: 'suspect', notes: 'Продаст кого угодно за хорошую цену.' }
+];
+
+const factions = [
+  { id: 'f1', name: 'Pilots Guild', role: 'Certified member', rank: 'Senior', reputation: 68, notes: 'Покрывает сертификаты и юридическую защиту.' },
+  { id: 'f2', name: 'Free Stars Alliance', role: 'Sympathizer', rank: '—', reputation: 45, notes: 'Не формальное членство. Иногда берёт контракты.' }
+];
+
+// ============ ALLEGIANCE RENDER ============
+function renderAllegiances() {
+  const body = document.getElementById('allegiance-body');
+  if (allegiances.length === 0) {
+    body.innerHTML = `<div class="empty-state">No allegiances yet. Click + to add one.</div>`;
+    return;
+  }
+
+  body.innerHTML = allegiances.map(a => {
+    const enemy = a.enemy_id ? allegiances.find(x => x.id === a.enemy_id) : null;
+    const totalClass = a.total >= 75 ? 'transcendent' : (a.total >= 50 ? 'high' : (a.total >= 25 ? 'mid' : 'low'));
+    const primaryClass = a.is_primary ? 'primary' : (a.is_transcendent ? 'transcendent' : '');
+    const transcendentSuggest = a.total >= 75 && !a.title;
+
+    return `
+      <div class="allegiance-card ${primaryClass}" data-id="${a.id}">
+        <div class="ac-header">
+          <div class="ac-primary-toggle ${a.is_primary ? 'on' : ''}" data-toggle-primary="${a.id}" title="${a.is_primary ? 'Primary allegiance' : 'Set as primary'}"></div>
+          <div class="ac-name">
+            ${a.name}
+            ${a.is_primary ? '<span class="primary-label">Primary</span>' : ''}
+            ${a.total >= 75 ? '<span class="transcendent-label">★ 75%+</span>' : ''}
+          </div>
+          <div class="ac-total ${totalClass}">${a.total}%</div>
+          <div class="ac-actions">
+            <button class="icon-btn small" data-action="open" data-id="${a.id}" title="Open object"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg></button>
+            <button class="icon-btn small" data-action="menu" data-id="${a.id}" title="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+          </div>
+        </div>
+        <div class="ac-bar">
+          <div class="ac-bar-fill" style="width: ${Math.min(100, a.total)}%"></div>
+          <div class="ac-bar-threshold"></div>
+        </div>
+        <div class="ac-details">
+          <div class="ac-detail">
+            <span class="ad-label">Title</span>
+            <span class="ad-val ${!a.title && transcendentSuggest ? 'suggest' : (!a.title ? 'empty' : '')}">${a.title || (transcendentSuggest ? 'INSERT TITLE (75%+ earned)' : '—')}</span>
+          </div>
+          <div class="ac-detail">
+            <span class="ad-label">Rank</span>
+            <span class="ad-val ${!a.rank ? 'empty' : ''}">${a.rank || '—'}</span>
+          </div>
+          <div class="ac-detail">
+            <span class="ad-label">Enemy allegiance</span>
+            <span class="ad-val ${!enemy ? 'empty' : 'linked'}">
+              ${enemy ? `<span class="enemy-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/><path d="M4 15c-1 5 2 7 8 7s9-2 8-7c-1-4-3-11-8-11s-7 7-8 11z"/></svg></span>${enemy.name}` : '—'}
+            </span>
+          </div>
+          <div class="ac-detail">
+            <span class="ad-label">Enemy points</span>
+            <span class="ad-val ${!enemy ? 'empty' : 'linked'}">
+              ${enemy ? `<span class="enemy-pct">${enemy.total}%</span>` : '—'}
+            </span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // attach handlers
+  body.querySelectorAll('[data-toggle-primary]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = btn.dataset.togglePrimary;
+      allegiances.forEach(a => a.is_primary = (a.id === id ? !a.is_primary : false));
+      renderAllegiances();
+      showChat('Primary allegiance updated');
+    });
+  });
+
+  body.querySelectorAll('.allegiance-card').forEach(card => {
+    card.addEventListener('dblclick', e => {
+      if (e.target.closest('.icon-btn') || e.target.closest('.ac-primary-toggle')) return;
+      const a = allegiances.find(x => x.id === card.dataset.id);
+      showChat(`[SHEET] Open allegiance object: ${a.name}`);
+    });
+
+    card.addEventListener('contextmenu', e => {
+      if (e.target.closest('.icon-btn')) return;
+      e.preventDefault();
+      showAllegianceCtx(e.clientX, e.clientY, card.dataset.id);
+    });
+  });
+
+  body.querySelectorAll('[data-action="open"]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const a = allegiances.find(x => x.id === btn.dataset.id);
+      showChat(`[SHEET] Open: ${a.name}`);
+    });
+  });
+
+  body.querySelectorAll('[data-action="menu"]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const rect = btn.getBoundingClientRect();
+      showAllegianceCtx(rect.right, rect.bottom, btn.dataset.id);
+    });
+  });
+}
+
+function showAllegianceCtx(x, y, id) {
+  const a = allegiances.find(x => x.id === id);
+  const ctx = document.getElementById('ctx');
+  ctx.innerHTML = `
+    <div class="ctx-item" data-ctx="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg>Open allegiance object</div>
+    <div class="ctx-item" data-ctx="primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>${a.is_primary ? 'Unset primary' : 'Set as primary'}</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item danger" data-ctx="remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Remove from character</div>
+  `;
+  ctx.classList.add('show');
+  ctx.style.left = Math.min(x, window.innerWidth - 220) + 'px';
+  ctx.style.top = Math.min(y, window.innerHeight - 180) + 'px';
+
+  ctx.querySelectorAll('[data-ctx]').forEach(item => {
+    item.addEventListener('click', () => {
+      const act = item.dataset.ctx;
+      if (act === 'open') showChat(`[SHEET] Open: ${a.name}`);
+      if (act === 'primary') {
+        allegiances.forEach(x => x.is_primary = (x.id === id ? !x.is_primary : false));
+        renderAllegiances();
+      }
+      if (act === 'remove') {
+        const idx = allegiances.indexOf(a);
+        allegiances.splice(idx, 1);
+        renderAllegiances();
+        showChat(`Removed: ${a.name}`);
+      }
+      ctx.classList.remove('show');
+    });
+  });
+}
+
+// ============ REPUTATION RENDER ============
+function renderReputations() {
+  const body = document.getElementById('reputation-body');
+  if (reputations.length === 0) {
+    body.innerHTML = `<div class="empty-state">No reputation scores. Click + to add one.</div>`;
+    return;
+  }
+
+  body.innerHTML = reputations.map(r => `
+    <div class="rep-card" data-id="${r.id}">
+      <div class="rep-name-block">
+        <div class="rep-name">
+          ${r.name}
+          <span class="rep-category-badge ${r.category}">${r.category}</span>
+        </div>
+        <div class="rep-scope">${r.scope}</div>
+      </div>
+      <div class="rep-bar-wrap">
+        <div class="rep-bar"><div class="rep-bar-fill" style="width: ${r.total}%; background: ${r.category === 'honor' ? 'var(--amber)' : r.category === 'status' ? 'var(--purple)' : 'var(--blue)'}"></div></div>
+      </div>
+      <div class="rep-value">${r.total}%</div>
+      <div class="rep-actions">
+        <button class="icon-btn small" data-rep-action="open" data-id="${r.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg></button>
+        <button class="icon-btn small" data-rep-action="menu" data-id="${r.id}"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+      </div>
+    </div>
+  `).join('');
+
+  body.querySelectorAll('.rep-card').forEach(c => {
+    c.addEventListener('dblclick', () => {
+      const r = reputations.find(x => x.id === c.dataset.id);
+      showChat(`[SHEET] Open reputation: ${r.name}`);
+    });
+  });
+}
+
+// ============ CONTACTS RENDER ============
+function renderContacts() {
+  const body = document.getElementById('contacts-body');
+  if (contacts.length === 0) {
+    body.innerHTML = `<div class="empty-state">No contacts yet. Click + to add one.</div>`;
+    return;
+  }
+
+  body.innerHTML = contacts.map(c => {
+    const initials = c.name.split(' ').map(n => n[0]).slice(0, 2).join('');
+    return `
+      <div class="contact-card" data-id="${c.id}" title="${c.notes}">
+        <div class="contact-avatar">${initials}</div>
+        <div>
+          <div class="contact-name">${c.name}</div>
+          <div class="contact-role">${c.role}</div>
+        </div>
+        <div class="contact-relation-badge ${c.relation}">${c.relation}</div>
+        <div class="contact-location">${c.location}</div>
+        <div class="rep-actions">
+          <button class="icon-btn small"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  body.querySelectorAll('.contact-card').forEach(c => {
+    c.addEventListener('dblclick', () => {
+      const ct = contacts.find(x => x.id === c.dataset.id);
+      showChat(`[SHEET] Open contact: ${ct.name}`);
+    });
+  });
+}
+
+// ============ FACTIONS RENDER ============
+function renderFactions() {
+  const body = document.getElementById('factions-body');
+  if (factions.length === 0) {
+    body.innerHTML = `<div class="empty-state">No factions yet. Click + to add one.</div>`;
+    return;
+  }
+
+  body.innerHTML = factions.map(f => `
+    <div class="faction-card" data-id="${f.id}" title="${f.notes}">
+      <div class="fc-head">
+        <span class="fc-name">${f.name}</span>
+        <span class="fc-rank-inline">${f.rank !== '—' ? 'Rank: ' + f.rank : ''}</span>
+        <div class="rep-actions">
+          <button class="icon-btn small"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg></button>
+          <button class="icon-btn small"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+        </div>
+      </div>
+      <div class="fc-meta">
+        <div><div class="m-label">Role</div><div class="m-val">${f.role}</div></div>
+        <div><div class="m-label">Reputation within</div><div class="m-val">${f.reputation}%</div></div>
+        <div><div class="m-label">Notes</div><div class="m-val" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">${f.notes}</div></div>
+      </div>
+    </div>
+  `).join('');
+
+  body.querySelectorAll('.faction-card').forEach(c => {
+    c.addEventListener('dblclick', () => {
+      const f = factions.find(x => x.id === c.dataset.id);
+      showChat(`[SHEET] Open faction: ${f.name}`);
+    });
+  });
+}
+
+// ============ SECTION TOGGLE ============
+document.querySelectorAll('.section-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    if (chip.classList.contains('forced')) return;
+    const section = chip.dataset.section;
+    state.sectionsEnabled[section] = !state.sectionsEnabled[section];
+    chip.classList.toggle('active');
+    document.querySelector(`[data-section-body="${section}"]`).classList.toggle('hidden', !state.sectionsEnabled[section]);
+  });
+});
+
+// ============ SECTION COLLAPSE ============
+document.querySelectorAll('.section-header').forEach(h => {
+  h.addEventListener('click', e => {
+    if (e.target.closest('.icon-btn')) return;
+    h.parentElement.classList.toggle('collapsed');
+  });
+});
+
+// ============ ADD BUTTONS ============
+document.querySelectorAll('[data-add]').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const type = btn.dataset.add;
+    showChat(`[ADD] Open creation flow for: ${type}`);
+  });
+});
+
+// ============ CTX CLOSE ============
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ctx')) document.getElementById('ctx').classList.remove('show');
+});
+
+// ============ RAIL ============
+document.querySelectorAll('.rail-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// ============ CHAT ============
+let chatTimeout;
+function showChat(msg) {
+  const log = document.getElementById('chat-log');
+  document.getElementById('chat-body').textContent = msg;
+  log.classList.add('show');
+  clearTimeout(chatTimeout);
+  chatTimeout = setTimeout(() => log.classList.remove('show'), 3200);
+}
+
+// ============ INIT ============
+renderAllegiances();
+renderReputations();
+renderContacts();
+renderFactions();
+</script>
+</body>
+</html>

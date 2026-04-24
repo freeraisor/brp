@@ -1,0 +1,20 @@
+<form class="brp" id="health-silhouette-settings-form">
+  <ol class="brp-health-map-list">
+    {{#each locations as |location key|}}
+      <li class="brp-health-map-row">
+        <div class="brp-health-map-main">
+          <strong>{{location.name}}</strong>
+          {{#if location.brpid}}<span>{{location.brpid}}</span>{{/if}}
+        </div>
+        <select class="stat-name centre" data-handle-change name="map-{{location.id}}">
+          {{selectOptions ../partOptions selected=location.selectedPartId}}
+        </select>
+      </li>
+    {{/each}}
+  </ol>
+
+  <label class="brp-health-map-reset">
+    <input type="checkbox" name="resetMap" />
+    {{localize 'BRP.healthSilhouetteReset'}}
+  </label>
+</form>

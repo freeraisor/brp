@@ -35,6 +35,39 @@ BRP.statsDerived = {
   "edu": "BRP.StatsEduDeriv",
 };
 
+BRP.effectsSheet = {
+  actorFlagPath: 'flags.brp.sheet.effects',
+  effectFlagPath: 'flags.brp.sheet.effects',
+  filters: {
+    all: 'BRP.effectsFilterAll',
+    'active-only': 'BRP.effectsFilterActiveOnly',
+    temporary: 'BRP.effectsFilterTemporary',
+    hidden: 'BRP.effectsFilterHidden'
+  },
+  groups: {
+    items: 'BRP.effectsGroupItems',
+    status: 'BRP.effectsGroupStatus',
+    wounds: 'BRP.effectsGroupWounds',
+    magic: 'BRP.effectsGroupMagic',
+    injuries: 'BRP.effectsGroupInjuries',
+    manual: 'BRP.effectsGroupManual'
+  },
+  durations: {
+    permanent: 'BRP.effectsDurationPermanent',
+    timed: 'BRP.effectsDurationTimed',
+    conditional: 'BRP.effectsDurationConditional'
+  },
+  targetCategories: {
+    'skill-category': 'BRP.effectsCategorySkillCategory',
+    'specific-skill': 'BRP.effectsCategorySpecificSkill',
+    characteristic: 'BRP.effectsCategoryCharacteristic',
+    derived: 'BRP.effectsCategoryDerived',
+    armour: 'BRP.effectsCategoryArmour',
+    resource: 'BRP.effectsCategoryResource',
+    other: 'BRP.effectsCategoryOther'
+  }
+};
+
 BRP.keysActiveEffects = {
   'system.stats.str.effects': 'BRP.StatsStrAbbr',
   'system.stats.con.effects': 'BRP.StatsConAbbr',

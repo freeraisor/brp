@@ -1,130 +1,113 @@
 import { BRPUtilities } from '../apps/utilities.mjs';
 import { BRPactorDetails } from "../apps/actorDetails.mjs";
 import BRPDialog from '../setup/brp-dialog.mjs';
+import { BRPHealth } from './health.mjs';
+
+const DAMAGE_TYPES = ['piercing', 'slashing', 'blunt', 'burn', 'cold', 'energy', 'poison', 'disease', 'other'];
 
 export class BRPDamage {
 
   // Add Damage
-  static async addDamage(target, actor, token, damage) {
-    let partic = await BRPactorDetails._getParticipantPriority(token, actor)
-    let getLoc = false
-    let getDam = false
-    let locs = {}
-    let listLocs = {}
-    let locationId = target.dataset.itemId;
-    if (!locationId && game.settings.get('brp', 'useHPL')) {
-      locs = await actor.items.filter(itm => itm.type === 'hit-location')
-      if (locs.length === 1) {
-        locationId = locs[0]._id
-      } else if (locs.length > 1) {
-        getLoc = true
-        locs.sort(function (a, b) {
-          let x = a.system.lowRoll;
-          let y = b.system.lowRoll;
-          if (x < y) { return 1 };
-          if (x > y) { return -1 };
-          return 0;
-        });
-        for (let loc of locs) {
-          let label = loc.system.displayName + "(" + loc.system.lowRoll + "-" + loc.system.highRoll + ")"
-          if (loc.system.lowRoll === loc.system.highRoll) {
-            label = loc.system.displayName + "(" + loc.system.lowRoll + ")"
-          }
-          listLocs = Object.assign(listLocs, { [loc._id]: label })
-        }
-      }
-    }
-    if (damage < 1) {
-      getDam = true
-    }
-    if (getDam || getLoc) {
-      let usage = await this.getWoundForm(getDam, getLoc, partic.name, listLocs)
-      if (getDam) { damage = Number(usage.damage) };
-      if (getLoc) { locationId = usage.woundLoc};
-    }
-    if (damage < 1) { return }
+  static async addDamage(target, actor, token, damage = 0, options = {}) {
+    const partic = await BRPactorDetails._getParticipantPriority(token, actor);
+    if (!partic) return;
 
-    let location = ""
-    if (actor) {
-      location = actor.items.get(locationId)
-    } else {
-      location = token.actor.items.get(locationId)
+    const useHPL = game.settings.get('brp', 'useHPL');
+    const locations = this.damageLocationOptions(partic, useHPL);
+    const locationIds = Object.keys(locations);
+    if (useHPL && locationIds.length === 0) {
+      ui.notifications.warn(game.i18n.localize('BRP.healthNoHitLocations'));
+      return;
     }
 
-    //Check for damage at 2 or 3 times HPL (where current HP<=0 dealt with in actor.mjs)
-    let checkprop = {}
-    //If using HPL and this is a an actual hit location (not general)
-    if (game.settings.get('brp', 'useHPL') && location.system.locType != 'general') {
-      if (damage >= location.system.maxHP * 3 && location.system.locType === 'limb') {
-        checkprop = {
-          'system.severed': true,
-          'system.bleeding': true
-        }
-      } else if (damage >= location.system.maxHP * 3 && location.system.locType != 'general') {
-        checkprop = {
-          'system.dead': true,
-          'system.incapacitated': true,
-          'system.bleeding': true
-        }
-      } else if (damage >= location.system.maxHP * 2 && location.system.locType === 'limb') {
-        checkprop = {
-          'system.incapacitated': true,
-          'system.bleeding': true
-        }
-      } else if (damage >= location.system.maxHP * 2 && location.system.locType != 'general') {
-        checkprop = {
-          'system.unconscious': true,
-          'system.bleeding': true
-        }
-      } else if (damage >= location.system.currHP && location.system.locType != 'limb') {
-        checkprop = { 'system.bleeding': true }
+    const selectedLocationId = this.selectedDamageLocation(target?.dataset?.itemId, partic, locationIds, useHPL);
+    const rawDamage = Number(damage) > 0 ? Number(damage) : '';
+    const ballisticArmor = Boolean(options.ballisticArmor || target?.dataset?.armorMode === 'ballistic');
+    const html = await foundry.applications.handlebars.renderTemplate(
+      'systems/brp/templates/dialog/applyDamage.hbs',
+      {
+        showLocation: useHPL,
+        locations,
+        selectedLocationId,
+        damageTypes: this.damageTypeOptions(),
+        selectedDamageType: 'other',
+        rawDamage,
+        appliesArmor: true,
+        ballisticArmor
       }
-      damage = Math.min(damage, location.system.maxHP * 2)
-      //Otherwise if not using HPL
-    } else if (!game.settings.get('brp', 'useHPL')) {
-      if (damage >= partic.system.health.mjrwnd) {
-        await partic.update({
-          'system.majorWnd': true,
-          'system.health.daily': 0
-        })
-      } else if (partic.system.health.daily + damage >= partic.system.health.mjrwnd) {
-        await partic.update({
-          'system.minorWnd': true,
-          'system.health.daily': 0
-        })
-      }
-      if (!partic.system.minorWnd && !partic.system.majorWnd)
-        await partic.update({ 'system.health.daily': partic.system.health.daily + damage })
-    }
-    if (game.settings.get('brp', 'useHPL')) { await location.update(checkprop) }
+    );
 
-    //Prepare the new wound data and create it
-    const itemData = {
-      name: game.i18n.localize('BRP.wound'),
-      type: 'wound',
-      system: {
-        locId: locationId,
-        value: damage
+    const usage = await BRPDialog.input({
+      window: { title: game.i18n.localize('BRP.healthApplyDamage') + ": " + partic.name },
+      content: html,
+      ok: {
+        label: game.i18n.localize('BRP.confirm')
       }
-    };
-    const newItem = await Item.create(itemData, { parent: partic });
-    let key = await game.system.api.brpid.guessId(newItem)
-    await newItem.update({
-      'flags.brp.brpidFlag.id': key,
-      'flags.brp.brpidFlag.lang': game.i18n.lang,
-      'flags.brp.brpidFlag.priority': 0
-    })
+    });
+    if (!usage) return;
 
+    const rawDamageValue = Number(usage.rawDamage);
+    if (!Number.isFinite(rawDamageValue) || rawDamageValue < 1) return;
+
+    await BRPHealth.applyDamage(partic, {
+      locationId: useHPL ? usage.locationId || selectedLocationId : 'total',
+      rawDamage: rawDamageValue,
+      damageType: usage.damageType || 'other',
+      appliesArmor: this.isChecked(usage.appliesArmor),
+      ballisticArmor: this.isChecked(usage.ballisticArmor) || ballisticArmor,
+      woundName: usage.woundName ?? '',
+      description: usage.description ?? '',
+      source: 'health-tab'
+    });
+  }
+
+  static damageLocationOptions(actor, useHPL) {
+    if (!useHPL) return { total: game.i18n.localize('BRP.general') };
+
+    return actor.items
+      .filter(itm => itm.type === 'hit-location')
+      .sort(function (a, b) {
+        let x = a.system.lowRoll;
+        let y = b.system.lowRoll;
+        if (x < y) { return 1 };
+        if (x > y) { return -1 };
+        return 0;
+      })
+      .reduce((locations, loc) => {
+        const lowRoll = loc.system.lowRoll;
+        const highRoll = loc.system.highRoll;
+        const range = lowRoll === highRoll ? lowRoll : `${lowRoll}-${highRoll}`;
+        locations[loc._id] = `${loc.system.displayName || loc.name} (${range})`;
+        return locations;
+      }, {});
+  }
+
+  static selectedDamageLocation(candidateId, actor, locationIds, useHPL) {
+    if (!useHPL) return 'total';
+    if (candidateId && locationIds.includes(candidateId)) return candidateId;
+    const generalLocation = actor.items.find?.(itm => itm.type === 'hit-location' && itm.system.locType === 'general');
+    if (generalLocation?._id && locationIds.includes(generalLocation._id)) return generalLocation._id;
+    return locationIds[0] ?? '';
+  }
+
+  static damageTypeOptions() {
+    return DAMAGE_TYPES.reduce((options, type) => {
+      options[type] = game.i18n.localize(`BRP.${type}`);
+      return options;
+    }, {});
+  }
+
+  static isChecked(value) {
+    return value === true || value === 'true' || value === 'on' || value === '1' || value === 1;
   }
 
   static async allHeal(el, actor) {
     let confirmation = await BRPUtilities.confirmation('allHeal', 'chatMsg');
     if (confirmation) {
+      await BRPHealth.healAllWounds(actor);
       for (let i of actor.items) {
-        if (i.type === 'wound') {
-          i.delete();
-        } else if (i.type === 'hit-location') {
-          i.update({
+        if (i.type === 'hit-location') {
+          await i.update({
             'system.bleeding': false,
             'system.incapacitated': false,
             'system.injured': false,
@@ -147,165 +130,117 @@ export class BRPDamage {
     let getWnd = false
     let healTypes = {}
     let wndList = {}
+    let selectedWoundName = ''
 
-    if (!['medical', 'magic'].includes(type)) {
+    if (!['medical', 'magic', 'medicine', 'manual'].includes(type)) {
       getType = true
       healTypes = Object.assign(healTypes, {
-        'medical': game.i18n.localize('BRP.medical'),
-        'magical': game.i18n.localize('BRP.magical')
+        'medical': game.i18n.localize('BRP.firstAid'),
+        'medicine': game.i18n.localize('BRP.medicine'),
+        'magical': game.i18n.localize('BRP.magical'),
+        'manual': game.i18n.localize('BRP.other')
       })
     }
     if (!itemID) {
-      let wounds = await actor.items.filter(itm => itm.type === 'wound')
+      let wounds = await actor.items.filter(itm => itm.type === 'wound' && BRPHealth.isActiveWound(itm))
       if (wounds.length === 0) { return }
       if (wounds.length === 1) {
         itemID = wounds[0]._id
+        selectedWoundName = this.woundSelectionLabel(actor, wounds[0])
       } else {
         getWnd = true
         wounds.sort(function (a, b) {
-          let x = a.system.value;
-          let y = b.system.value;
+          let x = BRPHealth.getWoundDamageRemaining(a);
+          let y = BRPHealth.getWoundDamageRemaining(b);
           if (x < y) { return 1 };
           if (x > y) { return -1 };
           return 0;
         });
         for (let wound of wounds) {
-          let wndLoc = actor.items.get(wound.system.locId)
-          let label = ""
-          if (wndLoc) {
-            label = wndLoc.system.displayName + "(" + wound.system.value + ")"
-          } else {
-            label = game.i18n.localize('BRP.general') + "(" + wound.system.value + ")"
-          }
-          if (wound.system.treated) {
-            label = label + " " + game.i18n.localize('BRP.treated')
-          }
-          wndList = Object.assign(wndList, { [wound._id]: label })
+          wndList = Object.assign(wndList, { [wound._id]: this.woundSelectionLabel(actor, wound) })
         }
       }
-
-
+    } else {
+      const selectedWound = actor.items.get(itemID);
+      if (selectedWound) selectedWoundName = this.woundSelectionLabel(actor, selectedWound)
     }
     let healing = 0
-    let usage = await BRPDamage.healingAmount(game.i18n.localize('BRP.treatWound'), getType, getWnd, wndList, healTypes)
+    let usage = await BRPDamage.healingAmount(game.i18n.localize('BRP.treatWound'), getType, getWnd, wndList, healTypes, selectedWoundName)
     if (usage) {
       healing = Number(usage.treatWound);
       if (getType) { type = usage.healType };
       if (getWnd) { itemID = usage.woundId };
     } else if (!usage) return
+    type = BRPHealth.normalizeHealingMethod(type)
 
     const item = actor.items.get(itemID);
     let hitLoc = actor.items.get(item.system.locId)
-    if (item.system.treated && type === 'medical') {
+    if (BRPHealth.normalizeWoundSystem(item).firstAidUsed && type === 'medical') {
       ui.notifications.warn(game.i18n.localize('BRP.woundTreated'));
       return;
     }
 
-    //If amout of healing is zero then simply ignore and stop
-    if (healing === 0) { return }
+    //If amount of healing is zero or invalid then simply ignore and stop
+    if (!Number.isFinite(healing) || healing === 0) { return }
 
 
 
-    //If amount of healing >- wound then simply delete the wound
-    if (healing >= item.system.value) {
-      item.delete();
-      actor.render(true)
-      return
-    }
-
-    //Otherwise reduce the wound score by amount healed (or increase if a negative) and set treated status to true
-    let newWound = item.system.value
-    let checkProp = {
-      'system.value': item.system.value - healing,
-      'system.treated': true
-    }
-    item.update(checkProp)
-    if (game.settings.get('brp', 'useHPL')) {
+    await BRPHealth.healWound(item, {
+      healing,
+      method: type,
+      result: usage.result ?? '',
+      note: usage.note ?? '',
+      source: 'health-tab'
+    })
+    if (game.settings.get('brp', 'useHPL') && hitLoc) {
       hitLoc.update({
         'system.bleeding': false,
         'system.incapacitated': false,
         'system.unconscious': false
       })
     }
-    //Take the opportunity to delete any wounds with zero damage they may not be visible
-    await BRPDamage.cleanseWounds(actor)
+    actor.render(true)
   }
 
 
   static async naturalHeal(event, actor) {
     let usage = await BRPDamage.healingAmount(game.i18n.localize('BRP.naturalHealing'), false, false)
     let healing = 0
-    let updates = [];
-    let deletes = [];
     if (usage) {
       healing = Number(usage.treatWound);
     }
-    //If amout of healing is zero then simply ignore and stop
-    if (healing === 0) { return }
+    //If amount of healing is zero or invalid then simply ignore and stop
+    if (!Number.isFinite(healing) || healing === 0) { return }
 
-    //Put wounds in array and sort lowest to highest damage
-    let wounds = [];
-    for (let i of actor.items) {
-      if (i.type === 'wound') {
-        wounds.push(i);
-      }
-    }
-    wounds.sort(function (a, b) {
-      let x = a.system.value;
-      let y = b.system.value;
-      if (x < y) { return -1 };
-      if (x > y) { return 1 };
-      return 0;
+    await BRPHealth.distributeNaturalHealing(actor, {
+      healing,
+      note: usage.note ?? '',
+      source: 'natural-healing'
     });
-
-    let nw = wounds.length;
-    for (let i of wounds) {
-      if (i.system.value < 1) {
-        deletes.push(i._id)
-      } else {
-        let avgHeal = Math.ceil(healing / nw)
-        let woundHeal = Math.min(healing, i.system.value, avgHeal);
-        healing = healing - woundHeal;
-        if (woundHeal >= i.system.value) {
-          deletes.push(i._id)
-        } else if (woundHeal > 0) {
-          updates.push({
-            _id: i._id,
-            'system.treated.': true,
-            'system.value': i.system.value - woundHeal
-          })
-        } else {
-          updates.push({
-            _id: i._id,
-            'system.treated.': true
-          })
-        }
-      }
-      nw--;
-    }
-    await Item.updateDocuments(updates, { parent: actor });
-    await Item.deleteDocuments(deletes, { parent: actor });
+    actor.render(true)
   }
 
 
   //Delete any wounds that have zero or less damage - they may not be visible on the character sheet
   static async cleanseWounds(actor) {
     for (let i of actor.items) {
-      if (i.type === 'wound' && i.system.value < 1) {
-        i.delete();
+      if (i.type === 'wound' && BRPHealth.getWoundDamageRemaining(i) < 1) {
+        await BRPHealth.updateWound(i, { damageRemaining: 0, status: 'healed' });
       }
     }
   }
 
   // Form to get amount of damage or healing
-  static async healingAmount(title, getType, getWnd, wndList, healTypes) {
+  static async healingAmount(title, getType, getWnd, wndList = {}, healTypes = {}, selectedWoundName = '') {
     const html = await foundry.applications.handlebars.renderTemplate(
       'systems/brp/templates/dialog/treatWound.hbs',
       {
         getType,
         getWnd,
         wndList,
-        healTypes
+        healTypes,
+        selectedWoundName,
+        resultLevels: this.healingResultOptions()
       }
     )
     const dlg = await BRPDialog.input({
@@ -316,6 +251,26 @@ export class BRPDamage {
       }
     })
     return dlg
+  }
+
+  static woundSelectionLabel(actor, wound) {
+    const normalized = BRPHealth.normalizeWoundSystem(wound);
+    const location = actor.items.get(normalized.locId);
+    const locationName = location?.system?.displayName || location?.name || game.i18n.localize('BRP.general');
+    const damageRemaining = BRPHealth.getWoundDamageRemaining(wound);
+    const treated = normalized.treated ? ` ${game.i18n.localize('BRP.treated')}` : '';
+    return `${wound.name} - ${locationName} (${damageRemaining})${treated}`;
+  }
+
+  static healingResultOptions() {
+    return {
+      '': game.i18n.localize('BRP.manual'),
+      '0': game.i18n.localize('BRP.resultLevel.0'),
+      '1': game.i18n.localize('BRP.resultLevel.1'),
+      '2': game.i18n.localize('BRP.resultLevel.2'),
+      '3': game.i18n.localize('BRP.resultLevel.3'),
+      '4': game.i18n.localize('BRP.resultLevel.4')
+    };
   }
 
   static async resetDaily(event, actor) {
@@ -351,7 +306,6 @@ export class BRPDamage {
     let actor = wound.parent
     let healing = 0
     let healingForm = ""
-    successLevel = 0
     switch (successLevel) {
       case 0:
         //Fumble - create a wound
@@ -398,13 +352,13 @@ export class BRPDamage {
       }
     }
 
-    if (healing >= wound.system.value) {
-      wound.delete();
-      actor.render(true)
-    } else {
-      await wound.update({
-        'system.treated': true,
-        'system.value': wound.system.value - healing
+    if (healing !== 0) {
+      await BRPHealth.healWound(wound, {
+        healing,
+        method: 'medical',
+        result: String(successLevel),
+        formula: healingForm,
+        source: 'card-healing'
       })
       actor.render(true)
     }
@@ -416,20 +370,10 @@ export class BRPDamage {
   static async firstAidFumble(actorId, actorType, locationId) {
 
     let actor = await BRPactorDetails._getParticipant(actorId, actorType)
-    const itemData = {
-      name: game.i18n.localize('BRP.wound'),
-      type: 'wound',
-      system: {
-        locId: locationId,
-        value: 1
-      }
-    };
-    const newItem = await Item.create(itemData, { parent: actor });
-    let key = await game.system.api.brpid.guessId(newItem)
-    await newItem.update({
-      'flags.brp.brpidFlag.id': key,
-      'flags.brp.brpidFlag.lang': game.i18n.lang,
-      'flags.brp.brpidFlag.priority': 0
+    await BRPHealth.createWound(actor, {
+      locationId,
+      damage: 1,
+      source: 'first-aid-fumble'
     })
   }
 

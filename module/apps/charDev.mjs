@@ -25,15 +25,20 @@ export class BRPCharDev {
     let results = {}
     let partic = await BRPactorDetails._getParticipantPriority(token, actor);
     for (let i of partic.items) {
-      if (i.system.improve) {
-        results = await BRPCharDev.xpCheck(actor, token, i._id, rollType, false);
-        success.push(results)
-      }
       if (i.type === "persTrait") {
-        if (i.system.oppimprove) {
+        if (i.system.improve) {
+          results = await BRPCharDev.xpCheck(actor, token, i._id, rollType, false);
+          success.push(results)
+        } else if (i.system.oppimprove) {
           results = await BRPCharDev.xpCheck(actor, token, i._id, rollType, true);
           success.push(results)
         }
+        continue;
+      }
+
+      if (i.system.improve) {
+        results = await BRPCharDev.xpCheck(actor, token, i._id, rollType, false);
+        success.push(results)
       }
     }
     await BRPCharDev.xpOutput(success, partic)

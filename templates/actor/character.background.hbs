@@ -1,31 +1,434 @@
 <section class="actor tab background {{tab.cssClass}}" data-group="primary" data-tab="background">
-
-  {{#unless isLocked}}
-    <div class='bio-control' style='flex:initial;'>
-      <div class='button addNewSection' style="margin-bottom:10px;">{{localize 'BRP.backgroundNewSection'}}</div>
-    </div>
-  {{/unless}}
-  {{#each storySections as |section index|}}
-    <div class="section-header bio-section flexrow-brp" data-index='{{index}}'>
-      {{#if ../isLocked}}
-        <div class="story-subtitle">{{section.title}}</div>
-      {{else}}
-        <input class='story-subtitle bio-section-title' type="text" value="{{section.title}}" placeholder="{{localize 'BRP.backgroundSectionNameHolder'}}">
-        <div class="header-buttons">
-          {{#unless section.isFirst}}<a class="move-section-up" data-action="storyUp" data-tooltip="{{localize 'BRP.backgroundSectionMoveUp'}}"><i class="fas fa-caret-up"></i></a>{{/unless}}
-          {{#unless section.isLast}}<a class="move-section-down" data-action="storyDown" data-tooltip="{{localize 'BRP.backgroundSectionMoveDown'}}"><i class="fas fa-caret-down"></i></a>{{/unless}}
-          <a class="delete-section" data-action="storyDelete" data-tooltip="{{localize 'BRP.backgroundDeleteSection'}}"><i class="fas fa-trash"></i></a>
+  {{#with storyRefresh as |story|}}
+    <section class="brp-story-refresh">
+      <header class="brp-story-refresh-titlebar">
+        <div class="brp-story-refresh-heading">
+          <i class="fas fa-book-open"></i>
+          <span>{{story.title}}</span>
         </div>
-      {{/if}}
-    </div>
-    <div class="story">
-      {{#if ../editable}}
-        <prose-mirror class="bio-section-value" data-index='{{index}}' target=(concat "system.stories." index ".value") value="{{section.value}}" data-document-u-u-i-d="{{../actor.uuid}}" name=(concat "system.stories." index ".value") collaborate="true" toggled="true">
-          {{{section.enriched}}}
-      </prose-mirror>
-      {{else}}
-        {{{section.enriched}}}
-      {{/if}}
-    </div>
-  {{/each}}
+
+        <div class="brp-story-refresh-controls">
+          <button
+            type="button"
+            class="brp-story-refresh-timeline-button"
+            data-action="{{story.actions.openTimeline.action}}"
+            data-tooltip="{{localize 'BRP.storyOpenTimeline'}}"
+          >
+            <i class="fas fa-wave-square"></i>
+            <span>{{localize 'BRP.storyOpenTimeline'}}</span>
+          </button>
+
+          <div class="brp-story-refresh-lock">
+            <i class="fas {{#if story.isLocked}}fa-lock{{else}}fa-lock-open{{/if}}"></i>
+            <span>{{#if story.isLocked}}{{localize 'BRP.locked'}}{{else}}{{localize 'BRP.unlocked'}}{{/if}}</span>
+          </div>
+        </div>
+      </header>
+
+      {{#with story.sections.quests as |section|}}
+        <section class="brp-story-refresh-section {{#if section.collapsed}}is-collapsed{{/if}}" data-story-section="quests">
+          <header class="brp-story-refresh-section-header">
+            <button
+              type="button"
+              class="brp-story-refresh-section-toggle"
+              data-action="storySectionToggle"
+              data-section-id="{{section.id}}"
+              aria-expanded="{{#if section.collapsed}}false{{else}}true{{/if}}"
+              data-tooltip="{{#if section.collapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}"
+            >
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <h3 class="brp-story-refresh-section-title">{{section.title}}</h3>
+            <span class="brp-story-refresh-section-count">{{section.count}}</span>
+            <span class="brp-story-refresh-section-line"></span>
+            <div class="brp-story-refresh-section-actions">
+              <button
+                type="button"
+                class="brp-icon-button {{#unless section.canCreate}}is-disabled{{/unless}}"
+                {{#if section.canCreate}}data-action="{{section.createAction.action}}"{{else}}disabled{{/if}}
+                data-tooltip="{{#if section.canCreate}}{{localize 'BRP.storyAddQuest'}}{{else}}{{section.createDisabledReason}}{{/if}}"
+              >
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </header>
+
+          <div class="brp-story-refresh-section-body" {{#if section.collapsed}}hidden{{/if}}>
+            {{#if section.hasRows}}
+              <ol class="brp-story-refresh-quest-list">
+                {{#each section.rows as |row|}}
+                  <li
+                    class="brp-story-refresh-quest-card is-{{row.status}}"
+                    data-story-row-id="{{row.rowId}}"
+                    data-quest-id="{{row.quest.id}}"
+                    data-quest-uuid="{{row.quest.uuid}}"
+                  >
+                    <div class="brp-story-refresh-quest-head">
+                      <div class="brp-story-refresh-quest-main">
+                        <button
+                          type="button"
+                          class="brp-story-refresh-quest-name"
+                          data-action="{{row.actions.open.action}}"
+                          data-quest-id="{{row.actions.open.questId}}"
+                          data-quest-uuid="{{row.actions.open.questUuid}}"
+                        >
+                          <span class="brp-story-refresh-title-text">{{row.title}}</span>
+                        </button>
+                        <span class="brp-story-refresh-quest-status">{{row.statusLabel}}</span>
+                      </div>
+
+                      <div class="brp-story-refresh-quest-actions">
+                        <button
+                          type="button"
+                          class="brp-story-refresh-card-action"
+                          data-action="{{row.actions.open.action}}"
+                          data-quest-id="{{row.actions.open.questId}}"
+                          data-quest-uuid="{{row.actions.open.questUuid}}"
+                          data-tooltip="{{localize 'BRP.viewDoc' type=(localize 'TYPES.Item.quest')}}"
+                        >
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="brp-story-refresh-card-action {{#unless row.canMutate}}is-disabled{{/unless}}"
+                          {{#if row.canMutate}}data-action="{{row.actions.menu.action}}" data-quest-id="{{row.actions.menu.questId}}" data-quest-uuid="{{row.actions.menu.questUuid}}"{{else}}disabled{{/if}}
+                          data-tooltip="{{localize 'BRP.options'}}"
+                        >
+                          <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="brp-story-refresh-quest-objective {{#unless row.objectivePreview}}is-empty{{/unless}}">
+                      {{#if row.objectivePreview}}{{row.objectivePreview}}{{else}}{{localize 'BRP.storyQuestNoObjective'}}{{/if}}
+                    </div>
+
+                    <div class="brp-story-refresh-quest-meta">
+                      <span>
+                        <span class="brp-story-refresh-quest-meta-key">{{localize 'BRP.storyQuestSessionGiven'}}</span>
+                        <span class="brp-story-refresh-quest-meta-value">{{#if row.sessionGiven}}{{row.sessionGiven}}{{else}}&mdash;{{/if}}</span>
+                      </span>
+                      <span>
+                        <span class="brp-story-refresh-quest-meta-key">{{localize 'BRP.storyLinkedLabel'}}</span>
+                        <span class="brp-story-refresh-quest-meta-value">{{row.linkedCount}}</span>
+                      </span>
+                      <span>
+                        <span class="brp-story-refresh-quest-meta-key">{{localize 'BRP.storyQuestUpdatesLabel'}}</span>
+                        <span class="brp-story-refresh-quest-meta-value">{{row.updatesCount}}</span>
+                      </span>
+                    </div>
+
+                    {{#if row.updatesCount}}
+                      <div class="brp-story-refresh-quest-updates">
+                        <div class="brp-story-refresh-quest-updates-label">{{localize 'BRP.storyQuestRecentUpdates'}}</div>
+                        <div class="brp-story-refresh-quest-updates-list">
+                          {{#each row.updates as |update|}}
+                            <div class="brp-story-refresh-quest-update">
+                              <span class="brp-story-refresh-quest-update-date">
+                                {{#if update.session}}{{update.session}}{{else}}{{#if update.inGameDate}}{{update.inGameDate}}{{else}}{{update.realDate}}{{/if}}{{/if}}
+                              </span>
+                              <span class="brp-story-refresh-quest-update-text">{{update.preview}}</span>
+                            </div>
+                          {{/each}}
+                        </div>
+                      </div>
+                    {{/if}}
+                  </li>
+                {{/each}}
+              </ol>
+            {{else}}
+              <div class="brp-story-refresh-empty">{{section.emptyText}}</div>
+            {{/if}}
+          </div>
+        </section>
+      {{/with}}
+
+      {{#with story.sections.journal as |section|}}
+        <section class="brp-story-refresh-section {{#if section.collapsed}}is-collapsed{{/if}}" data-story-section="journal">
+          <header class="brp-story-refresh-section-header">
+            <button
+              type="button"
+              class="brp-story-refresh-section-toggle"
+              data-action="storySectionToggle"
+              data-section-id="{{section.id}}"
+              aria-expanded="{{#if section.collapsed}}false{{else}}true{{/if}}"
+              data-tooltip="{{#if section.collapsed}}{{localize 'BRP.expand'}}{{else}}{{localize 'BRP.collapse'}}{{/if}}"
+            >
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <h3 class="brp-story-refresh-section-title">{{section.title}}</h3>
+            <span class="brp-story-refresh-section-count">{{section.count}}</span>
+            <span class="brp-story-refresh-section-line"></span>
+            <div class="brp-story-refresh-section-actions">
+              <button
+                type="button"
+                class="brp-icon-button {{#unless section.canCreate}}is-disabled{{/unless}}"
+                {{#if section.canCreate}}data-action="{{section.createAction.action}}"{{else}}disabled{{/if}}
+                data-tooltip="{{#if section.canCreate}}{{localize 'BRP.storyAddJournalEntry'}}{{else}}{{section.createDisabledReason}}{{/if}}"
+              >
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </header>
+
+          <div class="brp-story-refresh-section-body" {{#if section.collapsed}}hidden{{/if}}>
+            <div class="brp-story-refresh-journal-toolbar">
+              <div class="brp-story-refresh-filter-chips">
+                {{#each section.filters.chips as |chip|}}
+                  <button
+                    type="button"
+                    class="brp-story-refresh-type-chip {{#if chip.active}}is-active{{/if}}"
+                    data-action="storyFilterTypeToggle"
+                    data-type="{{chip.id}}"
+                    aria-pressed="{{#if chip.active}}true{{else}}false{{/if}}"
+                  >
+                    <span class="brp-story-refresh-type-chip-icon">
+                      <i class="{{chip.icon}}"></i>
+                    </span>
+                    <span>{{chip.label}}</span>
+                    <span class="brp-story-refresh-type-chip-count">{{chip.count}}</span>
+                  </button>
+                {{/each}}
+              </div>
+
+              <label class="brp-story-refresh-search">
+                <i class="fas fa-search"></i>
+                <input
+                  type="search"
+                  class="brp-story-refresh-search-input"
+                  name="storyFilterSearch"
+                  value="{{section.filters.search}}"
+                  placeholder="{{localize 'BRP.search'}}"
+                  autocomplete="off"
+                  data-action="storyFilterSearch"
+                />
+              </label>
+            </div>
+
+            {{#if section.hasRows}}
+              <ol class="brp-story-refresh-journal-feed">
+                {{#each section.rows as |row|}}
+                  <li
+                    class="brp-story-refresh-journal-entry {{#if row.pinned}}is-pinned{{/if}} {{#if row.status}}is-{{row.status}}{{/if}}"
+                    data-story-row-id="{{row.rowId}}"
+                    data-story-type="{{row.type}}"
+                    data-story-source="{{row.source}}"
+                    data-entry-id="{{row.actions.open.entryId}}"
+                    data-quest-id="{{row.actions.open.questId}}"
+                    data-quest-uuid="{{row.actions.open.questUuid}}"
+                    data-search-text="{{row.searchText}}"
+                  >
+                    <div class="brp-story-refresh-journal-head">
+                      <div class="brp-story-refresh-journal-type-icon">
+                        <i class="{{row.icon}}"></i>
+                      </div>
+
+                      <button
+                        type="button"
+                        class="brp-story-refresh-journal-title"
+                        data-action="{{row.actions.open.action}}"
+                        data-entry-id="{{row.actions.open.entryId}}"
+                        data-quest-id="{{row.actions.open.questId}}"
+                        data-quest-uuid="{{row.actions.open.questUuid}}"
+                      >
+                        <span class="brp-story-refresh-title-text">{{row.title}}</span>
+                        {{#if row.pinned}}
+                          <span class="brp-story-refresh-journal-pin" aria-hidden="true">
+                            <i class="fas fa-star"></i>
+                          </span>
+                        {{/if}}
+                      </button>
+
+                      <div class="brp-story-refresh-journal-badges">
+                        <span class="brp-story-refresh-type-badge">{{row.typeLabel}}</span>
+                        {{#if row.statusLabel}}
+                          <span class="brp-story-refresh-quest-status is-compact">{{row.statusLabel}}</span>
+                        {{/if}}
+                      </div>
+
+                      <div class="brp-story-refresh-journal-date">
+                        {{#if row.session}}<span class="brp-story-refresh-journal-session">{{row.session}}</span>{{/if}}
+                        {{#if row.inGameDate}}
+                          <span class="brp-story-refresh-journal-ingame">{{row.inGameDate}}</span>
+                        {{else}}
+                          {{#if row.realDate}}<span class="brp-story-refresh-journal-ingame">{{row.realDate}}</span>{{/if}}
+                        {{/if}}
+                      </div>
+
+                      <div class="brp-story-refresh-journal-actions">
+                        {{#if row.actions.pin}}
+                          <button
+                            type="button"
+                            class="brp-story-refresh-card-action {{#unless row.canMutate}}is-disabled{{/unless}}"
+                            {{#if row.canMutate}}data-action="{{row.actions.pin.action}}" data-entry-id="{{row.actions.pin.entryId}}"{{else}}disabled{{/if}}
+                            data-tooltip="{{#if row.pinned}}{{localize 'BRP.storyUnpinEntry'}}{{else}}{{localize 'BRP.storyPinEntry'}}{{/if}}"
+                          >
+                            <i class="fas fa-star"></i>
+                          </button>
+                        {{/if}}
+
+                        {{#if row.actions.menu}}
+                          <button
+                            type="button"
+                            class="brp-story-refresh-card-action {{#unless row.canMutate}}is-disabled{{/unless}}"
+                            {{#if row.canMutate}}data-action="{{row.actions.menu.action}}" data-entry-id="{{row.actions.menu.entryId}}" data-quest-id="{{row.actions.menu.questId}}" data-quest-uuid="{{row.actions.menu.questUuid}}"{{else}}disabled{{/if}}
+                            data-tooltip="{{localize 'BRP.options'}}"
+                          >
+                            <i class="fas fa-ellipsis-h"></i>
+                          </button>
+                        {{/if}}
+                      </div>
+                    </div>
+
+                    <div class="brp-story-refresh-journal-content">{{#if row.actions.pin}}{{{row.enrichedContent}}}{{else}}{{row.contentPreview}}{{/if}}</div>
+
+                    {{#if row.linkedCount}}
+                      <div class="brp-story-refresh-linked-list">
+                        {{#each row.linked as |link|}}
+                          {{#if link.action}}
+                            <button
+                              type="button"
+                              class="brp-story-refresh-linked-chip is-{{link.kind}} {{#if link.orphan}}is-orphan{{/if}}"
+                              data-action="{{link.action.action}}"
+                              data-link="{{link.action.link}}"
+                              data-kind="{{link.action.kind}}"
+                              data-uuid="{{link.action.uuid}}"
+                            >
+                              <i class="fas fa-link"></i>
+                              <span class="brp-story-refresh-linked-kind">{{link.kindLabel}}</span>
+                              <span class="brp-story-refresh-linked-label">{{link.displayLabel}}</span>
+                            </button>
+                          {{else}}
+                            <span class="brp-story-refresh-linked-chip is-{{link.kind}} {{#if link.orphan}}is-orphan{{/if}}">
+                              <i class="fas fa-link"></i>
+                              <span class="brp-story-refresh-linked-kind">{{link.kindLabel}}</span>
+                              <span class="brp-story-refresh-linked-label">{{link.displayLabel}}</span>
+                            </span>
+                          {{/if}}
+                        {{/each}}
+                      </div>
+                    {{/if}}
+                  </li>
+                {{/each}}
+              </ol>
+            {{else}}
+              {{#if section.totalCount}}
+                <div class="brp-story-refresh-empty">{{localize 'BRP.storyNoMatches'}}</div>
+              {{else}}
+                <div class="brp-story-refresh-empty">{{section.emptyText}}</div>
+              {{/if}}
+            {{/if}}
+          </div>
+        </section>
+      {{/with}}
+
+      <aside class="brp-story-refresh-timeline is-view-{{story.timeline.view}}" data-story-timeline hidden>
+        <div class="brp-story-refresh-timeline-header">
+          <div class="brp-story-refresh-timeline-title">{{story.timeline.title}}</div>
+
+          <div class="brp-story-refresh-timeline-switcher">
+            {{#each story.timeline.viewOptions as |option|}}
+              <button
+                type="button"
+                class="brp-story-refresh-timeline-switch {{#if option.active}}is-active{{/if}}"
+                data-action="storyTimelineViewSet"
+                data-view="{{option.id}}"
+                aria-pressed="{{#if option.active}}true{{else}}false{{/if}}"
+              >
+                <i class="{{option.icon}}"></i>
+                <span>{{option.label}}</span>
+              </button>
+            {{/each}}
+          </div>
+
+          <button type="button" class="brp-story-refresh-timeline-close" data-action="storyTimelineClose">
+            <i class="fas fa-times"></i>
+            <span>{{localize 'BRP.closeCard'}}</span>
+          </button>
+        </div>
+
+        <div class="brp-story-refresh-timeline-body">
+          {{#if story.timeline.hasEvents}}
+            <section class="brp-story-refresh-timeline-sessions">
+              {{#each story.timeline.sessions as |session|}}
+                <div class="brp-story-refresh-timeline-session">
+                  <div class="brp-story-refresh-timeline-session-header">
+                    <div class="brp-story-refresh-timeline-session-dot"></div>
+                    <div class="brp-story-refresh-timeline-session-label">{{session.label}}</div>
+                    {{#if session.displayDate}}
+                      <div class="brp-story-refresh-timeline-session-date">{{session.displayDate}}</div>
+                    {{/if}}
+                  </div>
+
+                  <div class="brp-story-refresh-timeline-session-events">
+                    {{#each session.events as |event|}}
+                      <button
+                        type="button"
+                        class="brp-story-refresh-timeline-event"
+                        data-story-type="{{event.type}}"
+                        data-action="{{event.action.action}}"
+                        data-entry-id="{{event.action.entryId}}"
+                        data-quest-id="{{event.action.questId}}"
+                        data-quest-uuid="{{event.action.questUuid}}"
+                      >
+                        <div class="brp-story-refresh-timeline-event-head">
+                          <span class="brp-story-refresh-timeline-event-icon">
+                            <i class="{{event.icon}}"></i>
+                          </span>
+                          <span class="brp-story-refresh-timeline-event-title">{{event.title}}</span>
+                        </div>
+                        <div class="brp-story-refresh-timeline-event-content">{{event.contentPreview}}</div>
+                      </button>
+                    {{/each}}
+                  </div>
+                </div>
+              {{/each}}
+            </section>
+
+            <section class="brp-story-refresh-timeline-lanes">
+              {{#each story.timeline.lanes as |lane|}}
+                <div class="brp-story-refresh-timeline-lane" data-story-type="{{lane.id}}">
+                  <div class="brp-story-refresh-timeline-lane-label">
+                    <i class="{{lane.icon}}"></i>
+                    <span>{{lane.label}}</span>
+                    <span class="brp-story-refresh-timeline-lane-count">{{lane.count}}</span>
+                  </div>
+
+                  <div class="brp-story-refresh-timeline-lane-track">
+                    {{#each @root.storyRefresh.timeline.markers as |marker|}}
+                      <div class="brp-story-refresh-timeline-marker" style="left: {{marker.position}}%;" data-label="{{marker.label}}"></div>
+                    {{/each}}
+
+                    {{#each lane.events as |event|}}
+                      <button
+                        type="button"
+                        class="brp-story-refresh-timeline-dot"
+                        style="left: {{event.position}}%;"
+                        data-story-type="{{event.type}}"
+                        data-action="{{event.action.action}}"
+                        data-entry-id="{{event.action.entryId}}"
+                        data-quest-id="{{event.action.questId}}"
+                        data-quest-uuid="{{event.action.questUuid}}"
+                      >
+                        <span class="brp-story-refresh-timeline-tooltip">
+                          <strong>{{event.title}}</strong>
+                          <small>{{event.sessionLabel}}</small>
+                        </span>
+                      </button>
+                    {{/each}}
+                  </div>
+                </div>
+              {{/each}}
+            </section>
+          {{else}}
+            <div class="brp-story-refresh-empty">{{localize 'BRP.storyTimelineEmpty'}}</div>
+          {{/if}}
+        </div>
+      </aside>
+    </section>
+  {{else}}
+    <section class="brp-story-refresh">
+      <div class="brp-story-refresh-empty">{{localize 'BRP.storyUnavailable'}}</div>
+    </section>
+  {{/with}}
 </section>

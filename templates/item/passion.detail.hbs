@@ -1,4 +1,60 @@
 <section class='item tab details {{tab.cssClass}}' data-group='primary' data-tab='details'>
+  <div class="item-title"> {{localize 'BRP.details'}}:</div>
+  <div class="brp-item-detail-grid">
+    <div class="brp-item-detail-label">{{localize 'BRP.persPassionType'}}</div>
+    <div class="brp-item-detail-field">
+      <select name="system.type">
+        {{selectOptions passionView.typeOptions selected=passionView.type}}
+      </select>
+    </div>
+    <div class="brp-item-detail-label">{{localize 'BRP.persFocus'}}</div>
+    <div class="brp-item-detail-field"><input name="system.focus" type="text" value="{{item.system.focus}}" /></div>
+    <div class="brp-item-detail-label">{{localize 'BRP.persFocusLinkType'}}</div>
+    <div class="brp-item-detail-field">
+      <select name="system.focusLinkType">
+        {{selectOptions passionView.focusLinkTypeOptions selected=passionView.focusLinkType}}
+      </select>
+    </div>
+    <div class="brp-item-detail-label">{{localize 'BRP.persFocusLinkTarget'}}</div>
+    <div class="brp-item-detail-field">
+      {{#if passionView.hasOwnerActor}}
+        {{#if (eq passionView.focusLinkType 'contact')}}
+          <select name="system.focusLinkUuid">
+            {{selectOptions passionView.contactOptions selected=passionView.focusLinkUuid}}
+          </select>
+        {{else}}
+          {{#if (eq passionView.focusLinkType 'faction')}}
+            <select name="system.focusLinkUuid">
+              {{selectOptions passionView.factionOptions selected=passionView.focusLinkUuid}}
+            </select>
+          {{else}}
+            <span class="brp-item-detail-static">{{localize 'BRP.persFocusLinkNone'}}</span>
+            <input name="system.focusLinkUuid" type="hidden" value="" />
+          {{/if}}
+        {{/if}}
+      {{else}}
+        <span class="brp-item-detail-static">{{localize 'BRP.persFocusLinkUnavailable'}}</span>
+        <input name="system.focusLinkUuid" type="hidden" value="{{item.system.focusLinkUuid}}" />
+      {{/if}}
+    </div>
+    {{> brpItemDetailTextareaField
+      label='BRP.notes'
+      name='system.notes'
+      rows=4
+      value=item.system.notes
+    }}
+    <div class="brp-item-detail-label">{{localize 'BRP.persOpenLinkedFocus'}}</div>
+    <div class="brp-item-detail-field">
+      {{#if passionView.linkedFocus}}
+        <button type="button" class="clickable-button brp-item-detail-link" data-action="passionOpenLinkedFocus">{{passionView.linkedFocus.label}}</button>
+      {{else}}
+        <span class="brp-item-detail-static">-</span>
+      {{/if}}
+    </div>
+  </div>
+  <div class="itemSummary brp-item-detail-help">{{localize 'BRP.persFocusLinkHint'}}</div>
+  <br>
+
   {{#if hasOwner}}
     <div class="item-title"> {{localize 'BRP.scores'}}:</div>
     <div class="armour-scores">
@@ -9,13 +65,10 @@
       <div class="weapon-input centre"><input name="system.xp" type="text" value="{{item.system.xp}}"
           data-dtype="Number" /></div>
       <div class="skill-display indent">{{localize 'BRP.total'}}</div>
-      <div class="weapon-input centre bold tertiary">{{item.system.total}}</div>
+      <div class="weapon-input centre bold tertiary">{{passionView.total}}</div>
       <br>
       <div class="skill-display new-row">{{localize 'BRP.improve'}}</div>
-      <div class="centre itemIcon"><a class="nopad" data-action="itemToggle" data-property="improve"><i
-            class="{{#if item.system.improve}}fa-regular fa-square-check{{else}}fa-regular fa-square{{/if}}"></i></a>
-      </div>
-  </div>
+      <div class="weapon-input centre"><input name="system.improve" type="checkbox" {{checked item.system.improve}} /></div>
+    </div>
   {{/if}}
-  </div>
 </section>

@@ -1,5 +1,13 @@
 // Additional Handlebar helpers
 
+const SHARED_HANDLEBAR_PARTIALS = {
+  brpItemDetailTextareaField: 'systems/brp/templates/global/parts/item-detail-textarea.hbs'
+};
+
+export async function loadHandlebarsPartials() {
+  return foundry.applications.handlebars.loadTemplates(SHARED_HANDLEBAR_PARTIALS);
+}
+
 export const handlebarsHelper = function () {
   Handlebars.registerHelper('isAnd', function (cond1, cond2, options) {
     return (cond1 && cond2) ? options.fn(this) : options.inverse(this);

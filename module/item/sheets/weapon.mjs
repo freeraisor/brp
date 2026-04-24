@@ -42,20 +42,29 @@ export class BRPWeaponSheet extends BRPItemSheetV2 {
     //Get drop down options from select-lists.mjs
     context.priceOptions = await BRPSelectLists.getPriceOptions();
     context.equippedOptions = await BRPSelectLists.getEquippedOptions(this.document.type);
+    context.inventoryUseEffectOptions = await BRPSelectLists.getInventoryUseEffectOptions();
+    context.currencyIconOptions = await BRPSelectLists.getCurrencyIconOptions();
     context.priceName = game.i18n.localize("BRP." + this.item.system.price);
     context.equippedName = game.i18n.localize("BRP." + this.item.system.equipStatus);
     context.weaponOptions = await BRPSelectLists.getWpnCategoryOptions();
     context.damOptions = await BRPSelectLists.getDamBonusOptions();
+    context.ammoModeOptions = await BRPSelectLists.getAmmoModeOptions();
     context.specialOptions = await BRPSelectLists.getSpecialOptions();
     context.handedOptions = await BRPSelectLists.getHandedOptions();
     context.wpnSkillOptions1 = await BRPSelectLists.getWeaponSkillOptions("1");
     context.wpnSkillOptions2 = await BRPSelectLists.getWeaponSkillOptions(this.item.system.skill1);
     context.weaponCatName = game.i18n.localize("BRP." + this.item.system.weaponType);
     context.damName = game.i18n.localize("BRP." + this.item.system.db);
+    context.ammoMode = this.item.system.ammoMode ?? 'none';
+    context.ammoModeName = context.ammoModeOptions[context.ammoMode] ?? context.ammoModeOptions.none;
+    context.ammoModeHintKey = getAmmoModeHintKey(context.ammoMode);
+    context.ammoQuantityHintKey = context.ammoMode === 'count' ? 'BRP.ammoQuantityCountHint' : 'BRP.quantityHint';
+    context.magazineCount = this.item.system.magazineCount ?? 0;
+    context.sortOrder = this.item.system.sortOrder ?? 0;
     context.handedName = game.i18n.localize("BRP." + this.item.system.hands);
     context.specName = game.i18n.localize("BRP." + this.item.system.special);
     context.isAmmo = false;
-    if (this.item.system.weaponType === 'firearm' || this.item.system.weaponType === 'energy' || this.item.system.weaponType === 'artillery' || this.item.system.weaponType === 'missile' || this.item.system.weaponType === 'heavy') {
+    if (context.ammoMode !== 'none' || this.item.system.weaponType === 'firearm' || this.item.system.weaponType === 'energy' || this.item.system.weaponType === 'artillery' || this.item.system.weaponType === 'missile' || this.item.system.weaponType === 'heavy') {
       context.isAmmo = true;
     }
     if (this.item.system.skill1 === 'none') {
@@ -173,4 +182,11 @@ export class BRPWeaponSheet extends BRPItemSheetV2 {
 
   //-----------------------ACTIONS-----------------------------------
 
+}
+
+function getAmmoModeHintKey(mode) {
+  if (mode === 'count') return 'BRP.ammoModeCountHint';
+  if (mode === 'single') return 'BRP.ammoModeSingleHint';
+  if (mode === 'magazine') return 'BRP.ammoModeMagazineHint';
+  return 'BRP.ammoModeNoneHint';
 }
